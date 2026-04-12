@@ -1,0 +1,168 @@
+/* =============================
+   Shared Utility Classes
+   ============================= */
+
+/* Material Symbols Configuration */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
+/* Custom Scrollbar Hiding */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glass Panel Effect */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* =============================
+   Listing Page Specific Styles
+   ============================= */
+
+/* Smooth Transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card Hover Effects */
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(10, 31, 68, 0.08);
+}
+
+/* Image Scale Effect */
+.image-scale-hover img:hover {
+  transform: scale(1.05);
+}
+
+/* Badge Styles */
+.badge-primary {
+  background-color: #00081e;
+  color: #ffffff;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-secondary {
+  background-color: #855300;
+  color: #ffffff;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-tertiary {
+  background-color: #1a0073;
+  color: #ffffff;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Verified Badge */
+.badge-verified {
+  background-color: #1a0073;
+  color: #ffffff;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Location Chip */
+.location-chip {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  color: #ffffff;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Trending Indicator */
+.trending-badge {
+  color: #00081e;
+  font-weight: 900;
+  font-size: 0.6875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Trending Secondary Color */
+.trending-secondary .trending-badge {
+  color: #855300;
+}
+
+/* =============================
+   Glass Card Effect
+   ============================= */
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* =============================
+   Typography Styles
+   ============================= */
+body {
+  font-family: 'Epilogue', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Epilogue', sans-serif;
+}
+
+/* =============================
+   Responsive Design Utilities
+   ============================= */
+@media (max-width: 1024px) {
+  .sticky {
+    position: relative;
+  }
+}

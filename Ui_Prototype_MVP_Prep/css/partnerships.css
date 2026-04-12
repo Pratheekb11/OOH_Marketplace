@@ -1,0 +1,189 @@
+/* Material Symbols Icon Styling */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Glass Morphism Card Effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Asymmetric Grid Layout */
+.asymmetric-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+}
+
+/* Responsive Asymmetric Grid */
+@media (max-width: 768px) {
+  .asymmetric-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Smooth Transitions */
+a {
+  transition-property: color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Header Sticky Positioning */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* Trust Bar Icons */
+.trust-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Card Hover Effects */
+.partnership-card {
+  transition-property: box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 500ms;
+}
+
+.partnership-card:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Image Grayscale Hover Effect */
+.grayscale-hover {
+  transition-property: filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 700ms;
+}
+
+.grayscale-hover:hover {
+  filter: grayscale(0%);
+}
+
+/* Brand Trust Scroll Effect */
+.brand-scroll {
+  display: flex;
+  gap: 6rem;
+  white-space: nowrap;
+  opacity: 0.4;
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 500ms;
+  padding: 3rem;
+}
+
+.brand-scroll:hover {
+  opacity: 0.8;
+}
+
+/* Bento Grid Layout */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1.5rem;
+  min-height: 600px;
+}
+
+/* Primary Bento Card */
+.bento-primary {
+  grid-column: span 8;
+  grid-row: span 2;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Bento Side Cards */
+.bento-side-top {
+  grid-column: span 4;
+  border-bottom-width: 4px;
+}
+
+.bento-side-bottom {
+  grid-column: span 4;
+  border-bottom-width: 4px;
+}
+
+@media (max-width: 768px) {
+  .bento-primary {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+
+  .bento-side-top,
+  .bento-side-bottom {
+    grid-column: span 1;
+  }
+
+  .bento-grid {
+    min-height: auto;
+  }
+}
+
+/* CTA Section Image Overlay */
+.cta-image-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(10, 31, 68, 0.2);
+  mix-blend-mode: multiply;
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(to bottom right, #855300, #fea619);
+  color: white;
+  padding: 0.625rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 700;
+  transition-property: opacity;
+  transition-duration: 200ms;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.btn-secondary {
+  padding: 1rem 2rem;
+  border-radius: 0.375rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: white;
+  border-bottom-width: 2px;
+  border-color: rgba(255, 255, 255, 0.2);
+  transition-property: border-color;
+  transition-duration: 300ms;
+}
+
+.btn-secondary:hover {
+  border-color: white;
+}
+
+/* Footer Styles */
+footer {
+  margin-top: auto;
+}
+
+footer a {
+  opacity: 0.7;
+  transition-property: opacity;
+  transition-duration: 300ms;
+}
+
+footer a:hover {
+  opacity: 1;
+}

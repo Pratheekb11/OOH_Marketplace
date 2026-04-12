@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>List Your Media | OOH Marketplace</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind Config -->
+  <!-- Custom Styles -->
+  <link href="./css/listing_your_adspace.css" rel="stylesheet" />
+
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    .gradient-primary {
+      background: linear-gradient(135deg, #855300 0%, #fea619 100%);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f0f3ff;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #d5e3ff;
+      border-radius: 10px;
+    }
+  </style>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00081e",
+            "on-tertiary-fixed": "#160066",
+            "primary-fixed-dim": "#b4c6f4",
+            "on-primary-container": "#7687b2",
+            "secondary-container": "#fea619",
+            "on-error": "#ffffff",
+            "surface-dim": "#cbdbf9",
+            "on-tertiary-container": "#8274ff",
+            "error-container": "#ffdad6",
+            "surface-variant": "#d5e3ff",
+            "secondary-fixed-dim": "#ffb95f",
+            "on-tertiary": "#ffffff",
+            "outline-variant": "#c5c6cf",
+            "on-secondary-fixed": "#2a1700",
+            "on-tertiary-fixed-variant": "#4029bb",
+            "on-primary": "#ffffff",
+            "surface-tint": "#4c5e86",
+            "on-secondary": "#ffffff",
+            "on-surface-variant": "#44464e",
+            "on-primary-fixed": "#041a3f",
+            "tertiary-fixed-dim": "#c6bfff",
+            "surface-container-highest": "#d5e3ff",
+            "tertiary-fixed": "#e4dfff",
+            "on-secondary-container": "#684000",
+            "surface-container-low": "#f0f3ff",
+            "surface-container-high": "#dee8ff",
+            "inverse-surface": "#223149",
+            background: "#f9f9ff",
+            "primary-fixed": "#d9e2ff",
+            "surface-container": "#e7eeff",
+            "secondary-fixed": "#ffddb8",
+            "inverse-on-surface": "#ecf1ff",
+            error: "#ba1a1a",
+            "surface-container-lowest": "#ffffff",
+            "primary-container": "#0a1f44",
+            surface: "#f9f9ff",
+            tertiary: "#060031",
+            "on-secondary-fixed-variant": "#653e00",
+            "inverse-primary": "#b4c6f4",
+            outline: "#75777f",
+            "on-background": "#0b1c32",
+            "on-surface": "#0b1c32",
+            "on-error-container": "#93000a",
+            "tertiary-container": "#1a0073",
+            secondary: "#855300",
+            "surface-bright": "#f9f9ff",
+            "on-primary-fixed-variant": "#34466d"
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            lg: "0.25rem",
+            xl: "0.5rem",
+            full: "0.75rem"
+          },
+          fontFamily: {
+            headline: ["Syne", "sans-serif"],
+            body: ["Manrope", "sans-serif"],
+            label: ["Inter", "sans-serif"],
+            epilogue: ["Epilogue", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="bg-surface font-body text-on-surface">
+  <!-- TopNavBar (Shared Component) -->
+  <nav class="w-full top-0 sticky bg-slate-50/60 backdrop-blur-xl z-50 flex justify-between items-center px-8 py-4 max-w-full">
+    <div class="flex items-center gap-12">
+      <span class="text-xl font-bold text-[#0A1F44] font-epilogue tracking-tight">OOH Marketplace</span>
+      <div class="hidden md:flex items-center gap-8 font-epilogue text-sm">
+        <a class="text-slate-500 hover:text-[#0A1F44] transition-colors" href="./landing_page.html">Marketplace</a>
+        <a class="text-slate-500 hover:text-[#0A1F44] transition-colors" href="./Campaign_analytics.html">Analytics</a>
+        <a class="text-slate-500 hover:text-[#0A1F44] transition-colors" href="./listing_your_adspace.html">My Inventory</a>
+        <a class="text-slate-500 hover:text-[#0A1F44] transition-colors" href="./support_page.html">Support</a>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-6">
+      <div class="hidden sm:flex items-center gap-4">
+        <button class="material-symbols-outlined text-slate-500 hover:bg-slate-100/50 p-2 rounded-full transition-colors" data-icon="notifications">notifications</button>
+        <button class="material-symbols-outlined text-slate-500 hover:bg-slate-100/50 p-2 rounded-full transition-colors" data-icon="account_circle">account_circle</button>
+      </div>
+      <a href="./listing_your_adspace.html" class="bg-[#0a1f44] text-white px-6 py-2.5 rounded-lg font-bold font-epilogue text-sm hover:opacity-80 transition-opacity">List Media</a>
+    </div>
+  </nav>
+<div class="flex min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-64 sticky top-20 bg-[#f0f3ff] flex flex-col py-8 hidden lg:flex">
+<div class="px-6 mb-10">
+<div class="flex items-center gap-3 mb-4">
+<img alt="Inventory Owner Profile" class="w-10 h-10 rounded-full object-cover" data-alt="Professional portrait of a confident Indian male entrepreneur in his 30s wearing a crisp white shirt, clean lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhVjCfV_CXMw8IW7eG9EnCML3fnnFhYEtbuVLkSklmyAu6kWzr_BkXvXDyCe06nb2s8b3FPlvU3imD_SNuJS-EhgrDl_Sm9c5sWju7rPDhUE_3wBbsHC6QgAaxwTjnDyMMzBmPGT-VDaonR6L669oPHVohO2jQVz1O8gJ1jdhKsYDZtBBkO-KjDIJDrU2QOYH01znR5pkOSyrGNl5maDDmQ8hlOvnR7re09VUP2bPUnoCp-jdtMS_FvZTq0XMYq2gTXxLPMHojknBl"/>
+<div>
+<p class="text-[#0A1F44] font-bold text-sm font-epilogue">Bengaluru Media Hub</p>
+<p class="text-slate-500 text-[10px] uppercase tracking-widest font-semibold">Onboarding Progress: 20%</p>
+</div>
+</div>
+<div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary-container h-full w-1/5"></div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col font-epilogue text-sm">
+<!-- Active Item -->
+<div class="bg-white text-[#0A1F44] font-semibold rounded-l-lg ml-2 py-3 px-6 flex items-center gap-4 transition-all">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+<span>Media Details</span>
+</div>
+<a href="./location.html" class="text-slate-500 py-3 px-6 flex items-center gap-4 hover:text-[#0A1F44] transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span>Location</span>
+</a>
+<a href="./pricing.html" class="text-slate-500 py-3 px-6 flex items-center gap-4 hover:text-[#0A1F44] transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span>Pricing</span>
+</a>
+<a href="./availability.html" class="text-slate-500 py-3 px-6 flex items-center gap-4 hover:text-[#0A1F44] transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span>Availability</span>
+</a>
+<a href="./review.html" class="text-slate-500 py-3 px-6 flex items-center gap-4 hover:text-[#0A1F44] transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span>Review</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full py-3 border-2 border-[#0A1F44] text-[#0A1F44] font-bold rounded-xl hover:bg-[#0A1F44] hover:text-white transition-all active:scale-95 duration-150 font-epilogue text-sm">
+                    Save Draft
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-8 lg:px-24 py-16 bg-surface">
+<!-- Header Section -->
+<div class="max-w-4xl mb-20">
+<h1 class="text-6xl font-headline font-bold text-primary tracking-tight leading-tight mb-6">
+                    Expand Your <span class="text-secondary">Urban Footprint.</span>
+</h1>
+<p class="text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+                    Showcase your Bengaluru media assets to a premium network of brands. Our Architectural Curator system ensures your inventory is presented with precision and authority.
+                </p>
+</div>
+<form class="space-y-24">
+<!-- Section 1: Basic Media Details -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-12">
+<div class="md:col-span-4">
+<h2 class="text-2xl font-headline font-bold text-primary mb-3">Media Core</h2>
+<p class="text-on-surface-variant text-sm">Define the identity and physical category of your asset.</p>
+</div>
+<div class="md:col-span-8 bg-surface-container-low p-10 rounded-xl space-y-8">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-primary/60">Name of Media Asset</label>
+<input class="w-full bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="e.g., MG Road Digital Landmark" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-primary/60">Media Type</label>
+<select class="w-full bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20">
+<option>Hoarding (Traditional)</option>
+<option>DOOH (Digital Out-of-Home)</option>
+<option>Bus Shelter</option>
+<option>Gantry</option>
+<option>Transit Media</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-primary/60">Specific Location in Bengaluru</label>
+<input class="w-full bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="e.g., Near Trinity Metro Station" type="text"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Dimensions & Pricing -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-12">
+<div class="md:col-span-4">
+<h2 class="text-2xl font-headline font-bold text-primary mb-3">Scale &amp; Valuation</h2>
+<p class="text-on-surface-variant text-sm">Specify the physical dimensions and commercial structure.</p>
+</div>
+<div class="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-1">
+<div class="bg-surface-container-low p-8 rounded-l-xl space-y-6">
+<h3 class="font-bold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="square_foot">square_foot</span>
+                                Dimensions (Feet)
+                            </h3>
+<div class="flex items-center gap-4">
+<div class="flex-1">
+<label class="text-[10px] font-bold text-slate-400 uppercase">Width</label>
+<input class="w-full bg-white border-none rounded-lg p-3 text-primary text-center" placeholder="20" type="number"/>
+</div>
+<span class="mt-6 text-slate-300">×</span>
+<div class="flex-1">
+<label class="text-[10px] font-bold text-slate-400 uppercase">Height</label>
+<input class="w-full bg-white border-none rounded-lg p-3 text-primary text-center" placeholder="40" type="number"/>
+</div>
+</div>
+</div>
+<div class="bg-surface-container p-8 rounded-r-xl space-y-6">
+<h3 class="font-bold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="currency_rupee">currency_rupee</span>
+                                Pricing Model (INR)
+                            </h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between bg-white p-3 rounded-lg">
+<span class="text-sm font-semibold">Weekly</span>
+<input class="w-24 border-none text-right focus:ring-0 p-0 text-primary font-bold" placeholder="0.00" type="text"/>
+</div>
+<div class="flex items-center justify-between bg-white p-3 rounded-lg">
+<span class="text-sm font-semibold">Monthly</span>
+<input class="w-24 border-none text-right focus:ring-0 p-0 text-primary font-bold" placeholder="0.00" type="text"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Legal & Verification -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-12">
+<div class="md:col-span-4">
+<h2 class="text-2xl font-headline font-bold text-primary mb-3">Verification Vault</h2>
+<p class="text-on-surface-variant text-sm">Regulatory compliance and ownership authentication.</p>
+</div>
+<div class="md:col-span-8 bg-surface-container-low p-10 rounded-xl space-y-10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="group cursor-pointer">
+<div class="border-2 border-dashed border-slate-300 group-hover:border-secondary-container transition-colors rounded-xl p-8 flex flex-col items-center justify-center text-center bg-white/50">
+<span class="material-symbols-outlined text-4xl text-slate-300 group-hover:text-secondary-container mb-4" data-icon="description">description</span>
+<p class="text-sm font-bold text-primary mb-1">Proof of Ownership</p>
+<p class="text-[10px] text-slate-400">PDF or JPEG, max 5MB</p>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="border-2 border-dashed border-slate-300 group-hover:border-secondary-container transition-colors rounded-xl p-8 flex flex-col items-center justify-center text-center bg-white/50">
+<span class="material-symbols-outlined text-4xl text-slate-300 group-hover:text-secondary-container mb-4" data-icon="verified">verified</span>
+<p class="text-sm font-bold text-primary mb-1">Registered GST Certificate</p>
+<p class="text-[10px] text-slate-400">PDF or JPEG, max 5MB</p>
+</div>
+</div>
+</div>
+<!-- Mandatory Disclaimer -->
+<div class="flex gap-4 p-6 bg-tertiary-container/5 rounded-lg border-l-4 border-secondary-container">
+<span class="material-symbols-outlined text-secondary-container" data-icon="gavel">gavel</span>
+<p class="text-sm text-primary leading-relaxed">
+<span class="font-bold">Disclaimer:</span> All listings are subject to a mandatory 48-hour verification process by the AdSpace team to ensure compliance with <span class="font-bold text-secondary">BBMP/BMRCL regulations</span>. Accurate documentation accelerates this process.
+                            </p>
+</div>
+</div>
+</section>
+<!-- Action Footer -->
+<div class="flex flex-col md:flex-row items-center justify-between gap-8 pt-12 border-t border-slate-200">
+<div class="flex items-center gap-4 text-slate-400">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span class="text-xs font-semibold uppercase tracking-widest">End-to-End Encrypted Uploads</span>
+</div>
+<div class="flex items-center gap-6 w-full md:w-auto">
+<button class="flex-1 md:flex-none px-12 py-5 font-headline font-bold text-on-surface-variant hover:text-primary transition-colors">Discard</button>
+<a href="./location.html" class="flex-1 md:flex-none px-16 py-5 rounded-xl text-white font-headline font-bold gradient-primary shadow-xl shadow-secondary/20 hover:scale-[1.02] transition-transform active:scale-95">
+                            Next: Location
+                        </a>
+</div>
+</div>
+</form>
+</main>
+</div>
+<!-- Background Decoration -->
+<div class="fixed top-0 right-0 -z-10 w-1/2 h-screen opacity-20 pointer-events-none">
+<img alt="Bengaluru Skyline at Dusk" class="w-full h-full object-cover grayscale" data-alt="Abstract architectural lines of a modern skyscraper in Bengaluru against a twilight sky, deep shadows and sharp highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSGvRoo6LSUU_JByx1qC_ey4cMeJJCypI0EMprVhNLE8HsKR2zhLT65isjEroSYIrRTbM4sB3jOLBuP-JsrzbiPCtGVTWTlx0G0dJo-HJ9b5EslMZRi11kKpSh6iXApCInznE5fDyNGcJy754-w0eoM0SewoFX7_sCtcZfAssLEptx5GLe2qWX8kbdO-U7MnOBnEfuu4ZJjDmg9S9U__fRJPpB0gc4kbom_5ojf25Y9GkNZDjPP8CgG2-WiT8mkAX_05saQmnDdrEv"/>
+<div class="absolute inset-0 bg-gradient-to-l from-surface via-surface/80 to-transparent"></div>
+</div>
+</body></html>

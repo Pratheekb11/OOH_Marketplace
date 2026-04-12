@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AdSpace Horizon | Bengaluru's own OOH Marketplace</title>
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Symbols -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Tailwind Configuration -->
+    <script src="./js/tailwind.config.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="./css/landing_page.css" />
+  </head>
+
+  <body class="bg-surface font-body text-primary selection:bg-accent/30">
+    <!-- =============================================== 
+         NAVIGATION SECTION 
+         =============================================== -->
+    <nav class="w-full top-0 sticky z-50 bg-white/95 backdrop-blur-sm border-b border-border-subtle px-8 py-5 flex justify-between items-center">
+      <!-- Logo -->
+      <a href="landing_page.html" class="text-xl font-extrabold tracking-tight uppercase font-headline hover:opacity-80 transition-opacity">
+        AdSpace<span class="text-secondary">Horizon</span>
+      </a>
+
+      <!-- Navigation Links (Desktop) -->
+      <div class="hidden md:flex items-center space-x-10 text-[13px] font-semibold tracking-wider uppercase">
+    <a class="nav-link text-secondary border-b-2 border-secondary pb-1" href="landing_page.html">Home</a>
+    <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="listing_page.html">Inventory</a>
+    <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="Partnerships.html">Partnerships</a>
+    <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="Campaign_analytics.html">Analytics</a>
+    <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="support_page.html">Support</a>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-6">
+        <button onclick="openSearchModal()" class="text-primary hover:opacity-70 transition-opacity">
+          <span class="material-symbols-outlined">search</span>
+        </button>
+        <button class="bg-primary text-white px-5 py-2 text-xs font-bold tracking-widest uppercase hover:bg-secondary transition-colors"  onclick="window.location.href='login_Page.html';">
+          Sign In
+        </button>
+      </div>
+    </nav>
+
+    <!-- =============================================== 
+         HERO SECTION 
+         =============================================== -->
+    <section class="relative min-h-[85vh] flex items-center overflow-hidden border-b border-border-subtle">
+      <div class="max-w-7xl mx-auto w-full px-8 py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-0 items-stretch">
+          <!-- Left Content: Headline & CTA -->
+          <div class="lg:col-span-7 flex flex-col justify-center pr-12">
+            <!-- Accent Label -->
+            <div class="mb-8 flex items-center gap-4">
+              <span class="w-12 h-[1px] bg-secondary"></span>
+              <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-secondary">Bengaluru OOH Direct</span>
+            </div>
+
+            <!-- Main Headline -->
+            <h1 class="text-5xl md:text-7xl font-headline font-bold text-primary leading-[1.1] mb-8">
+              Curated Physical <br />
+              <span class="italic font-normal">Media Placements.</span>
+            </h1>
+
+            <!-- Description -->
+            <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed mb-12 font-light">
+              A marketplace connecting premium brands with verified high-impact outdoor assets. Skip the worries and secure your adspot now.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-4">
+              <button class="bg-primary text-white px-10 py-4 font-bold text-xs tracking-[0.15em] uppercase hover:bg-secondary transition-all" onclick="window.location.href='listing_page.html';">
+                View Inventory
+              </button>
+              <button class="border border-primary text-primary px-10 py-4 font-bold text-xs tracking-[0.15em] uppercase hover:bg-primary hover:text-white transition-all">
+                Request Proposal
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Content: Hero Image -->
+          <div class="lg:col-span-5 relative mt-16 lg:mt-0">
+            <!-- Image Container -->
+            <div class="w-full h-full relative z-10 border border-primary/10">
+              <img alt="Premium Billboard" class="w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAs_-areY23J0vnAFcooN7y4glFKvO86bfq9dw3BhXr9vTVezgjS4EtuhF_YGzO92QC36e21wVAgoZOqhDNA_vV7YPun9V3WouJx5PDEaIX8FkgP8vB7yg574ZPmclya8STpuZ3q6tfzF6nIr0nmspXYC4ymyc5gMLVun0jYCuIeGtJ4k9Oc0r7msAKcYClygNZ1jL5uSjg_9nvKtgJDKv-yaCBm4BYfT-FkRl6qJa6HVdlfPLiqvNO5bWduwuLxp7ZB15SwqSiETz5" />
+            </div>
+
+            <!-- Stats Card -->
+            <div class="absolute -bottom-6 -right-6 bg-white p-8 border border-border-subtle shadow-sm z-20 min-w-[240px]">
+              <div class="text-4xl font-headline font-bold text-primary mb-1">250K+</div>
+              <div class="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Daily Reach / MG Road</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Background Grid Pattern -->
+      <div class="absolute inset-0 architectural-grid pointer-events-none -z-10 opacity-30"></div>
+    </section>
+    <!-- =============================================== 
+         CORE VALUE PILLARS SECTION 
+         =============================================== -->
+    <section class="py-32 px-8 bg-white">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+          <!-- Pillar 1: Financial Transparency -->
+          <div class="space-y-6">
+            <div class="text-secondary">
+              <span class="material-symbols-outlined text-4xl">account_balance</span>
+            </div>
+            <h3 class="text-xl font-headline font-bold tracking-tight">Financial Transparency</h3>
+            <p class="text-on-surface-variant text-sm leading-relaxed font-light">Direct-to-owner pricing structures that eliminate any overhead. Real-time rate cards and transparent settlements with agreements.</p>
+          </div>
+
+          <!-- Pillar 2: Verified Inventory -->
+          <div class="space-y-6">
+            <div class="text-secondary">
+              <span class="material-symbols-outlined text-4xl">architecture</span>
+            </div>
+            <h3 class="text-xl font-headline font-bold tracking-tight">Verified Inventory</h3>
+            <p class="text-on-surface-variant text-sm leading-relaxed font-light">Every location is physically audited for structural integrity, visibility angles, and lighting performance metrics.</p>
+          </div>
+
+          <!-- Pillar 3: Managed Fulfillment -->
+          <div class="space-y-6">
+            <div class="text-secondary">
+              <span class="material-symbols-outlined text-4xl">precision_manufacturing</span>
+            </div>
+            <h3 class="text-xl font-headline font-bold tracking-tight">Managed Fulfillment</h3>
+            <p class="text-on-surface-variant text-sm leading-relaxed font-light">End-to-end logistics including large-format technical printing, certified rigging, and bi-weekly photo audits.</p>
+          </div>
+        </div>
+      </div>
+    <!-- =============================================== 
+         MARKETPLACE SELECTS SECTION 
+         =============================================== -->
+    <section class="py-32 px-8 bg-surface">
+      <div class="max-w-7xl mx-auto">
+        <!-- Section Header -->
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+          <div>
+            <h2 class="text-4xl font-headline font-bold mb-4">Marketplace Selects</h2>
+            <div class="w-20 h-1 bg-primary"></div>
+          </div>
+          <a class="text-xs font-bold tracking-widest uppercase flex items-center gap-2 hover:text-secondary transition-colors" href="listing_page.html">
+            All Placements
+            <span class="material-symbols-outlined text-sm">north_east</span>
+          </a>
+        </div>
+
+        <!-- Inventory Grid: Featured + Side Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <!-- Feature Card (Large) -->
+          <a href="listing_view.html" class="md:col-span-7 group cursor-pointer border border-border-subtle bg-white overflow-hidden block">
+            <div class="aspect-[16/9] overflow-hidden">
+              <img alt="Digital" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB40XbvfxSMStUOV_Qix5385SWwt8RLS9BtTOdAh_gvcGbAkPvz2-K4rFJ3aywkULUUF_t4GaszLbkow1GOgTjDWv-TlLoiQoRFNLeMRMZ9Fe7yZGezq7KjUSrJ_R7r3Y1n-k8azmdUrpMX0xd4am8eCs8FM0n1rlErBPG2w8_8qpBsVf70h-kgzhj5AWbEO19ACHiot4_IxvTZ0nSguEcaB-USNueK6U4c95mKLp6djlhipzCdpkq4HP5rZV-XFzu7n46jW-cE9pl9" />
+            </div>
+            <div class="p-8">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="text-2xl font-headline font-bold mb-1">MG Road Digital Cluster</h3>
+                  <p class="text-on-surface-variant text-sm font-light">Financial District • Digital Network</p>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold">₹85,000</div>
+                  <div class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Per Week</div>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <!-- Side Cards Container -->
+          <div class="md:col-span-5 flex flex-col gap-8">
+            <!-- Side Card 1: Retail Kiosks -->
+            <a href="listing_view.html" class="group cursor-pointer border border-border-subtle bg-white overflow-hidden flex flex-col h-full block">
+              <div class="aspect-video overflow-hidden">
+                <img alt="Mall" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjKb_4RCts4befMCixqWMUGYdwwNXx3IISx9Ah9LEt5RaXcUTIR89kgQWe-K6X37FxggTypHKdxZaaSP28NDHglSuvJz4q5515if7QsSo4CQBjl8Ebmg_xrOJwrdUaiOkim_joPYk3OXgO3511SI6pPNH3iK4YlFmMjXpmwktyj6CS0sg0IMeCAPcdus88Si8t4K8s1Hn4ET57ovUPx2GOpd5klNx3gndVK_ZmV_-6KMindlWLAPCBt3s4Zhoxy_VQHHMr2zlfMRod" />
+              </div>
+              <div class="p-6">
+                <h3 class="text-lg font-headline font-bold mb-1">Retail Kiosks: Mall of Asia</h3>
+                <p class="text-on-surface-variant text-xs font-light">Lifestyle • 12 Units</p>
+              </div>
+            </a>
+
+            <!-- Side Card 2: Transit Network -->
+            <a href="listing_view.html" class="group cursor-pointer border border-border-subtle bg-white overflow-hidden flex flex-col h-full block">
+              <div class="aspect-video overflow-hidden">
+                <img alt="Metro" class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBK4-T2AXsG6M0D2m2KOphgRQivfzz7j9jUs9R374rMZPinMB5VSWJf_iQ31Vt_XA-vtNafV0mIqHRVZ6DiVCdk897FbWQqV0MB8vImWI55DTXpMGwGxinFwHr1wJpgD4oIJ11CtF8mznsPv8xj_2zmxunMkxxN7HbNQj7XK95YNS10FKcv4fF4Mex2SWBZNeP6866Yrq-glJ-m0587N-2mZCwwtXQddh18QPRGNbT2obUFRbcUd9ugkGMCFGpGvrdhN0cCrFp-tAbS" />
+              </div>
+              <div class="p-6">
+                <h3 class="text-lg font-headline font-bold mb-1">Transit Network: Metro Panels</h3>
+                <p class="text-on-surface-variant text-xs font-light">Commuter • 50 Stations</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================================== 
+         INSTITUTIONAL SUPPORT SECTION 
+         =============================================== -->
+    <section class="py-32 px-8 bg-primary text-white overflow-hidden relative">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+          <!-- Left Content: Features List -->
+          <div>
+            <h2 class="text-4xl font-headline font-bold mb-10">Institutional Support</h2>
+            <div class="space-y-12">
+              <!-- Feature 1: High-Precision Output -->
+              <div class="flex items-start gap-8">
+                <div class="w-12 h-12 border border-white/20 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined">print</span>
+                </div>
+                <div>
+                  <h4 class="text-lg font-bold mb-2">High-Precision Output</h4>
+                  <p class="text-white/60 text-sm leading-relaxed font-light">Industrial grade vinyl and backlit textiles with UV-stabilized pigments for consistent brand representation.</p>
+                </div>
+              </div>
+
+              <!-- Feature 2: Structural Engineering -->
+              <div class="flex items-start gap-8">
+                <div class="w-12 h-12 border border-white/20 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined">construction</span>
+                </div>
+                <div>
+                  <h4 class="text-lg font-bold mb-2">Structural Engineering</h4>
+                  <p class="text-white/60 text-sm leading-relaxed font-light">Deployment managed by certified rigging teams with specialized expertise in high-elevation urban installs.</p>
+                </div>
+              </div>
+
+              <!-- Feature 3: Proof of Performance -->
+              <div class="flex items-start gap-8">
+                <div class="w-12 h-12 border border-white/20 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined">verified</span>
+                </div>
+                <div>
+                  <h4 class="text-lg font-bold mb-2">Proof of Performance</h4>
+                  <p class="text-white/60 text-sm leading-relaxed font-light">Real-time digital confirmation and daily high-resolution photo reports for all active placements.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Content: Animated Shield Icon -->
+          <div class="hidden lg:block">
+            <div class="relative w-full aspect-square flex items-center justify-center">
+              <div class="absolute inset-0 border border-white/10 rounded-full animate-[spin_60s_linear_infinite]"></div>
+              <div class="absolute inset-20 border border-white/10 rounded-full animate-[spin_30s_linear_infinite_reverse]"></div>
+              <div class="p-20 border border-white/20">
+                <span class="material-symbols-outlined text-8xl text-secondary">shield</span>
+              </div>
+            </div>
+          </div>
+</div>
+</div>
+</section>
+
+    <!-- =============================================== 
+         ASSET LIQUIDITY SECTION 
+         =============================================== -->
+    <section class="py-32 px-8 bg-white border-b border-border-subtle">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
+          <!-- Left Column: Asset Monetization Models -->
+          <div>
+            <h2 class="text-4xl font-headline font-bold mb-8">Asset Liquidity</h2>
+            <p class="text-on-surface-variant font-light mb-12">Monetize premium urban surfaces through structured leasing or direct marketplace participation.</p>
+            <div class="space-y-6">
+              <!-- Model 1: Fixed Lease -->
+              <div class="p-10 border border-border-subtle hover:border-primary transition-colors cursor-pointer group">
+                <h4 class="text-xl font-bold mb-4 flex items-center gap-3">
+                  <span class="material-symbols-outlined text-secondary">contract</span>
+                  Fixed Lease Model
+                </h4>
+                <p class="text-on-surface-variant text-sm font-light leading-relaxed mb-6">Long-term institutional leasing with guaranteed monthly disbursements, regardless of occupancy. Professional asset management included.</p>
+                <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-primary group-hover:translate-x-2 transition-transform inline-block">Learn More →</span>
+              </div>
+
+              <!-- Model 2: Marketplace Participation -->
+              <div class="p-10 border border-border-subtle hover:border-primary transition-colors cursor-pointer group">
+                <h4 class="text-xl font-bold mb-4 flex items-center gap-3">
+                  <span class="material-symbols-outlined text-secondary">analytics</span>
+                  Marketplace Participation
+                </h4>
+                <p class="text-on-surface-variant text-sm font-light leading-relaxed mb-6">List assets on our institutional marketplace. Maintain control over pricing while leveraging our verified buyer network.</p>
+                <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-primary group-hover:translate-x-2 transition-transform inline-block">List Asset →</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Ancillary Services -->
+          <div class="bg-surface p-12 flex flex-col justify-center border border-border-subtle">
+            <h3 class="text-2xl font-headline font-bold mb-6">Ancillary Services</h3>
+            <p class="text-on-surface-variant text-sm font-light mb-10">Leverage our technical infrastructure for independent fulfillments.</p>
+            <ul class="space-y-8 mb-12">
+              <li class="flex gap-4 items-start">
+                <span class="material-symbols-outlined text-secondary">task_alt</span>
+                <span class="text-sm font-semibold tracking-tight">Technical Print Management (Large Format)</span>
+              </li>
+              <li class="flex gap-4 items-start">
+                <span class="material-symbols-outlined text-secondary">task_alt</span>
+                <span class="text-sm font-semibold tracking-tight">Structural Rigging &amp; Installation Teams</span>
+              </li>
+              <li class="flex gap-4 items-start">
+                <span class="material-symbols-outlined text-secondary">task_alt</span>
+                <span class="text-sm font-semibold tracking-tight">Post-Install Compliance Documentation</span>
+              </li>
+            </ul>
+            <button class="w-full bg-white border border-primary text-primary py-5 font-bold text-xs tracking-[0.2em] uppercase hover:bg-primary hover:text-white transition-all">
+              Service Quotation
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================================== 
+         LIST YOUR SPACE SECTION 
+         =============================================== -->
+    <section class="py-32 px-8 bg-gradient-to-r from-[#0a1f44] to-[#1a3a5e] text-white relative overflow-hidden">
+      <div class="max-w-5xl mx-auto">
+        <!-- Section Heading -->
+        <div class="mb-16 max-w-2xl">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="w-12 h-[1px] bg-[#fea619]"></span>
+            <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-[#fea619]">For Media Owners</span>
+          </div>
+          <h2 class="text-5xl md:text-6xl font-headline font-bold mb-6">Monetize Your Media Assets.</h2>
+          <p class="text-lg text-[#d5e3ff] leading-relaxed">
+            Connect directly with premium brands and advertising agencies. List your outdoor media inventory on AdSpace Horizon and unlock new revenue streams with transparent pricing and verified bookings.
+          </p>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <!-- Feature 1 -->
+          <div class="flex gap-4">
+            <div class="shrink-0">
+              <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-[#fea619]/20 border border-[#fea619]/50">
+                <span class="material-symbols-outlined text-[#fea619] text-xl">rate_review</span>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-bold text-white mb-2">Zero Verification Hassle</h3>
+              <p class="text-sm text-[#d5e3ff]">BBMP & BMRCL compliant. Our team handles the bureaucracy so you don't have to.</p>
+            </div>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="flex gap-4">
+            <div class="shrink-0">
+              <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-[#fea619]/20 border border-[#fea619]/50">
+                <span class="material-symbols-outlined text-[#fea619] text-xl">trending_up</span>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-bold text-white mb-2">Real-Time Bookings</h3>
+              <p class="text-sm text-[#d5e3ff]">Get instant notifications when brands book your inventory. Manage all bookings from one dashboard.
+              </p>
+            </div>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="flex gap-4">
+            <div class="shrink-0">
+              <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-[#fea619]/20 border border-[#fea619]/50">
+                <span class="material-symbols-outlined text-[#fea619] text-xl">security</span>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-bold text-white mb-2">Transparent Payouts</h3>
+              <p class="text-sm text-[#d5e3ff]">No hidden charges. Secure payments processed automatically upon campaign completion.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA Button -->
+        <div class="flex flex-wrap gap-4">
+          <a href="./listing_your_adspace.html" class="bg-[#fea619] text-[#0a1f44] px-12 py-5 font-bold text-xs tracking-[0.15em] uppercase hover:bg-white transition-all inline-block">
+            Start Listing Your Space
+          </a>
+          <button class="border-2 border-[#fea619] text-[#fea619] px-12 py-5 font-bold text-xs tracking-[0.15em] uppercase hover:bg-[#fea619] hover:text-[#0a1f44] transition-all">
+            Schedule Demo Call
+          </button>
+        </div>
+      </div>
+
+      <!-- Background Decoration -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-[#fea619]/5 rounded-full blur-3xl -z-10"></div>
+      <div class="absolute bottom-0 left-1/4 w-80 h-80 bg-[#fea619]/5 rounded-full blur-3xl -z-10"></div>
+    </section>
+
+    <!-- =============================================== 
+         FINAL CTA SECTION 
+         =============================================== -->
+    <section class="py-40 px-8 text-center bg-white relative overflow-hidden">
+      <div class="max-w-4xl mx-auto relative z-10">
+        <h2 class="text-5xl md:text-6xl font-headline font-bold mb-10">Institutional Excellence in Physical Media.</h2>
+        <div class="flex flex-col sm:flex-row justify-center gap-6">
+          <button class="bg-primary text-white px-12 py-5 font-bold text-xs tracking-[0.2em] uppercase hover:bg-secondary transition-all" onclick="window.location.href='listing_page.html';">Explore Placements</button>
+          <button class="border border-primary text-primary px-12 py-5 font-bold text-xs tracking-[0.2em] uppercase hover:bg-primary hover:text-white transition-all">Speak to an Advisor</button>
+        </div>
+      </div>
+      <!-- Background Decoration -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-primary/5 rounded-full pointer-events-none"></div>
+    </section>
+  </main>
+
+  <!-- =============================================== 
+       FOOTER SECTION 
+       =============================================== -->
+  <footer class="bg-white border-t border-border-subtle text-primary">
+    <div class="max-w-7xl mx-auto px-8 py-20">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-16">
+        <!-- Column 1: Brand Info -->
+        <div class="col-span-1 md:col-span-1">
+          <div class="font-extrabold text-lg uppercase font-headline mb-6">AdSpace<span class="text-secondary">Horizon</span></div>
+          <p class="text-on-surface-variant text-xs font-light leading-relaxed opacity-70 mb-8">Institutional physical advertising marketplace. Bengaluru HQ.</p>
+          <p class="text-[10px] font-bold tracking-widest uppercase opacity-40">© 2024 AdSpace Horizon</p>
+        </div>
+
+        <!-- Column 2: Platform Links -->
+        <div>
+          <h5 class="text-[10px] font-bold tracking-[0.2em] uppercase text-secondary mb-8">Platform</h5>
+          <ul class="space-y-4 text-xs font-medium">
+            <li><a class="hover:text-secondary transition-colors" href="#">Inventory Map</a></li>
+            <li><a class="hover:text-secondary transition-colors" href="#">Asset Owners</a></li>
+            <li><a class="hover:text-secondary transition-colors" href="#">VAS Fulfillment</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Legal Links -->
+        <div>
+          <h5 class="text-[10px] font-bold tracking-[0.2em] uppercase text-secondary mb-8">Legal</h5>
+          <ul class="space-y-4 text-xs font-medium">
+            <li><a class="hover:text-secondary transition-colors" href="#">Terms of Service</a></li>
+            <li><a class="hover:text-secondary transition-colors" href="#">Privacy Protocol</a></li>
+            <li><a class="hover:text-secondary transition-colors" href="#">Compliance</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Newsletter Signup -->
+        <div>
+          <h5 class="text-[10px] font-bold tracking-[0.2em] uppercase text-secondary mb-8">Insights</h5>
+          <p class="text-xs font-light text-on-surface-variant mb-6">Professional OOH market analysis.</p>
+          <div class="flex">
+            <input class="bg-surface border border-border-subtle px-4 py-3 w-full text-xs focus:ring-0 focus:border-primary" placeholder="Professional Email" type="email" />
+            <button class="bg-primary text-white px-4 py-3 hover:bg-secondary transition-colors">
+              <span class="material-symbols-outlined text-sm">east</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Search Modal -->
+  <div id="searchModal" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-start justify-center pt-20">
+    <div class="bg-white rounded-lg w-full max-w-2xl mx-4 shadow-2xl">
+      <div class="p-6 border-b border-border-subtle flex items-center justify-between">
+        <h2 class="text-xl font-headline font-bold">Search Page</h2>
+        <button onclick="closeSearchModal()" class="text-on-surface-variant hover:text-primary transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="p-6">
+        <input 
+          id="searchInput" 
+          type="text" 
+          placeholder="Search for inventory, placements, locations, and more..." 
+          class="w-full px-4 py-3 border border-border-subtle rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none text-sm"
+          onkeyup="performSearch()"
+        />
+      </div>
+      <div id="searchResults" class="px-6 pb-6 max-h-96 overflow-y-auto">
+        <p class="text-on-surface-variant text-sm">Start typing to search...</p>
+      </div>
+      <div class="px-6 pb-6 border-t border-border-subtle flex gap-4">
+        <button onclick="closeSearchModal()" class="flex-1 border border-primary text-primary px-4 py-2 rounded-lg font-bold text-sm hover:bg-primary hover:text-white transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openSearchModal() {
+      document.getElementById('searchModal').classList.remove('hidden');
+      document.getElementById('searchInput').focus();
+    }
+
+    function closeSearchModal() {
+      document.getElementById('searchModal').classList.add('hidden');
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchResults').innerHTML = '<p class="text-on-surface-variant text-sm">Start typing to search...</p>';
+    }
+
+    function performSearch() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const resultsContainer = document.getElementById('searchResults');
+
+      if (!query) {
+        resultsContainer.innerHTML = '<p class="text-on-surface-variant text-sm">Start typing to search...</p>';
+        return;
+      }
+
+      // Get all text content from the page
+      const pageText = document.body.innerText;
+      const lines = pageText.split('\n');
+      
+      // Find matching lines
+      const matches = lines.filter(line => line.toLowerCase().includes(query) && line.trim());
+
+      if (matches.length === 0) {
+        resultsContainer.innerHTML = '<p class="text-on-surface-variant text-sm">No results found.</p>';
+        return;
+      }
+
+      // Display results
+      const resultsHTML = matches.slice(0, 10).map(match => {
+        const highlighted = match.replace(
+          new RegExp(`(${query})`, 'gi'),
+          '<span class="bg-secondary text-on-surface font-bold">$1</span>'
+        );
+        return `<div class="py-3 px-3 bg-surface rounded-lg mb-2 text-sm border border-surface-container"><p>${highlighted}</p></div>`;
+      }).join('');
+
+      resultsContainer.innerHTML = `<p class="text-on-surface-variant text-xs mb-4">Found ${matches.length} results</p>${resultsHTML}`;
+    }
+
+    // Close modal when pressing Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSearchModal();
+    });
+  </script>
+</body></html>

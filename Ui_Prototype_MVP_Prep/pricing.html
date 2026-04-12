@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Set Pricing | OOH Marketplace</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <!-- Custom Styles -->
+  <link href="./css/listing_your_adspace.css" rel="stylesheet" />
+
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    .gradient-primary {
+      background: linear-gradient(135deg, #855300 0%, #fea619 100%);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f0f3ff;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #d5e3ff;
+      border-radius: 10px;
+    }
+  </style>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00081e",
+            "on-tertiary-fixed": "#160066",
+            "primary-fixed-dim": "#b4c6f4",
+            "on-primary-container": "#7687b2",
+            "secondary-container": "#fea619",
+            "on-error": "#ffffff",
+            "surface-dim": "#cbdbf9",
+            "on-tertiary-container": "#8274ff",
+            "error-container": "#ffdad6",
+            "surface-variant": "#d5e3ff",
+            "secondary-fixed-dim": "#ffb95f",
+            "on-tertiary": "#ffffff",
+            "outline-variant": "#c5c6cf",
+            "on-secondary-fixed": "#2a1700",
+            "on-tertiary-fixed-variant": "#4029bb",
+            "on-primary": "#ffffff",
+            "surface-tint": "#4c5e86",
+            "on-secondary": "#ffffff",
+            "on-surface-variant": "#44464e",
+            "on-primary-fixed": "#041a3f",
+            "tertiary-fixed-dim": "#c6bfff",
+            "surface-container-highest": "#d5e3ff",
+            "tertiary-fixed": "#e4dfff",
+            "on-secondary-container": "#684000",
+            "surface-container-low": "#f0f3ff",
+            "surface-container-high": "#dee8ff",
+            "inverse-surface": "#223149",
+            background: "#f9f9ff",
+            "primary-fixed": "#d9e2ff",
+            "surface-container": "#e7eeff",
+            "secondary-fixed": "#ffddb8",
+            "inverse-on-surface": "#ecf1ff",
+            error: "#ba1a1a",
+            "surface-container-lowest": "#ffffff",
+            "primary-container": "#0a1f44",
+            surface: "#f9f9ff",
+            tertiary: "#060031",
+            "on-secondary-fixed-variant": "#653e00",
+            "inverse-primary": "#b4c6f4",
+            outline: "#75777f",
+            "on-background": "#0b1c32",
+            "on-surface": "#0b1c32",
+            "on-error-container": "#93000a",
+            "tertiary-container": "#1a0073",
+            secondary: "#855300",
+            "surface-bright": "#f9f9ff",
+            "on-primary-fixed-variant": "#34466d"
+          },
+          borderRadius: {
+            DEFAULT: "0.125rem",
+            lg: "0.25rem",
+            xl: "0.5rem",
+            full: "0.75rem"
+          },
+          fontFamily: {
+            headline: ["Syne", "sans-serif"],
+            body: ["Manrope", "sans-serif"],
+            label: ["Inter", "sans-serif"],
+            epilogue: ["Epilogue", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="bg-surface font-body text-on-surface">
+  <!-- TopNavBar -->
+  <nav class="w-full top-0 sticky bg-slate-50/60 backdrop-blur-xl z-50 flex justify-between items-center px-8 py-4 max-w-full">
+    <div class="flex items-center gap-12">
+      <span class="text-xl font-bold text-[#0A1F44] font-epilogue tracking-tight">OOH Marketplace</span>
+      <div class="hidden md:flex items-center gap-8 font-epilogue text-sm">
+        <a class="text-slate-500 hover:text-[#0A1F44] transition-colors" href="./landing_page.html">Marketplace</a>
+        <a class="text-slate-500 hover:text-[#0A1F44] transition-colors" href="./Campaign_analytics.html">Analytics</a>
+        <a class="text-slate-500 hover:text-[#0A1F44] transition-colors" href="./listing_your_adspace.html">My Inventory</a>
+        <a class="text-slate-500 hover:text-[#0A1F44] transition-colors" href="./support_page.html">Support</a>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-6">
+      <div class="hidden sm:flex items-center gap-4">
+        <button class="material-symbols-outlined text-slate-500 hover:bg-slate-100/50 p-2 rounded-full transition-colors" data-icon="notifications">notifications</button>
+        <button class="material-symbols-outlined text-slate-500 hover:bg-slate-100/50 p-2 rounded-full transition-colors" data-icon="account_circle">account_circle</button>
+      </div>
+      <a href="./listing_your_adspace.html" class="bg-[#0a1f44] text-white px-6 py-2.5 rounded-lg font-bold font-epilogue text-sm hover:opacity-80 transition-opacity">List Media</a>
+    </div>
+  </nav>
+
+  <div class="flex min-h-screen">
+    <!-- SideNavBar -->
+    <aside class="h-screen w-64 sticky top-20 bg-[#f0f3ff] flex flex-col py-8 hidden lg:flex">
+      <div class="px-6 mb-10">
+        <div class="flex items-center gap-3 mb-4">
+          <img alt="Inventory Owner Profile" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhVjCfV_CXMw8IW7eG9EnCML3fnnFhYEtbuVLkSklmyAu6kWzr_BkXvXDyCe06nb2s8b3FPlvU3imD_SNuJS-EhgrDl_Sm9c5sWju7rPDhUE_3wBbsHC6QgAaxwTjnDyMMzBmPGT-VDaonR6L669oPHVohO2jQVz1O8gJ1jdhKsYDZtBBkO-KjDIJDrU2QOYH01znR5pkOSyrGNl5maDDmQ8hlOvnR7re09VUP2bPUnoCp-jdtMS_FvZTq0XMYq2gTXxLPMHojknBl"/>
+          <div>
+            <p class="text-[#0A1F44] font-bold text-sm font-epilogue">Bengaluru Media Hub</p>
+            <p class="text-slate-500 text-[10px] uppercase tracking-widest font-semibold">Onboarding Progress: 60%</p>
+          </div>
+        </div>
+        <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+          <div class="bg-secondary-container h-full w-3/5"></div>
+        </div>
+      </div>
+
+      <nav class="flex-1 flex flex-col font-epilogue text-sm">
+        <a href="./listing_your_adspace.html" class="text-slate-500 py-3 px-6 flex items-center gap-4 hover:text-[#0A1F44] transition-all cursor-pointer">
+          <span class="material-symbols-outlined" data-icon="info">info</span>
+          <span>Media Details</span>
+        </a>
+
+        <a href="./location.html" class="text-slate-500 py-3 px-6 flex items-center gap-4 hover:text-[#0A1F44] transition-all cursor-pointer">
+          <span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+          <span>Location</span>
+        </a>
+
+        <div class="bg-white text-[#0A1F44] font-semibold rounded-l-lg ml-2 py-3 px-6 flex items-center gap-4 transition-all">
+          <span class="material-symbols-outlined" data-icon="payments">payments</span>
+          <span>Pricing</span>
+        </div>
+
+        <a href="./availability.html" class="text-slate-500 py-3 px-6 flex items-center gap-4 hover:text-[#0A1F44] transition-all cursor-pointer">
+          <span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+          <span>Availability</span>
+        </a>
+
+        <a href="./review.html" class="text-slate-500 py-3 px-6 flex items-center gap-4 hover:text-[#0A1F44] transition-all cursor-pointer">
+          <span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+          <span>Review</span>
+        </a>
+      </nav>
+
+      <div class="px-6 mt-auto">
+        <button class="w-full py-3 border-2 border-[#0A1F44] text-[#0A1F44] font-bold rounded-xl hover:bg-[#0A1F44] hover:text-white transition-all active:scale-95 duration-150 font-epilogue text-sm">
+          Save Draft
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="flex-1 px-8 lg:px-24 py-16 bg-surface">
+      <!-- Header Section -->
+      <div class="max-w-4xl mb-20">
+        <h1 class="text-6xl font-headline font-bold text-primary tracking-tight leading-tight mb-6">
+          Define Your <span class="text-secondary">Economic Model.</span>
+        </h1>
+        <p class="text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+          Set competitive rates for your media inventory. Our AI-powered pricing tool suggests optimal pricing based on location, traffic, and market demand.
+        </p>
+      </div>
+
+      <form class="space-y-24">
+        <!-- Section 1: Pricing Tiers -->
+        <section class="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <div class="md:col-span-4">
+            <h2 class="text-2xl font-headline font-bold text-primary mb-3">Rate Card</h2>
+            <p class="text-on-surface-variant text-sm">Set prices for different booking durations.</p>
+          </div>
+
+          <div class="md:col-span-8 bg-surface-container-low p-10 rounded-xl space-y-8">
+            <!-- Weekly Rate -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-widest text-primary/60">Weekly Rate (INR)</label>
+              <div class="flex items-center gap-2">
+                <span class="text-primary font-bold">₹</span>
+                <input class="flex-1 bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="10000" type="number"/>
+              </div>
+              <p class="text-[10px] text-slate-400">Recommended price for 7-day bookings</p>
+            </div>
+
+            <!-- Monthly Rate -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-widest text-primary/60">Monthly Rate (INR)</label>
+              <div class="flex items-center gap-2">
+                <span class="text-primary font-bold">₹</span>
+                <input class="flex-1 bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="35000" type="number"/>
+              </div>
+              <p class="text-[10px] text-slate-400">Recommended price for 30-day bookings</p>
+            </div>
+
+            <!-- Quarterly Rate -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-widest text-primary/60">Quarterly Rate (INR)</label>
+              <div class="flex items-center gap-2">
+                <span class="text-primary font-bold">₹</span>
+                <input class="flex-1 bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="95000" type="number"/>
+              </div>
+              <p class="text-[10px] text-slate-400">Recommended price for 90-day bookings</p>
+            </div>
+
+            <!-- Annual Rate -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-widest text-primary/60">Annual Rate (INR)</label>
+              <div class="flex items-center gap-2">
+                <span class="text-primary font-bold">₹</span>
+                <input class="flex-1 bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="350000" type="number"/>
+              </div>
+              <p class="text-[10px] text-slate-400">Best rate for 365-day bookings</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 2: Additional Charges -->
+        <section class="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <div class="md:col-span-4">
+            <h2 class="text-2xl font-headline font-bold text-primary mb-3">Modifiers</h2>
+            <p class="text-on-surface-variant text-sm">Optional charges for premium placement.</p>
+          </div>
+
+          <div class="md:col-span-8 bg-surface-container-low p-10 rounded-xl space-y-8">
+            <!-- Premium Placement Charge -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-widest text-primary/60">Peak Hour Surcharge (₹ per day)</label>
+              <div class="flex items-center gap-2">
+                <span class="text-primary font-bold">₹</span>
+                <input class="flex-1 bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="5000" type="number"/>
+              </div>
+              <p class="text-[10px] text-slate-400">Additional cost for exclusive 6pm-10pm slots</p>
+            </div>
+
+            <!-- Installation Fee -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-widest text-primary/60">Setup / Installation Fee (INR)</label>
+              <div class="flex items-center gap-2">
+                <span class="text-primary font-bold">₹</span>
+                <input class="flex-1 bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="2000" type="number"/>
+              </div>
+              <p class="text-[10px] text-slate-400">One-time setup charge per campaign</p>
+            </div>
+
+            <!-- Maintenance Fee -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-widest text-primary/60">Maintenance / Monthly Support (INR)</label>
+              <div class="flex items-center gap-2">
+                <span class="text-primary font-bold">₹</span>
+                <input class="flex-1 bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="1000" type="number"/>
+              </div>
+              <p class="text-[10px] text-slate-400">Monthly maintenance for upkeep of asset</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Pricing Strategy -->
+        <section class="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <div class="md:col-span-4">
+            <h2 class="text-2xl font-headline font-bold text-primary mb-3">Strategy</h2>
+            <p class="text-on-surface-variant text-sm">Choose your pricing approach.</p>
+          </div>
+
+          <div class="md:col-span-8 bg-surface-container-low p-10 rounded-xl space-y-6">
+            <!-- Pricing Strategy -->
+            <div class="space-y-4">
+              <label class="text-xs font-bold uppercase tracking-widest text-primary/60 block">Pricing Model</label>
+              <div class="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-primary cursor-pointer">
+                <input type="radio" name="pricing_model" id="fixed" checked value="fixed" class="w-4 h-4"/>
+                <label for="fixed" class="flex-1 cursor-pointer">
+                  <p class="text-sm font-semibold text-primary">Fixed Rates</p>
+                  <p class="text-[10px] text-slate-400">Same price regardless of season</p>
+                </label>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-slate-200 cursor-pointer hover:border-slate-300">
+                <input type="radio" name="pricing_model" id="dynamic" value="dynamic" class="w-4 h-4"/>
+                <label for="dynamic" class="flex-1 cursor-pointer">
+                  <p class="text-sm font-semibold text-primary">Dynamic Pricing</p>
+                  <p class="text-[10px] text-slate-400">Adjust prices based on demand</p>
+                </label>
+              </div>
+            </div>
+
+            <!-- Discount Policy -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-widest text-primary/60">Bulk Booking Discount (%)</label>
+              <select class="w-full bg-surface-container-highest border-none rounded-lg p-4 text-primary focus:ring-2 focus:ring-primary/20">
+                <option>No discount</option>
+                <option>5% for 3+ months</option>
+                <option>10% for 6+ months</option>
+                <option>15% for 12+ months</option>
+              </select>
+              <p class="text-[10px] text-slate-400">Discount offered for long-term bookings</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Action Footer -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-8 pt-12 border-t border-slate-200">
+          <div class="flex items-center gap-4 text-slate-400">
+            <span class="material-symbols-outlined" data-icon="trending_up"></span>
+            <span class="text-xs font-semibold uppercase tracking-widest">AI-Powered Pricing Suggestions</span>
+          </div>
+
+          <div class="flex items-center gap-6 w-full md:w-auto">
+            <a href="./location.html" class="flex-1 md:flex-none px-12 py-5 font-headline font-bold text-on-surface-variant hover:text-primary transition-colors">Previous</a>
+            <a href="./availability.html" class="flex-1 md:flex-none px-16 py-5 rounded-xl text-white font-headline font-bold gradient-primary shadow-xl shadow-secondary/20 hover:scale-[1.02] transition-transform active:scale-95">
+              Next: Availability
+            </a>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <!-- Background Decoration -->
+  <div class="fixed top-0 right-0 -z-10 w-1/2 h-screen opacity-20 pointer-events-none">
+    <img alt="Bengaluru Skyline at Dusk" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSGvRoo6LSUU_JByx1qC_ey4cMeJJCypI0EMprVhNLE8HsKR2zhLT65isjEroSYIrRTbM4sB3jOLBuP-JsrzbiPCtGVTWTlx0G0dJo-HJ9b5EslMZRi11kKpSh6iXApCInznE5fDyNGcJy754-w0eoM0SewoFX7_sCtcZfAssLEptx5GLe2qWX8kbdO-U7MnOBnEfuu4ZJjDmg9S9U__fRJPpB0gc4kbom_5ojf25Y9GkNZDjPP8CgG2-WiT8mkAX_05saQmnDdrEv"/>
+    <div class="absolute inset-0 bg-gradient-to-l from-surface via-surface/80 to-transparent"></div>
+  </div>
+</body>
+
+</html>

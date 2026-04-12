@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>OOH Marketplace - Analytics Dashboard</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700;800&family=Manrope:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="./js/tailwind.config.campaign.js"></script>
+
+    <!-- Custom Styles -->
+    <link href="./css/campaign_analytics.css" rel="stylesheet"/>
+  </head>
+<body class="bg-surface font-body text-on-surface">
+  <nav class="w-full top-0 sticky z-50 bg-white/95 backdrop-blur-sm border-b border-border-subtle px-8 py-5 flex justify-between items-center">
+    <!-- Logo -->
+    <div class="text-xl font-extrabold tracking-tight uppercase font-headline">
+      AdSpace<span class="text-secondary">Horizon</span>
+    </div>
+
+    <!-- Navigation Links (Desktop) -->
+    <div class="hidden md:flex items-center space-x-10 text-[13px] font-semibold tracking-wider uppercase">
+      <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="listing_page.html">Inventory</a>
+      <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="Partnerships.html">Partnerships</a>
+      <a class="nav-link text-secondary border-b-2 border-secondary pb-1" href="Campaign_analytics.html">Analytics</a>
+      <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="support_page.html">Support</a>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center space-x-6">
+      <button class="text-primary hover:opacity-70 transition-opacity">
+        <span class="material-symbols-outlined">search</span>
+      </button>
+      <button class="bg-primary text-white px-5 py-2 text-xs font-bold tracking-widest uppercase hover:bg-secondary transition-colors"  onclick="window.location.href='login_Page.html';">
+        Sign In
+      </button>
+    </div>
+  </nav>
+  <!-- Main Content -->
+  <main class="pt-28 pb-12 px-8 max-w-[1600px] mx-auto">
+    <!-- Dashboard Header -->
+    <section class="mb-12 flex justify-between items-end">
+      <div>
+        <h1 class="text-5xl font-extrabold font-headline tracking-tighter text-on-surface mb-2">
+          Campaign Intelligence
+        </h1>
+        <p class="text-on-surface-variant text-lg max-w-2xl">
+          Real-time performance metrics across your 48 active digital and physical displays in the Bengaluru Metropolitan area.
+        </p>
+      </div>
+      <div class="flex gap-4">
+        <div class="bg-surface-container-low px-4 py-3 rounded-full flex items-center gap-3">
+          <span class="material-symbols-outlined text-on-primary-container" data-icon="calendar_today">
+            calendar_today
+          </span>
+          <span class="font-semibold text-sm">
+            Oct 01 — Oct 31, 2024
+          </span>
+          <span class="material-symbols-outlined text-on-surface-variant" data-icon="expand_more">
+            expand_more
+          </span>
+        </div>
+        <button class="bg-primary px-6 py-3 text-white rounded-full font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-xl shadow-primary/10">
+          <span class="material-symbols-outlined" data-icon="download">
+            download
+          </span>
+          Export Report
+        </button>
+      </div>
+    </section>
+    <!-- Analytics Grid -->
+    <div class="grid grid-cols-12 gap-6 mb-12">
+      <!-- Total Reach Card -->
+      <div class="col-span-12 md:col-span-4 bg-surface-container-lowest p-8 rounded-full shadow-sm flex flex-col justify-between border-t-2 border-[#fea619]">
+        <div>
+          <span class="text-xs font-bold tracking-widest uppercase text-secondary mb-4 block">
+            Total Reach
+          </span>
+          <div class="flex items-baseline gap-3">
+            <h2 class="text-6xl font-extrabold font-headline tracking-tighter">
+              4.2M
+            </h2>
+            <span class="text-green-600 font-bold flex items-center text-sm">
+              <span class="material-symbols-outlined text-xs" data-icon="trending_up">
+                trending_up
+              </span>
+              12.4%
+            </span>
+          </div>
+        </div>
+        <div class="mt-8 h-20 w-full bg-surface-container-low rounded-full flex items-end overflow-hidden p-1">
+          <div class="h-[40%] w-full bg-primary-fixed-dim rounded-full mx-0.5"></div>
+          <div class="h-[60%] w-full bg-primary-fixed-dim rounded-full mx-0.5"></div>
+          <div class="h-[55%] w-full bg-primary-fixed-dim rounded-full mx-0.5"></div>
+          <div class="h-[85%] w-full bg-[#fea619] rounded-full mx-0.5"></div>
+          <div class="h-[70%] w-full bg-primary-fixed-dim rounded-full mx-0.5"></div>
+          <div class="h-[90%] w-full bg-primary-fixed-dim rounded-full mx-0.5"></div>
+        </div>
+      </div>
+
+      <!-- Footfall Dynamics Chart -->
+      <div class="col-span-12 md:col-span-8 bg-surface-container-low p-8 rounded-full">
+        <div class="flex justify-between items-start mb-8">
+          <h3 class="text-xl font-bold font-headline">
+            Footfall Dynamics
+          </h3>
+          <div class="flex gap-2">
+            <span class="px-3 py-1 bg-surface-container-lowest text-xs font-bold rounded-full border border-outline-variant/10">
+              Impressions
+            </span>
+            <span class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
+              Engagements
+            </span>
+          </div>
+        </div>
+        <div class="h-64 flex items-end gap-4 px-4">
+          <!-- Monday -->
+          <div class="flex-1 flex flex-col gap-2 items-center">
+            <div class="w-full bg-surface-container-highest rounded-full h-32 relative">
+              <div class="absolute bottom-0 w-full bg-primary-container/40 rounded-full h-[60%]"></div>
+            </div>
+            <span class="text-[10px] font-bold text-on-surface-variant">
+              MON
+            </span>
+          </div>
+
+          <!-- Tuesday -->
+          <div class="flex-1 flex flex-col gap-2 items-center">
+            <div class="w-full bg-surface-container-highest rounded-full h-40 relative">
+              <div class="absolute bottom-0 w-full bg-primary-container/40 rounded-full h-[75%]"></div>
+            </div>
+            <span class="text-[10px] font-bold text-on-surface-variant">
+              TUE
+            </span>
+          </div>
+
+          <!-- Wednesday -->
+          <div class="flex-1 flex flex-col gap-2 items-center">
+            <div class="w-full bg-surface-container-highest rounded-full h-24 relative">
+              <div class="absolute bottom-0 w-full bg-primary-container/40 rounded-full h-[40%]"></div>
+            </div>
+            <span class="text-[10px] font-bold text-on-surface-variant">
+              WED
+            </span>
+          </div>
+
+          <!-- Thursday -->
+          <div class="flex-1 flex flex-col gap-2 items-center">
+            <div class="w-full bg-surface-container-highest rounded-full h-52 relative">
+              <div class="absolute bottom-0 w-full bg-secondary-container rounded-full h-[85%] shadow-lg shadow-secondary-container/20"></div>
+            </div>
+            <span class="text-[10px] font-bold text-on-surface-variant">
+              THU
+            </span>
+          </div>
+
+          <!-- Friday -->
+          <div class="flex-1 flex flex-col gap-2 items-center">
+            <div class="w-full bg-surface-container-highest rounded-full h-44 relative">
+              <div class="absolute bottom-0 w-full bg-primary-container/40 rounded-full h-[65%]"></div>
+            </div>
+            <span class="text-[10px] font-bold text-on-surface-variant">
+              FRI
+            </span>
+          </div>
+
+          <!-- Saturday -->
+          <div class="flex-1 flex flex-col gap-2 items-center">
+            <div class="w-full bg-surface-container-highest rounded-full h-36 relative">
+              <div class="absolute bottom-0 w-full bg-primary-container/40 rounded-full h-[50%]"></div>
+            </div>
+            <span class="text-[10px] font-bold text-on-surface-variant">
+              SAT
+            </span>
+          </div>
+
+          <!-- Sunday -->
+          <div class="flex-1 flex flex-col gap-2 items-center">
+            <div class="w-full bg-surface-container-highest rounded-full h-28 relative">
+              <div class="absolute bottom-0 w-full bg-primary-container/40 rounded-full h-[35%]"></div>
+            </div>
+            <span class="text-[10px] font-bold text-on-surface-variant">
+              SUN
+            </span>
+          </div>
+        </div>
+      </div>
+<span class="text-[10px] font-bold text-on-surface-variant">FRI</span>
+</div>
+<div class="flex-1 flex flex-col gap-2 items-center">
+<div class="w-full bg-surface-container-highest rounded-full h-36 relative">
+<div class="absolute bottom-0 w-full bg-primary-container/40 rounded-full h-[50%]"></div>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant">SAT</span>
+</div>
+<div class="flex-1 flex flex-col gap-2 items-center">
+<div class="w-full bg-surface-container-highest rounded-full h-28 relative">
+<div class="absolute bottom-0 w-full bg-primary-container/40 rounded-full h-[35%]"></div>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant">SUN</span>
+</div>
+</div>
+</div>
+      <!-- Heatmap Visualization -->
+      <div class="col-span-12 md:col-span-7 bg-surface-container-high rounded-full overflow-hidden relative group min-h-[400px]">
+        <div class="absolute inset-0 grayscale opacity-50 bg-center bg-cover" style="background-image: url('https://via.placeholder.com/600x400?text=City+Street+Pattern')"></div>
+        <div class="absolute inset-0 bg-primary/20 backdrop-blur-[2px]"></div>
+
+        <!-- Heatmap Orbs -->
+        <div class="absolute top-1/4 left-1/3 w-32 h-32 bg-secondary-container/60 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/3 right-1/4 w-48 h-48 bg-primary-fixed-dim/40 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-tertiary-fixed-dim/50 rounded-full blur-2xl"></div>
+
+        <div class="relative p-10 h-full flex flex-col justify-between">
+          <div class="flex justify-between">
+            <div class="bg-surface-container-lowest/90 backdrop-blur-md px-6 py-4 rounded-full">
+              <h4 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-1">
+                Density Analysis
+              </h4>
+              <p class="text-2xl font-extrabold font-headline">
+                Indiranagar &amp; Koramangala
+              </p>
+            </div>
+            <div class="bg-surface-container-lowest/90 backdrop-blur-md h-12 w-12 rounded-full flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary" data-icon="fullscreen">
+                fullscreen
+              </span>
+            </div>
+          </div>
+          <div class="flex justify-start gap-4">
+            <div class="bg-surface-container-lowest/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2">
+              <div class="w-3 h-3 bg-secondary-container rounded-full"></div>
+              <span class="text-xs font-bold">
+                High Density
+              </span>
+            </div>
+            <div class="bg-surface-container-lowest/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2">
+              <div class="w-3 h-3 bg-primary-fixed-dim rounded-full"></div>
+              <span class="text-xs font-bold">
+                Standard Activity
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Spend Analysis Section -->
+      <div class="col-span-12 md:col-span-5 flex flex-col gap-6">
+        <!-- Budget Utilization -->
+        <div class="bg-primary-container text-white p-8 rounded-full flex-1 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-secondary-container/20 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+          <div class="relative z-10">
+            <span class="text-xs font-bold uppercase tracking-widest text-on-primary-container block mb-6">
+              Budget Utilization
+            </span>
+            <h3 class="text-4xl font-extrabold font-headline mb-2">
+              ₹1,42,800.00
+            </h3>
+            <p class="text-on-primary-container text-sm">
+              Spent across 12 campaigns this month
+            </p>
+            <div class="mt-10 bg-white/10 h-3 rounded-full overflow-hidden">
+              <div class="h-full bg-secondary-container w-[72%] rounded-full"></div>
+            </div>
+            <div class="mt-4 flex justify-between text-xs font-bold">
+              <span>₹200k Total Budget</span>
+              <span class="text-secondary-container">72% Allocated</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Efficiency Indices -->
+        <div class="bg-surface-container-lowest p-8 rounded-full flex-1 shadow-sm border border-outline-variant/10">
+          <h3 class="text-lg font-bold font-headline mb-6">
+            Efficiency Indices
+          </h3>
+          <div class="space-y-6">
+            <!-- CPM Performance -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary">
+                  <span class="material-symbols-outlined text-sm" data-icon="group">
+                    group
+                  </span>
+                </div>
+                <div>
+                  <p class="text-sm font-bold">
+                    CPM Performance
+                  </p>
+                  <p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">
+                    Cost per 1k impressions
+                  </p>
+                </div>
+              </div>
+              <span class="text-xl font-extrabold font-headline">
+                ₹4.12
+              </span>
+            </div>
+
+            <!-- Interaction Rate -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+                  <span class="material-symbols-outlined text-sm" data-icon="touch_app">
+                    touch_app
+                  </span>
+                </div>
+                <div>
+                  <p class="text-sm font-bold">
+                    Interaction Rate
+                  </p>
+                  <p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">
+                    QR &amp; Mobile Bridge
+                  </p>
+                </div>
+              </div>
+              <span class="text-xl font-extrabold font-headline">
+                0.84%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+      <!-- Active Media Performance Section -->
+      <section class="bg-surface-container-lowest rounded-3xl p-10 shadow-sm">
+        <div class="flex justify-between items-center mb-10">
+          <h3 class="text-2xl font-extrabold font-headline tracking-tight">
+            Active Media Performance
+          </h3>
+          <div class="flex gap-4">
+            <div class="bg-surface-container-low px-4 py-2 rounded-full text-xs font-bold text-on-surface-variant flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm" data-icon="filter_list">
+                filter_list
+              </span>
+              Sort by Engagement
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Media Row 1: MG Road -->
+          <div class="flex items-center justify-between p-6 rounded-2xl hover:bg-surface-container-low transition-all group">
+            <div class="flex items-center gap-6 flex-[2]">
+              <img class="w-16 h-16 rounded-xl object-cover" src="https://via.placeholder.com/64?text=MG+Road" alt="MG Road Metro Digital Wall"/>
+              <div>
+                <p class="font-bold text-on-surface">
+                  MG Road Metro Digital Wall
+                </p>
+                <p class="text-sm text-on-surface-variant">
+                  Real-time performance metrics across your 48 active digital and physical displays in the Bengaluru Metropolitan area.
+                </p>
+              </div>
+            </div>
+            <div class="flex-[1] text-center">
+              <span class="text-xs font-bold text-on-surface-variant uppercase block mb-1">
+                Status
+              </span>
+              <span class="bg-tertiary-container text-on-tertiary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                Optimized
+              </span>
+            </div>
+            <div class="flex-[1] text-center">
+              <span class="text-xs font-bold text-on-surface-variant uppercase block mb-1">
+                Weekly Reach
+              </span>
+              <span class="font-headline font-extrabold">
+                842k
+              </span>
+            </div>
+            <div class="flex-[1] text-right">
+              <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" data-icon="chevron_right">
+                chevron_right
+              </span>
+            </div>
+          </div>
+
+          <!-- Media Row 2: Koramangala -->
+          <div class="flex items-center justify-between p-6 rounded-2xl hover:bg-surface-container-low transition-all group">
+            <div class="flex items-center gap-6 flex-[2]">
+              <img class="w-16 h-16 rounded-xl object-cover" src="https://via.placeholder.com/64?text=Koramangala" alt="Koramangala 80ft Rd Kiosk"/>
+              <div>
+                <p class="font-bold text-on-surface">
+                  Koramangala 80ft Rd Kiosk
+                </p>
+                <p class="text-sm text-on-surface-variant">
+                  Real-time performance metrics across your 48 active digital and physical displays in the Bengaluru Metropolitan area.
+                </p>
+              </div>
+            </div>
+            <div class="flex-[1] text-center">
+              <span class="text-xs font-bold text-on-surface-variant uppercase block mb-1">
+                Status
+              </span>
+              <span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                Hot Spot
+              </span>
+            </div>
+            <div class="flex-[1] text-center">
+              <span class="text-xs font-bold text-on-surface-variant uppercase block mb-1">
+                Weekly Reach
+              </span>
+              <span class="font-headline font-extrabold">
+                512k
+              </span>
+            </div>
+            <div class="flex-[1] text-right">
+              <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" data-icon="chevron_right">
+                chevron_right
+              </span>
+            </div>
+          </div>
+
+          <!-- Media Row 3: Airport -->
+          <div class="flex items-center justify-between p-6 rounded-2xl hover:bg-surface-container-low transition-all group">
+            <div class="flex items-center gap-6 flex-[2]">
+              <img class="w-16 h-16 rounded-xl object-cover" src="https://via.placeholder.com/64?text=Airport" alt="Kempegowda International Terminal 2"/>
+              <div>
+                <p class="font-bold text-on-surface">
+                  Kempegowda Int'l T2 Arrival LED
+                </p>
+                <p class="text-sm text-on-surface-variant">
+                  Real-time performance metrics across your 48 active digital and physical displays in the Bengaluru Metropolitan area.
+                </p>
+              </div>
+            </div>
+            <div class="flex-[1] text-center">
+              <span class="text-xs font-bold text-on-surface-variant uppercase block mb-1">
+                Status
+              </span>
+              <span class="bg-surface-container-highest text-on-primary-container text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                Stable
+              </span>
+            </div>
+            <div class="flex-[1] text-center">
+              <span class="text-xs font-bold text-on-surface-variant uppercase block mb-1">
+                Weekly Reach
+              </span>
+              <span class="font-headline font-extrabold">
+                1.2M
+              </span>
+            </div>
+            <div class="flex-[1] text-right">
+              <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" data-icon="chevron_right">
+                chevron_right
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-slate-50 dark:bg-[#0A1F44] w-full py-12">
+      <div class="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-full mx-auto font-['Epilogue'] text-sm">
+        <div class="flex flex-col md:flex-row items-center gap-8 mb-6 md:mb-0">
+          <span class="font-bold text-[#0A1F44] dark:text-white text-lg">
+            OOH Marketplace Excellence
+          </span>
+          <span class="text-slate-500 dark:text-slate-400">
+            © 2024 OOH Marketplace Excellence. All rights reserved.
+          </span>
+        </div>
+        <div class="flex gap-8 items-center">
+          <a class="text-slate-500 dark:text-slate-400 hover:text-[#fea619] transition-colors" href="#">
+            Privacy Policy
+          </a>
+          <a class="text-slate-500 dark:text-slate-400 hover:text-[#fea619] transition-colors" href="#">
+            Terms of Service
+          </a>
+          <a class="text-slate-500 dark:text-slate-400 hover:text-[#fea619] transition-colors" href="#">
+            Cookie Settings
+          </a>
+          <a class="text-slate-500 dark:text-slate-400 hover:text-[#fea619] transition-colors" href="#">
+            Contact Sales
+          </a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

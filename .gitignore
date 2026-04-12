@@ -1,0 +1,22 @@
+# GitHub
+.github/
+
+# Architecture and documentation
+Ui_Prototype_MVP_Prep/arch/
+AdSpace_Marketplace_PRD*
+
+# Lock files
+.~lock*
+
+# Node modules and dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDE and editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
