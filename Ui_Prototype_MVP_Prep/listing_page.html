@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AdSpace Horizon | Marketplace Discovery</title>
+
+    <!-- Fonts: Epilogue strictly as per Design System -->
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Tailwind Configuration -->
+    <script src="js/tailwind.config.js"></script>
+
+    <!-- Custom Styles -->
+    <link href="css/listing_page.css" rel="stylesheet" />
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<nav class="w-full top-0 sticky z-50 bg-white/95 backdrop-blur-sm border-b border-border-subtle px-8 py-5 flex justify-between items-center">
+  <!-- Logo -->
+  <a href="landing_page.html" class="text-xl font-extrabold tracking-tight uppercase font-headline hover:opacity-80 transition-opacity">
+    AdSpace<span class="text-secondary">Horizon</span>
+  </a>
+
+  <!-- Navigation Links (Desktop) -->
+  <div class="hidden md:flex items-center space-x-10 text-[13px] font-semibold tracking-wider uppercase">
+    <a class="nav-link text-secondary border-b-2 border-secondary pb-1" href="listing_page.html">Inventory</a>
+    <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="Partnerships.html">Partnerships</a>
+    <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="Campaign_analytics.html">Analytics</a>
+    <a class="nav-link text-on-surface-variant hover:text-primary transition-colors" href="support_page.html">Support</a>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex items-center space-x-6">
+    <button onclick="openSearchModal()" class="text-primary hover:opacity-70 transition-opacity">
+      <span class="material-symbols-outlined">search</span>
+    </button>
+    <button class="bg-primary text-white px-5 py-2 text-xs font-bold tracking-widest uppercase hover:bg-secondary transition-colors"  onclick="window.location.href='login_Page.html';">
+      Sign In
+    </button>
+  </div>
+</nav>
+<!-- Horizontal Advanced Filter Bar -->
+<section class="bg-surface-container-lowest px-8 py-4 sticky top-[72px] z-40 border-b border-surface-container shadow-sm">
+<div class="max-w-full mx-auto flex flex-wrap items-center gap-6">
+<!-- Search/Location -->
+<div class="flex flex-col gap-1 min-w-[200px]">
+<label class="text-[10px] font-black uppercase tracking-widest text-secondary">Location</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-outline-variant rounded-lg text-sm px-3 py-2 pr-8 focus:ring-secondary/30 focus:border-secondary transition-all" placeholder="Search areas..." type="text"/>
+<span class="material-symbols-outlined absolute right-2 top-2 text-outline text-sm">search</span>
+</div>
+</div>
+<!-- Ad Options Dropdown -->
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-black uppercase tracking-widest text-secondary">Ad Options</label>
+<select class="bg-surface-container-low border-outline-variant rounded-lg text-sm font-medium focus:ring-secondary/30 px-4 py-2 min-w-[160px]">
+<option>All Options</option>
+<option>Bus Shelter</option>
+<option>Hoarding</option>
+<option>Digital OOH</option>
+<option>Digital Bus Shelter</option>
+<option>Skywalk</option>
+</select>
+</div>
+<!-- Lit/Non-Lit -->
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-black uppercase tracking-widest text-secondary">Lighting</label>
+<select class="bg-surface-container-low border-outline-variant rounded-lg text-sm font-medium focus:ring-secondary/30 px-4 py-2 min-w-[140px]">
+<option>All Types</option>
+<option>Non Lit</option>
+<option>Back Lit</option>
+<option>Front Lit</option>
+<option>LED</option>
+</select>
+</div>
+<!-- Dimensions -->
+<div class="flex flex-col gap-1">
+<label class="text-[10px] font-black uppercase tracking-widest text-secondary">Dimensions (in feet)</label>
+<select class="bg-surface-container-low border-outline-variant rounded-lg text-sm font-medium focus:ring-secondary/30 px-4 py-2 min-w-[140px]">
+<option>Any Size</option>
+<option>40W X 40H</option>
+<option>20W X 20H</option>
+<option>40W X 20H</option>
+<option>30W X 20H</option>
+<option>30W X 30H</option>
+<option>41W X 40H</option>
+<option>20W X 15H</option>
+<option>40W X 30H</option>
+<option>60W X 20H</option>
+<option>20W X 10H</option>
+<option>35W X 35H</option>
+<option>30W X 40H</option>
+<option>20W X 30H</option>
+<option>25W X 25H</option>
+<option>15W X 15H</option>
+<option disabled="">Show More...</option>
+</select>
+</div>
+<div class="h-10 w-[1px] bg-outline-variant mx-2"></div>
+<!-- Sort -->
+<div class="flex flex-col gap-1 ml-auto">
+<label class="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Sort By</label>
+<select class="bg-transparent border-none text-sm font-bold text-primary focus:ring-0 cursor-pointer p-0">
+<option>Footfall (High to Low)</option>
+<option>Price (Low to High)</option>
+</select>
+</div>
+<button class="bg-primary text-white px-6 py-2.5 rounded-lg text-xs font-bold hover:bg-secondary transition-all shadow-md active:scale-95">
+            Update Search
+        </button>
+</div>
+</section>
+<main class="flex h-[calc(100vh-160px)] overflow-hidden">
+<!-- Left Side: Listings List -->
+<aside class="w-[68%] overflow-y-auto bg-surface px-8 py-6 hide-scrollbar">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h1 class="font-headline text-3xl font-extrabold tracking-tight text-primary">Discover Spaces</h1>
+<p class="text-on-surface-variant text-sm mt-1">128 premium OOH spaces available in Bengaluru</p>
+</div>
+</div>
+<!-- Dense Card Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Listing Card 1: Digital OOH Indiranagar -->
+<a href="listing_view.html" class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,31,68,0.08)] cursor-pointer border border-surface-container">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcrYp6o4XHaH3LI5lmYEL56rQCrZbRUkb41R3V4viM5AnrDFf0_3-m6jI4vz8_TfgH7ePxizfZIs6bwoG7EfZ63oHvPFtgpz_DJMk9Rgyif38iXzpisASqAnVHu7ZSIFuGiUt4P2oe_OYtdDQucKsgMXfRHm7vYheZSRlnKYTxqv8PQnd4EwEd136DWKML6KeGD98dIyOjoQk5OfCbc_n9nYv9z4VYyi7bIAWJthrgnVeqljl_HHVXQ9ynweAJ48UMxuQ8Jp0fJh3z"/>
+<div class="absolute top-3 left-3 flex gap-2">
+<span class="bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Digital OOH</span>
+<span class="bg-tertiary-container text-on-tertiary-container text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">verified</span>Verified
+                        </span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-base font-bold text-on-surface leading-tight">Indiranagar 100ft Rd Junction</h3>
+<div class="text-right shrink-0">
+<span class="block text-secondary font-black text-sm">₹45k</span>
+<span class="text-[9px] text-on-surface-variant uppercase font-bold">/ Slot</span>
+</div>
+</div>
+<p class="flex items-center gap-1 text-on-surface-variant text-[10px] mb-3">
+<span class="material-symbols-outlined text-xs">location_on</span>Opposite Toit
+                    </p>
+<div class="flex items-center justify-between border-t border-surface-container-low pt-3">
+<span class="text-primary font-extrabold text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>245k+
+                        </span>
+<button class="bg-primary text-white px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-secondary transition-colors">Book</button>
+</div>
+</div>
+</a>
+<!-- Listing Card 2: Bus Shelter Koramangala -->
+<a href="listing_view.html" class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,31,68,0.08)] cursor-pointer border border-surface-container">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKef6LbS90FGaydM_KAEt5sZjJhBTr2i4xgwwNGd1IUCVloO3JqMowK0t7eIceQ0dqaHcir0J6pmmmg-xezlj10y6JsdJiqGmTLuPvl1xDCMltVVgCkW8Wa_qe7f2X3UE2HQqYCg5tWbjD4yT7AWDeiUNBgbi3dald0QVlFPGfINdhVGG-BjdJkd7iNroyx_S3vFBQBZEwY-yHTb0bU0vmGbf01btjYONpou2IP0GLQ4jIcAn0ZuQWl8A8Aktz1b5CLA5QAHCF2rGo"/>
+<div class="absolute top-3 left-3">
+<span class="bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Bus Shelter</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-base font-bold text-on-surface leading-tight">Koramangala Sony World</h3>
+<div class="text-right shrink-0">
+<span class="block text-secondary font-black text-sm">₹85k</span>
+<span class="text-[9px] text-on-surface-variant uppercase font-bold">/ Month</span>
+</div>
+</div>
+<p class="flex items-center gap-1 text-on-surface-variant text-[10px] mb-3">
+<span class="material-symbols-outlined text-xs">location_on</span>80ft Road, 4th Block
+                    </p>
+<div class="flex items-center justify-between border-t border-surface-container-low pt-3">
+<span class="text-primary font-extrabold text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>180k+
+                        </span>
+<button class="bg-primary text-white px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-secondary transition-colors">Book</button>
+</div>
+</div>
+</a>
+<!-- Listing Card 3: Hoarding MG Road -->
+<a href="listing_view.html" class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,31,68,0.08)] cursor-pointer border border-surface-container">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHzAvLHkz_18zyfLqvFgD8i7pp11hWrplcboaUsbeUkxI_DYXVTtg3scwpTX6weMO7vKPqndn2g-FwRqUeODR7-SjOGEKXASS7ETmp7KVVhStcIzymtw7tc_h1rxO_Dgk4PhDNKMCwzN9WXuH7p-mM4yy36tpF88R6qiikRmA8z4Dalz0Va_AzL-naYgfgud1wMYhWOoQUoYE2Eo5_Cw9cM_YBveZwQfon5XIKN-38YY5ddfvdKyPqrn9gVAz1aOq7jZzG0Gz5R8YL"/>
+<div class="absolute top-3 left-3">
+<span class="bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Hoarding</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-base font-bold text-on-surface leading-tight">MG Road Metro Pillar</h3>
+<div class="text-right shrink-0">
+<span class="block text-secondary font-black text-sm">₹120k</span>
+<span class="text-[9px] text-on-surface-variant uppercase font-bold">/ Month</span>
+</div>
+</div>
+<p class="flex items-center gap-1 text-on-surface-variant text-[10px] mb-3">
+<span class="material-symbols-outlined text-xs">location_on</span>MG Road, Bengaluru
+                    </p>
+<div class="flex items-center justify-between border-t border-surface-container-low pt-3">
+<span class="text-primary font-extrabold text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>600k+
+                        </span>
+<button class="bg-primary text-white px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-secondary transition-colors">Book</button>
+</div>
+</div>
+</a>
+<!-- Listing Card 4: Digital Bus Shelter HSR Layout -->
+<a href="listing_view.html" class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,31,68,0.08)] cursor-pointer border border-surface-container">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8QG9XhCofj-PZ-L7Cj-WwU4_N_-3-m6jI4vz8_TfgH7ePxizfZIs6bwoG7EfZ63oHvPFtgpz_DJMk9Rgyif38iXzpisASqAnVHu7ZSIFuGiUt4P2oe_OYtdDQucKsgMXfRHm7vYheZSRlnKYTxqv8PQnd4EwEd136DWKML6KeGD98dIyOjoQk5OfCbc_n9nYv9z4VYyi7bIAWJthrgnVeqljl_HHVXQ9ynweAJ48UMxuQ8Jp0fJh3z"/>
+<div class="absolute top-3 left-3">
+<span class="bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Digital Bus Shelter</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-base font-bold text-on-surface leading-tight">HSR 27th Main Hub</h3>
+<div class="text-right shrink-0">
+<span class="block text-secondary font-black text-sm">₹38k</span>
+<span class="text-[9px] text-on-surface-variant uppercase font-bold">/ Slot</span>
+</div>
+</div>
+<p class="flex items-center gap-1 text-on-surface-variant text-[10px] mb-3">
+<span class="material-symbols-outlined text-xs">location_on</span>HSR Layout Sector 1
+                    </p>
+<div class="flex items-center justify-between border-t border-surface-container-low pt-3">
+<span class="text-primary font-extrabold text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>120k+
+                        </span>
+<button class="bg-primary text-white px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-secondary transition-colors">Book</button>
+</div>
+</div>
+</a>
+<!-- Listing Card 5: Skywalk Hebbal -->
+<a href="listing_view.html" class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,31,68,0.08)] cursor-pointer border border-surface-container">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHX-uA9_J_f57H2-Z_9O0-A5_1_2-m6jI4vz8_TfgH7ePxizfZIs6bwoG7EfZ63oHvPFtgpz_DJMk9Rgyif38iXzpisASqAnVHu7ZSIFuGiUt4P2oe_OYtdDQucKsgMXfRHm7vYheZSRlnKYTxqv8PQnd4EwEd136DWKML6KeGD98dIyOjoQk5OfCbc_n9nYv9z4VYyi7bIAWJthrgnVeqljl_HHVXQ9ynweAJ48UMxuQ8Jp0fJh3z"/>
+<div class="absolute top-3 left-3">
+<span class="bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Skywalk</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-base font-bold text-on-surface leading-tight">Hebbal Flyover Skywalk</h3>
+<div class="text-right shrink-0">
+<span class="block text-secondary font-black text-sm">₹95k</span>
+<span class="text-[9px] text-on-surface-variant uppercase font-bold">/ Month</span>
+</div>
+</div>
+<p class="flex items-center gap-1 text-on-surface-variant text-[10px] mb-3">
+<span class="material-symbols-outlined text-xs">location_on</span>Hebbal Junction
+                    </p>
+<div class="flex items-center justify-between border-t border-surface-container-low pt-3">
+<span class="text-primary font-extrabold text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>400k+
+                        </span>
+<button class="bg-primary text-white px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-secondary transition-colors">Book</button>
+</div>
+</div>
+</a>
+<!-- Listing Card 6: Transit -->
+<a href="listing_view.html" class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,31,68,0.08)] cursor-pointer border border-surface-container">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHzAvLHkz_18zyfLqvFgD8i7pp11hWrplcboaUsbeUkxI_DYXVTtg3scwpTX6weMO7vKPqndn2g-FwRqUeODR7-SjOGEKXASS7ETmp7KVVhStcIzymtw7tc_h1rxO_Dgk4PhDNKMCwzN9WXuH7p-mM4yy36tpF88R6qiikRmA8z4Dalz0Va_AzL-naYgfgud1wMYhWOoQUoYE2Eo5_Cw9cM_YBveZwQfon5XIKN-38YY5ddfvdKyPqrn9gVAz1aOq7jZzG0Gz5R8YL"/>
+<div class="absolute top-3 left-3">
+<span class="bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Transit</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-base font-bold text-on-surface leading-tight">BMTC Volvo - ORR Wrap</h3>
+<div class="text-right shrink-0">
+<span class="block text-secondary font-black text-sm">₹12k</span>
+<span class="text-[9px] text-on-surface-variant uppercase font-bold">/ Week</span>
+</div>
+</div>
+<p class="flex items-center gap-1 text-on-surface-variant text-[10px] mb-3">
+<span class="material-symbols-outlined text-xs">location_on</span>Hebbal to Silk Board
+                    </p>
+<div class="flex items-center justify-between border-t border-surface-container-low pt-3">
+<span class="text-primary font-extrabold text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>500k+
+                        </span>
+<button class="bg-primary text-white px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-secondary transition-colors">Book</button>
+</div>
+</div>
+</a>
+<!-- Listing Card 7: Digital OOH Indiranagar (Alternate) -->
+<a href="listing_view.html" class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,31,68,0.08)] cursor-pointer border border-surface-container">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcrYp6o4XHaH3LI5lmYEL56rQCrZbRUkb41R3V4viM5AnrDFf0_3-m6jI4vz8_TfgH7ePxizfZIs6bwoG7EfZ63oHvPFtgpz_DJMk9Rgyif38iXzpisASqAnVHu7ZSIFuGiUt4P2oe_OYtdDQucKsgMXfRHm7vYheZSRlnKYTxqv8PQnd4EwEd136DWKML6KeGD98dIyOjoQk5OfCbc_n9nYv9z4VYyi7bIAWJthrgnVeqljl_HHVXQ9ynweAJ48UMxuQ8Jp0fJh3z"/>
+<div class="absolute top-3 left-3">
+<span class="bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Digital OOH</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-base font-bold text-on-surface leading-tight">Indiranagar 12th Main</h3>
+<div class="text-right shrink-0">
+<span class="block text-secondary font-black text-sm">₹55k</span>
+<span class="text-[9px] text-on-surface-variant uppercase font-bold">/ Slot</span>
+</div>
+</div>
+<p class="flex items-center gap-1 text-on-surface-variant text-[10px] mb-3">
+<span class="material-symbols-outlined text-xs">location_on</span>Near Starbucks
+                    </p>
+<div class="flex items-center justify-between border-t border-surface-container-low pt-3">
+<span class="text-primary font-extrabold text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>310k+
+                        </span>
+<button class="bg-primary text-white px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-secondary transition-colors">Book</button>
+</div>
+</div>
+</a>
+<!-- Listing Card 8: Hoarding Bannerghatta Road -->
+<a href="listing_view.html" class="group flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,31,68,0.08)] cursor-pointer border border-surface-container">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKef6LbS90FGaydM_KAEt5sZjJhBTr2i4xgwwNGd1IUCVloO3JqMowK0t7eIceQ0dqaHcir0J6pmmmg-xezlj10y6JsdJiqGmTLuPvl1xDCMltVVgCkW8Wa_qe7f2X3UE2HQqYCg5tWbjD4yT7AWDeiUNBgbi3dald0QVlFPGfINdhVGG-BjdJkd7iNroyx_S3vFBQBZEwY-yHTb0bU0vmGbf01btjYONpou2IP0GLQ4jIcAn0ZuQWl8A8Aktz1b5CLA5QAHCF2rGo"/>
+<div class="absolute top-3 left-3">
+<span class="bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Hoarding</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-base font-bold text-on-surface leading-tight">Meenakshi Mall Frontage</h3>
+<div class="text-right shrink-0">
+<span class="block text-secondary font-black text-sm">₹110k</span>
+<span class="text-[9px] text-on-surface-variant uppercase font-bold">/ Month</span>
+</div>
+</div>
+<p class="flex items-center gap-1 text-on-surface-variant text-[10px] mb-3">
+<span class="material-symbols-outlined text-xs">location_on</span>Bannerghatta Road
+                    </p>
+<div class="flex items-center justify-between border-t border-surface-container-low pt-3">
+<span class="text-primary font-extrabold text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary text-sm">trending_up</span>280k+
+                        </span>
+<button class="bg-primary text-white px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-secondary transition-colors">Book</button>
+</div>
+</div>
+</a>
+</aside>
+<!-- Right Side: Square Map Section -->
+<section class="hidden md:block w-[32%] relative bg-surface-container-high overflow-hidden border-l border-surface-container">
+<!-- Map Canvas -->
+<div class="absolute inset-0 grayscale opacity-80">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6OgMHotIjAMaN2-j3GklxUB1T-n2SKL9WYJGDe86nF0-LrUSPI3GH4zBZ_7fYKMub8X_51aTHsHtbIbjz95J5ecHjBMalm5vOK4sjMopbpSHep9r9Kj0Bvnt521_HnA_yLGmZ8zWDUCuKrrlY7XPE-WxVkzRQZR0QO1v1QP7UnydIYfXh46Z-rpucl5FF0qEaZq6l-9p3Q0en4J4flScnUqQO7w00UxI_m2Emy8hH2vUOIAxDZLjM8ZNGnbGrCHq9ZOBDwth1cVP3"/>
+</div>
+<!-- Map UI Overlays (Zoom/Location) -->
+<div class="absolute top-6 right-6 flex flex-col gap-2 z-10">
+<button class="glass-panel w-10 h-10 flex items-center justify-center rounded-xl shadow-lg hover:bg-white transition-all text-primary">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+<button class="glass-panel w-10 h-10 flex items-center justify-center rounded-xl shadow-lg hover:bg-white transition-all text-primary">
+<span class="material-symbols-outlined text-xl">remove</span>
+</button>
+<button class="glass-panel w-10 h-10 mt-4 flex items-center justify-center rounded-xl shadow-lg hover:bg-white transition-all text-primary">
+<span class="material-symbols-outlined text-xl">my_location</span>
+</button>
+</div>
+<!-- Focus Label Overlay - Compact -->
+<div class="absolute bottom-6 left-6 right-6 z-10">
+<div class="glass-panel p-4 rounded-xl shadow-2xl flex items-center gap-4 border border-white/40">
+<div class="flex-1 overflow-hidden">
+<span class="text-[8px] font-black uppercase tracking-widest text-secondary">Active View</span>
+<h4 class="font-headline font-bold text-primary truncate text-sm">Indiranagar Central</h4>
+<p class="text-[9px] text-on-surface-variant truncate">14 slots available</p>
+</div>
+<div class="shrink-0 text-center bg-white/50 px-2 py-1 rounded-lg border border-white/20">
+<span class="block text-[10px] font-bold text-primary">₹32k</span>
+<span class="text-[7px] text-outline font-bold uppercase">Avg/D</span>
+</div>
+</div>
+</div>
+<!-- Simulated Map Pins -->
+<div class="absolute top-1/3 left-1/2 group cursor-pointer z-10">
+<div class="relative flex flex-col items-center">
+<div class="bg-primary text-white px-2 py-1 rounded-full text-[9px] font-bold shadow-xl border-2 border-white group-hover:scale-110 transition-transform">₹45k</div>
+<div class="w-0.5 h-2 bg-primary"></div>
+</div>
+</div>
+<div class="absolute top-2/3 right-1/4 group cursor-pointer z-10">
+<div class="relative flex flex-col items-center">
+<div class="bg-secondary text-white px-2 py-1 rounded-full text-[9px] font-bold shadow-xl border-2 border-white group-hover:scale-110 transition-transform">₹85k</div>
+<div class="w-0.5 h-2 bg-secondary"></div>
+</div>
+</div>
+</section>
+
+    <!-- =============================================== 
+         LIST YOUR SPACE CTA SECTION 
+         =============================================== -->
+    <section class="py-20 px-8 bg-white border-t border-surface-container max-w-full">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <!-- Left Content -->
+          <div>
+            <h2 class="text-4xl md:text-5xl font-headline font-bold text-primary mb-6">
+              Have Ad Space to Offer?
+            </h2>
+            <p class="text-lg text-on-surface-variant mb-8 leading-relaxed">
+              Join hundreds of media owners in Bengaluru who are already monetizing their assets on AdSpace Horizon. Get discovered by premium brands instantly.
+            </p>
+
+            <!-- Benefits List -->
+            <div class="space-y-4 mb-10">
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-secondary text-2xl shrink-0 mt-1">check_circle</span>
+                <div>
+                  <h4 class="font-bold text-primary mb-1">Instant Visibility</h4>
+                  <p class="text-sm text-on-surface-variant">Your inventory appears instantly to verified brands</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-secondary text-2xl shrink-0 mt-1">check_circle</span>
+                <div>
+                  <h4 class="font-bold text-primary mb-1">48-Hour Verification</h4>
+                  <p class="text-sm text-on-surface-variant">Quick compliance check & go live</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-secondary text-2xl shrink-0 mt-1">check_circle</span>
+                <div>
+                  <h4 class="font-bold text-primary mb-1">Revenue Analytics</h4>
+                  <p class="text-sm text-on-surface-variant">Track performance with real-time dashboards</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-wrap gap-4">
+              <a href="./listing_your_adspace.html" class="bg-primary text-white px-8 py-4 font-bold text-sm tracking-widest uppercase hover:bg-secondary transition-colors inline-block">
+                List Your Space Now
+              </a>
+              <button class="border-2 border-primary text-primary px-8 py-4 font-bold text-sm tracking-widest uppercase hover:bg-primary hover:text-white transition-all">
+                Learn More
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Content: Visual -->
+          <div class="relative">
+            <div class="bg-gradient-to-br from-[#f0f3ff] to-[#e7eeff] rounded-2xl p-12 border border-[#d5e3ff]">
+              <div class="space-y-6">
+                <!-- Icon Feature Card -->
+                <div class="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm">
+                  <span class="material-symbols-outlined text-secondary text-4xl">public</span>
+                  <div>
+                    <p class="font-bold text-primary text-sm">Global Brand Access</p>
+                    <p class="text-[11px] text-on-surface-variant">Connect with international advertisers</p>
+                  </div>
+                </div>
+
+                <!-- Stats Card -->
+                <div class="bg-white rounded-xl p-4 shadow-sm grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <p class="text-2xl font-bold text-secondary">500+</p>
+                    <p class="text-[10px] text-on-surface-variant">Brands</p>
+                  </div>
+                  <div>
+                    <p class="text-2xl font-bold text-secondary">2K+</p>
+                    <p class="text-[10px] text-on-surface-variant">Ads Listed</p>
+                  </div>
+                  <div>
+                    <p class="text-2xl font-bold text-secondary">₹50Cr+</p>
+                    <p class="text-[10px] text-on-surface-variant">Booked</p>
+                  </div>
+                </div>
+
+                <!-- Quick Metrics -->
+                <div class="bg-primary/5 rounded-xl p-4 border-l-4 border-secondary">
+                  <p class="text-[11px] font-bold text-secondary mb-2">Average Performance</p>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-primary">Avg. Monthly Revenue</span>
+                    <span class="font-bold text-primary">₹2.5L+</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-[#f0f3ff] dark:bg-[#0b1c32] grid grid-cols-1 md:grid-cols-3 gap-12 px-12 py-16 text-sm leading-relaxed text-[#0a1f44] dark:text-[#dee8ff]">
+<div class="space-y-4">
+<span class="font-bold text-lg text-[#0a1f44] dark:text-white">AdSpace Horizon</span>
+<p class="max-w-xs opacity-80">Empowering brands to secure high-impact physical advertising through real-time data and transparent commerce.</p>
+<p class="text-[10px] font-bold uppercase tracking-widest opacity-60">© 2024 AdSpace Horizon. Bengaluru HQ.</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<a class="text-[#44464e] dark:text-[#dee8ff] hover:text-[#855300] transition-colors underline-offset-4 hover:underline" href="#">About Us</a>
+<a class="text-[#44464e] dark:text-[#dee8ff] hover:text-[#855300] transition-colors underline-offset-4 hover:underline" href="#">Contact Support</a>
+<a class="text-[#44464e] dark:text-[#dee8ff] hover:text-[#855300] transition-colors underline-offset-4 hover:underline" href="#">Privacy Policy</a>
+</div>
+<div class="flex flex-col gap-2">
+<a class="text-[#44464e] dark:text-[#dee8ff] hover:text-[#855300] transition-colors underline-offset-4 hover:underline" href="#">Terms of Service</a>
+<a class="text-[#44464e] dark:text-[#dee8ff] hover:text-[#855300] transition-colors underline-offset-4 hover:underline" href="#">LinkedIn</a>
+<a class="text-[#44464e] dark:text-[#dee8ff] hover:text-[#855300] transition-colors underline-offset-4 hover:underline" href="#">Instagram</a>
+</div>
+</div>
+<div class="bg-primary-container p-6 rounded-2xl flex flex-col justify-between">
+<div>
+<h5 class="text-white font-bold mb-2">Advertise With Intelligence</h5>
+<p class="text-[#7687b2] text-xs">Join 500+ brands leveraging our marketplace for OOH excellence.</p>
+</div>
+<button class="mt-4 bg-secondary text-white py-2 px-4 rounded-lg text-xs font-bold hover:bg-secondary-container transition-all">List Your Space</button>
+</div>
+</footer>
+
+<!-- Search Modal -->
+<div id="searchModal" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-start justify-center pt-20">
+  <div class="bg-white rounded-lg w-full max-w-2xl mx-4 shadow-2xl">
+    <div class="p-6 border-b border-border-subtle flex items-center justify-between">
+      <h2 class="text-xl font-headline font-bold">Search Page</h2>
+      <button onclick="closeSearchModal()" class="text-on-surface-variant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="p-6">
+      <input 
+        id="searchInput" 
+        type="text" 
+        placeholder="Search for inventory, placements, locations, and more..." 
+        class="w-full px-4 py-3 border border-border-subtle rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none text-sm"
+        onkeyup="performSearch()"
+      />
+    </div>
+    <div id="searchResults" class="px-6 pb-6 max-h-96 overflow-y-auto">
+      <p class="text-on-surface-variant text-sm">Start typing to search...</p>
+    </div>
+    <div class="px-6 pb-6 border-t border-border-subtle flex gap-4">
+      <button onclick="closeSearchModal()" class="flex-1 border border-primary text-primary px-4 py-2 rounded-lg font-bold text-sm hover:bg-primary hover:text-white transition-colors">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openSearchModal() {
+    document.getElementById('searchModal').classList.remove('hidden');
+    document.getElementById('searchInput').focus();
+  }
+
+  function closeSearchModal() {
+    document.getElementById('searchModal').classList.add('hidden');
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchResults').innerHTML = '<p class="text-on-surface-variant text-sm">Start typing to search...</p>';
+  }
+
+  function performSearch() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const resultsContainer = document.getElementById('searchResults');
+
+    if (!query) {
+      resultsContainer.innerHTML = '<p class="text-on-surface-variant text-sm">Start typing to search...</p>';
+      return;
+    }
+
+    // Get all text content from the page
+    const pageText = document.body.innerText;
+    const lines = pageText.split('\n');
+    
+    // Find matching lines
+    const matches = lines.filter(line => line.toLowerCase().includes(query) && line.trim());
+
+    if (matches.length === 0) {
+      resultsContainer.innerHTML = '<p class="text-on-surface-variant text-sm">No results found.</p>';
+      return;
+    }
+
+    // Display results
+    const resultsHTML = matches.slice(0, 10).map(match => {
+      const highlighted = match.replace(
+        new RegExp(`(${query})`, 'gi'),
+        '<span class="bg-secondary text-on-surface font-bold">$1</span>'
+      );
+      return `<div class="py-3 px-3 bg-surface rounded-lg mb-2 text-sm border border-surface-container"><p>${highlighted}</p></div>`;
+    }).join('');
+
+    resultsContainer.innerHTML = `<p class="text-on-surface-variant text-xs mb-4">Found ${matches.length} results</p>${resultsHTML}`;
+  }
+
+  // Close modal when pressing Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSearchModal();
+  });
+</script>
+</body></html>
