@@ -1,0 +1,242 @@
+{
+  "$schema_note": "Machine-readable map of this repository for coding agents. Prose companion for Claude Code specifically is CLAUDE.md at repo root; this file is broader-purpose and tool-agnostic. Regenerate by re-deriving from source rather than hand-editing stale facts.",
+  "generated_at": "2026-08-01",
+  "repo_name": "physical_ads_and_OOH",
+  "product": {
+    "one_liner": "AdSpace Horizon: a Bengaluru-focused marketplace for out-of-home (OOH) advertising space (billboards, hoardings, etc.) connecting ad-space owners, advertisers, and a marketplace admin/ops team.",
+    "prd_files": [
+      "AdSpace_Marketplace_PRD.html (title: 'AdSpace Marketplace — PRD v0.1'; gitignored, present on disk but not tracked in git)",
+      "AdSpace_Marketplace_PRD_v0.1.docx (same content, .docx form; gitignored)"
+    ],
+    "prd_sections": [
+      "Executive Summary", "Problem Statement", "Goals & Success Metrics",
+      "User Personas", "High-Level User Stories (Advertiser / Owner / Admin-Ops)",
+      "Functional Requirements (auth & onboarding, discovery & listing, booking & checkout, VAS-only flow, advertiser CRM dashboard, owner dashboard, internal admin panel)",
+      "Non-Functional Requirements", "Business Rules (revenue model, booking rules, guaranteed contract rules, VAS rules)",
+      "Assumptions & Risks", "Out of Scope for v1", "Glossary"
+    ],
+    "personas": ["Advertiser (books ad space, orders VAS)", "Ad-space Owner (lists inventory)", "Admin/Ops (approves listings, runs VAS job queue)"],
+    "vas_meaning": "Value-Added Services: printing, installation, maintenance work related to an ad space, purchasable standalone or attached to a booking."
+  },
+  "repo_shape": {
+    "summary": "Two mostly-independent halves being wired together: a static HTML/CSS/Tailwind frontend prototype, and a FastAPI backend that is the source of truth for business logic.",
+    "top_level_entry_point": "index.html — meta-refresh redirect into Ui_Prototype_MVP_Prep/index.html (the marketplace landing page).",
+    "directories": {
+      "Ui_Prototype_MVP_Prep/": "Static HTML/CSS/Tailwind UI prototype. No build step, no bundler; open files directly or serve as static files.",
+      "Ui_Prototype_MVP_Prep/css/": "One hand-authored CSS file per page (not shared).",
+      "Ui_Prototype_MVP_Prep/js/": "tailwind.config.<page>.js per page, plus the single real integration file api.js.",
+      "Ui_Prototype_MVP_Prep/arch/": "PlantUML (.puml) and rendered PNG architecture/activity diagrams the backend design was derived from (context view, system view, booking/owner-listing/VAS/ad-agency activity diagrams). Gitignored — present on disk, not in git history.",
+      "backend/": "FastAPI + SQLAlchemy + Alembic REST API. Source of truth for business logic. IMPORTANT: this entire directory is untracked in git as of 2026-08-01 (see git_state.backend_untracked below) — it exists only in the working tree, not in any commit.",
+      "backend/app/": "Application code (see backend.modules below).",
+      "backend/alembic/": "Migration environment; only path allowed to change the DB schema.",
+      "backend/docs/": "Hand-written docs: ARCHITECTURE.md, API.md, DEPLOYMENT.md, OPERATIONS.md, FRONTEND.md, TESTING.md — treat these as authoritative and read them directly for full prose detail.",
+      "backend/tests/": "pytest suite: test_smoke.py (health/security-header check) and test_design_workflows.py (acceptance tests derived from the arch/ activity diagrams).",
+      "backend/uploads/": "Local fallback file storage (invoices/, listing-documents/) used when S3 is not configured. Gitignored.",
+      ".github/skills/refactorhtml/": "A Claude Code skill (repo-scoped) that refactors a prototype HTML page into separate CSS + Tailwind config files and adds indentation. Gitignored directory (see .gitignore), present on disk."
+    }
+  },
+  "git_state": {
+    "default_branch": "main",
+    "remote": "origin (GitHub)",
+    "backend_untracked": true,
+    "backend_untracked_detail": "`git ls-files` contains zero paths under backend/. The whole FastAPI app, its docs, tests, alembic migration, requirements.txt, Dockerfile, docker-compose.yml etc. are new/uncommitted working-tree content, not gitignored (backend/.gitignore only excludes .env/.venv/__pycache__/adspace.db/uploads/.pytest_cache). Before assuming backend/ is available in a fresh clone or worktree, check `git status` / `git ls-files` again — this may have been committed since this snapshot.",
+    "also_untracked": [
+      "Ui_Prototype_MVP_Prep/js/api.js (the only real frontend-backend integration file)",
+      "AdSpace_Marketplace_PRD.html / .docx (gitignored by pattern 'AdSpace_Marketplace_PRD*')",
+      "Ui_Prototype_MVP_Prep/arch/ (gitignored)",
+      ".github/ (gitignored, except this repo's own skill file still lives on disk)"
+    ],
+    "modified_uncommitted_at_snapshot": [
+      "Ui_Prototype_MVP_Prep/login_Page.html — added id attributes to the form/email/password inputs and a <script> block that POSTs to /auth/login via api.js, stores the JWT in localStorage, and redirects to listing_page.html."
+    ],
+    "notable_commits_oldest_to_newest": [
+      "8254fc2 Initial commit: Add UI prototype, CSS, and Tailwind configs",
+      "6bc1f14 Create CNAME / 4a1c8a9 Update CNAME / 0fe3ebd Delete CNAME (GitHub Pages custom-domain churn, since removed)",
+      "0782fb8 Rename landing_page.html to index.html and update all references",
+      "f24a5e5 Add root index.html redirect to marketplace",
+      "c2a3302 adding claude.md"
+    ]
+  },
+  "frontend": {
+    "stack": "Static HTML + Tailwind CSS (via per-page config files, no bundler) + vanilla JS.",
+    "wiring_status": "Only login_Page.html is wired to the real API so far. Every other page is presentation-only markup with no fetch calls.",
+    "integration_helper": {
+      "file": "Ui_Prototype_MVP_Prep/js/api.js",
+      "behavior": "async api(path, options): reads window.OOH_API_BASE_URL (default http://127.0.0.1:8000/api/v1), attaches Bearer token from localStorage key 'adspace_access_token', sets Content-Type: application/json, throws Error(payload.detail) on non-OK response, otherwise returns parsed JSON."
+    },
+    "pages": [
+      {"file": "Ui_Prototype_MVP_Prep/index.html", "title": "AdSpace Horizon | Bengaluru's own OOH Marketplace", "role": "Landing page."},
+      {"file": "Ui_Prototype_MVP_Prep/login_Page.html", "title": "Sign In | OOH Marketplace", "role": "Auth. WIRED: posts to POST /auth/login, stores access_token, redirects to listing_page.html."},
+      {"file": "Ui_Prototype_MVP_Prep/listing_page.html", "title": "AdSpace Horizon | Marketplace Discovery", "role": "Marketplace browse/discovery. Should call GET /listings and GET /listings/{id}."},
+      {"file": "Ui_Prototype_MVP_Prep/listing_view.html", "title": "MG Road Premium Billboard | AdSpace Horizon", "role": "Single listing detail view (currently static sample content)."},
+      {"file": "Ui_Prototype_MVP_Prep/listing_your_adspace.html", "title": "List Your Media | OOH Marketplace", "role": "Owner: submit new listing. Should call POST /listings, then multipart document upload."},
+      {"file": "Ui_Prototype_MVP_Prep/location.html", "title": "Specify Location | OOH Marketplace", "role": "Owner listing wizard step: location."},
+      {"file": "Ui_Prototype_MVP_Prep/pricing.html", "title": "Set Pricing | OOH Marketplace", "role": "Owner listing wizard step: price_per_day etc."},
+      {"file": "Ui_Prototype_MVP_Prep/availability.html", "title": "Set Availability | OOH Marketplace", "role": "Owner listing wizard step: availability."},
+      {"file": "Ui_Prototype_MVP_Prep/review.html", "title": "Review & Submit | OOH Marketplace", "role": "Owner listing wizard step: final review/submit."},
+      {"file": "Ui_Prototype_MVP_Prep/checkout_page.html", "title": "Checkout | OOH Marketplace Excellence", "role": "Booking checkout. Should call POST /bookings then a real payment step."},
+      {"file": "Ui_Prototype_MVP_Prep/Campaign_analytics.html", "title": "OOH Marketplace - Analytics Dashboard", "role": "Advertiser dashboard. Should call GET /dashboard/advertiser, GET /notifications, GET /invoices."},
+      {"file": "Ui_Prototype_MVP_Prep/Partnerships.html", "title": "Partnerships | OOH Marketplace Excellence", "role": "Marketing/partnerships static page."},
+      {"file": "Ui_Prototype_MVP_Prep/support_page.html", "title": "Support & Tickets | OOH Marketplace Excellence", "role": "Support/ticketing static page."}
+    ],
+    "conventions": "Each prototype page has a matching hand-authored CSS file (css/<page>.css) and Tailwind config (js/tailwind.config.<page>.js) — one pair per page, not shared. Check for an existing pair before adding styles for a page. A repo-scoped Claude Code skill (.github/skills/refactorhtml) automates converting a raw HTML page into this CSS+Tailwind-config+indentation pattern."
+  },
+  "backend": {
+    "stack": {
+      "framework": "FastAPI 0.140.0",
+      "orm": "SQLAlchemy 2.0.51 (Mapped/mapped_column style)",
+      "migrations": "Alembic 1.18.4 — schema is NEVER created via Base.metadata.create_all(); alembic upgrade head is the only path.",
+      "db_driver": "psycopg[binary] 3.3.3 (Postgres) — SQLite (sqlite:///./adspace.db) supported for local dev/tests.",
+      "auth": "python-jose (JWT HS256) + passlib/bcrypt password hashing.",
+      "rate_limiting": "slowapi (Limiter keyed by remote address).",
+      "file_storage": "boto3 (S3) with local ./uploads/ fallback.",
+      "pdf": "reportlab (invoice PDF generation).",
+      "email": "smtplib via a thin send_email() adapter — not yet invoked by any worker.",
+      "testing": "pytest 9.1.1 + pytest-cov; fully mocked/local-only, no external services required to run the suite."
+    },
+    "run_commands": {
+      "setup": ["cd backend", "source .venv/bin/activate", "cp .env.example .env  # first time only", "# set DATABASE_URL=sqlite:///./adspace.db in .env for local SQLite instead of Postgres"],
+      "migrate": "alembic upgrade head",
+      "serve": "uvicorn app.main:app --reload  # interactive docs at /docs (disabled when APP_ENV=production)",
+      "test_all": "pytest -q",
+      "test_one_file": "pytest -q tests/test_smoke.py",
+      "test_one_case": "pytest -q tests/test_design_workflows.py::test_name_here",
+      "new_migration_after_model_change": ["alembic revision --autogenerate -m \"describe change\"", "alembic upgrade head", "# review generated SQL before applying"],
+      "docker": "docker compose up --build -d   # from backend/; runs alembic upgrade head then uvicorn; requires APP_ENV=production, real DATABASE_URL, 32+ char SECRET_KEY, restrictive CORS_ORIGINS/ALLOWED_HOSTS"
+    },
+    "modules": {
+      "app/main.py": "All routes, authorization checks, pricing math, workflow orchestration, security middleware. No service/repository layer — everything is flat.",
+      "app/models.py": "SQLAlchemy entities and status enums (Role, ListingStatus, BookingStatus, PaymentStatus, JobStatus).",
+      "app/schemas.py": "Pydantic request/response schemas.",
+      "app/database.py": "Engine, session factory, get_db dependency.",
+      "app/config.py": "pydantic-settings Settings, env-backed, loaded from backend/.env.",
+      "app/integrations.py": "validate_gstin, geocode, send_email, store_file, invoice_pdf — thin adapters, each fails safe / falls back to local behavior when unconfigured.",
+      "alembic/versions/9e6fb23d291b_initial_production_schema.py": "The single migration so far; creates all 8 tables listed under entities below."
+    },
+    "settings_env_vars": {
+      "app_env": "development|production. production disables /docs and disables the simulated payment-confirm endpoint.",
+      "database_url": "default sqlite:///./adspace.db; use postgresql+psycopg://... in production.",
+      "secret_key": "JWT signing secret; must be unique 32+ chars in production.",
+      "access_token_expire_minutes": "default 1440.",
+      "cors_origins": "comma-separated exact origins.",
+      "allowed_hosts": "comma-separated TrustedHostMiddleware allowlist (only enforced when app_env=production).",
+      "smtp_host/smtp_port/smtp_username/smtp_password/smtp_from_email": "optional; send_email() no-ops if smtp_host unset.",
+      "s3_bucket/s3_region": "optional; store_file() falls back to local uploads/ if s3_bucket unset.",
+      "google_maps_api_key": "optional; geocode() returns (None, None) if unset.",
+      "gst_validation_url/gst_validation_api_key": "optional; validate_gstin() falls back to a length>=15 check if unset."
+    },
+    "roles": {
+      "advertiser": "Browse active listings, create bookings, create VAS orders, create payment intents, view invoices and advertiser dashboard.",
+      "owner": "Submit listings and documents, pause/resume approved listings, view owner dashboard.",
+      "admin": "Review pending listings, manage VAS job assignment/status. Production blocks public self-registration as admin — provision via internal process/migration."
+    },
+    "entities": {
+      "User": "users — email(unique), full_name, password_hash, role, gstin?, kyc_status.",
+      "Listing": "listings — owner_id→users, title, space_type, description, location, latitude?, longitude?, width_ft, height_ft, price_per_day, footfall_estimate?, status, rejection_reason?. Lifecycle: pending_approval → active/rejected; active ⇄ paused.",
+      "ListingDocument": "listing_documents — listing_id→listings, uploaded_by→users, original_name, content_type, storage_key(unique). Ownership/GST evidence file.",
+      "Booking": "bookings — listing_id→listings, advertiser_id→users, start_date, end_date, base_amount, vas_amount, vas_services(JSON)?, gst_amount, total_amount, status. Lifecycle: pending_payment → booked → active, or cancelled.",
+      "VASOrder": "vas_orders — advertiser_id→users, booking_id→bookings?, own_space_details(JSON)?, services(JSON), subtotal, gst_amount, total_amount, status, assigned_to→users?, scheduled_date?. Lifecycle: unassigned → scheduled → in_progress → completed, or cancelled. Linked to a booking OR standalone (advertiser's own space).",
+      "Payment": "payments — booking_id?→bookings, vas_order_id?→vas_orders, amount, status, provider_order_id(unique). Lifecycle: created → paid/failed. Provider-neutral intent record; no real gateway yet.",
+      "Invoice": "invoices — invoice_number(unique, format ADS-YYYYMMDD-XXXXXXXX), booking_id?, vas_order_id?, user_id→users, amount, gst_amount, document_key? (PDF storage key).",
+      "Notification": "notifications — user_id→users, event_type, message, read(bool). In-app outbox only; no SMTP/SMS dispatch worker exists yet.",
+      "AuditLog": "audit_logs — actor_id?→users, action, entity_type, entity_id, details(JSON)?, created_at. Written on every sensitive business mutation."
+    },
+    "pricing": {
+      "booking_base": "inclusive_days × listing.price_per_day, where inclusive_days = (end_date - start_date).days + 1",
+      "vas_rates": {"printing": "₹25 per unit quantity", "installation": "₹1,500 per unit quantity", "maintenance": "₹750 per unit quantity"},
+      "gst_rate": 0.18,
+      "gst_base": "18% applied over (base + VAS subtotal)",
+      "money_type_caveat": "Stored as Float in the MVP schema — NOT safe for real financial settlement yet; migrate to Decimal/integer-paise before real money moves (see known_gaps)."
+    },
+    "api": {
+      "base_url": "http://127.0.0.1:8000/api/v1 (docs at /docs in non-production)",
+      "auth_scheme": "Authorization: Bearer <JWT access_token> from /auth/login; payload = {sub: user_id, role, exp}, HS256.",
+      "endpoints": [
+        {"method": "GET", "path": "/health", "access": "public", "purpose": "Liveness; also verifies security headers in tests."},
+        {"method": "POST", "path": "/api/v1/auth/register", "access": "public, rate-limited 5/min", "purpose": "Create advertiser/owner account (admin allowed only outside production)."},
+        {"method": "POST", "path": "/api/v1/auth/login", "access": "public, rate-limited 10/min", "purpose": "Returns JWT bearer token."},
+        {"method": "GET", "path": "/api/v1/auth/me", "access": "authenticated", "purpose": "Current user profile."},
+        {"method": "GET", "path": "/api/v1/listings", "access": "public", "purpose": "Active listings; filters location, space_type, max_price."},
+        {"method": "POST", "path": "/api/v1/listings", "access": "owner", "purpose": "Create listing (status=pending_approval); geocodes location if lat/lng omitted and Maps key configured."},
+        {"method": "GET", "path": "/api/v1/listings/{listing_id}", "access": "public", "purpose": "Listing detail."},
+        {"method": "GET", "path": "/api/v1/owner/listings", "access": "owner", "purpose": "Owner's own inventory including non-public states."},
+        {"method": "PATCH", "path": "/api/v1/owner/listings/{listing_id}/status?paused=bool", "access": "owner", "purpose": "Pause/resume an active/paused listing (own only)."},
+        {"method": "GET", "path": "/api/v1/dashboard/advertiser", "access": "advertiser", "purpose": "booking_count, total_spend, active_bookings, bookings[]."},
+        {"method": "GET", "path": "/api/v1/dashboard/owner", "access": "owner", "purpose": "listing_count, active_listings, booking_revenue, booking_count."},
+        {"method": "POST", "path": "/api/v1/owner/listings/{listing_id}/documents", "access": "owner", "purpose": "Multipart upload (field 'file'); PDF/JPEG/PNG/WebP only, max 10 MB."},
+        {"method": "GET", "path": "/api/v1/admin/listings/pending", "access": "admin", "purpose": "Pending-review queue."},
+        {"method": "POST", "path": "/api/v1/admin/listings/{listing_id}/review", "access": "admin", "purpose": "{approve:true} or {approve:false, rejection_reason} (reason required on reject); notifies owner."},
+        {"method": "POST", "path": "/api/v1/bookings", "access": "advertiser", "purpose": "Create booking; 404 if listing not active; 409 on overlapping non-cancelled dates; computes base/vas/gst/total."},
+        {"method": "GET", "path": "/api/v1/bookings", "access": "advertiser", "purpose": "Own bookings."},
+        {"method": "POST", "path": "/api/v1/vas/orders", "access": "advertiser", "purpose": "Create VAS order; booking-linked reorder requires booking.status==active, else own_space_details required."},
+        {"method": "GET", "path": "/api/v1/vas/orders", "access": "advertiser", "purpose": "Own VAS order history."},
+        {"method": "GET", "path": "/api/v1/admin/vas/orders?job_status=", "access": "admin", "purpose": "Ops queue, optional status filter."},
+        {"method": "PATCH", "path": "/api/v1/admin/vas/orders/{order_id}", "access": "admin", "purpose": "Update status/assigned_to/scheduled_date; notifies advertiser."},
+        {"method": "POST", "path": "/api/v1/payments/booking/{booking_id}", "access": "advertiser", "purpose": "Create payment intent for a booking (own only)."},
+        {"method": "POST", "path": "/api/v1/payments/vas/{vas_order_id}", "access": "advertiser", "purpose": "Create payment intent for a VAS order (own only)."},
+        {"method": "POST", "path": "/api/v1/payments/{payment_id}/confirm", "access": "advertiser", "purpose": "DEV-ONLY simulated outcome (501 in production). On success: marks booking booked, issues invoice, creates linked VASOrder if vas_services present, sends notifications. On VAS-order payment success: issues invoice, notifies."},
+        {"method": "GET", "path": "/api/v1/invoices", "access": "authenticated", "purpose": "Current user's invoices."},
+        {"method": "GET", "path": "/api/v1/notifications", "access": "authenticated", "purpose": "Current user's in-app notifications."}
+      ],
+      "typical_booking_workflow": [
+        "Owner registers, submits listing, uploads documents.",
+        "Admin approves listing; it becomes discoverable.",
+        "Advertiser browses and creates a booking with optional VAS items.",
+        "API creates a payment intent; dev-only confirm marks it paid, confirms booking, creates invoice, records notifications.",
+        "Admin assigns/advances the related VAS job(s)."
+      ]
+    },
+    "security": [
+      "Passwords bcrypt-hashed via passlib.",
+      "JWT (HS256) contains user id, role, expiry.",
+      "Role guards (require_roles) enforced in main.py, not at the DB level.",
+      "Login/registration are IP rate-limited via slowapi (10/min, 5/min respectively).",
+      "CORS via CORSMiddleware (settings.cors_origins) and TrustedHostMiddleware (enforced only when app_env=production).",
+      "Every response gets X-Content-Type-Options: nosniff, X-Frame-Options: DENY, Referrer-Policy: strict-origin-when-cross-origin.",
+      "Upload validation: MIME allowlist + 10 MB size cap.",
+      "audit_logs row written on registration, login, listing create/status-change/review, booking create, VAS order create/update.",
+      "Production blocks public admin registration and the payment-simulation confirm endpoint (501)."
+    ],
+    "tests": {
+      "framework": "pytest, FastAPI TestClient",
+      "isolation": "conftest.py creates a fresh shared in-memory SQLite DB per test and overrides the get_db dependency; writes invoice artifacts to pytest's tmp dir. Never touches adspace.db, Postgres, S3, Maps, GST, or a real payment gateway.",
+      "files": {
+        "test_smoke.py": "Baseline: /health returns 200 + security headers present.",
+        "test_design_workflows.py": "Acceptance suite derived directly from the arch/ activity diagrams — owner submission→approval visibility, rejection requires a reason + notifies owner, booking pricing/GST/date-overlap rejection, booking+VAS single paid lifecycle creating one linked VASOrder, VAS standalone vs. reorder-requires-active-booking rule, admin-only VAS queue actions, advertiser denied admin actions."
+      },
+      "known_gap_found_by_tests": "First implementation only priced VAS into the booking total; the design test exposed that checkout-time VAS must also produce an operational VASOrder job once payment succeeds — now fixed (see confirm_payment in main.py)."
+    },
+    "known_gaps_before_public_launch": [
+      "No real payment gateway/webhook — implement provider checkout + signed, idempotent webhook; never trust a client-supplied 'paid' value.",
+      "Money stored as Float — move to Decimal/integer-paise before handling real settlement.",
+      "Notifications are DB rows only — no worker actually sends email/SMS yet; add a durable queue + retry/dead-letter.",
+      "No password reset / MFA / OAuth.",
+      "No DB-level booking concurrency locks — current overlap check is a query, not a constraint/transaction lock; race possible under concurrency.",
+      "Uploaded documents/invoices need authorization checks + short-lived signed URLs when served, not just storage.",
+      "No observability yet: structured logs, error tracking, metrics, uptime probes, DB backups.",
+      "No dependency/security scanning or integration/load tests wired into CI yet."
+    ],
+    "external_integration_status": {
+      "postgres": "Supported via SQLAlchemy + docker-compose; use managed PG + TLS + backups in production.",
+      "file_storage": "S3 when S3_BUCKET set, else local uploads/; needs private bucket + IAM + signed URLs in production.",
+      "gst_validation": "Calls configured URL if set, else a basic length>=15 check only.",
+      "google_maps": "Geocodes listing location only if GOOGLE_MAPS_API_KEY set.",
+      "smtp": "send_email() adapter exists; nothing currently calls it in a background worker.",
+      "payments": "Intent-only; simulated confirm is development-only and 501s in production."
+    }
+  },
+  "documentation_index": {
+    "CLAUDE.md": "Repo root. Prose guidance for Claude Code specifically (commands, architecture, wiring status) — read this for narrative context; this JSON is the structured/queryable counterpart.",
+    "backend/docs/ARCHITECTURE.md": "Runtime layout, modules, roles, entities, lifecycle states, pricing.",
+    "backend/docs/API.md": "Full endpoint reference with example payloads and the typical booking workflow.",
+    "backend/docs/DEPLOYMENT.md": "Local dev setup, Docker deployment, environment variables, migration discipline.",
+    "backend/docs/OPERATIONS.md": "Integration status table, security controls, pre-launch checklist.",
+    "backend/docs/FRONTEND.md": "How the static prototype should call the API, page-by-page.",
+    "backend/docs/TESTING.md": "Design-derived test strategy and the one behavior gap the tests caught.",
+    "backend/README.md": "Backend quickstart and links to the docs above."
+  },
+  "open_questions_for_a_human": [
+    "Is it intentional that backend/ (a fully built, documented, tested FastAPI app) has never been committed to git? If not, it should likely be added and committed soon to avoid losing it.",
+    "AdSpace_Marketplace_PRD* and Ui_Prototype_MVP_Prep/arch/ are gitignored — confirm that's deliberate (e.g. keeping internal planning docs out of a public GitHub Pages repo) rather than accidental."
+  ]
+}
