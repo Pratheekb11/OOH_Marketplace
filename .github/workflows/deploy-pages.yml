@@ -64,8 +64,13 @@ jobs:
           NEXT_OUTPUT: export
           # "/OOH_Marketplace" for a project site, "" for a user/org site.
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-          # Falls back to http://127.0.0.1:8000/api/v1 (see src/lib/api.ts)
-          # when the repository variable is unset.
+          # Unset by default. Pages has no backend, and a build without this
+          # falls back to http://127.0.0.1:8000/api/v1 (src/lib/api.ts) which
+          # the browser refuses to reach from an https origin. The marketplace
+          # therefore serves public/data/listings.json instead (see
+          # src/lib/listings-source.ts) and stays browsable but read-only.
+          # Set the repository variable to a public API URL to make the
+          # deployed site live rather than a snapshot.
           NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
         run: npm run build:pages
 
