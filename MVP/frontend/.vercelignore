@@ -1,0 +1,9 @@
+# Build output and local caches. `out/` in particular is the GitHub Pages
+# static export (~115 MB) and must never be uploaded to a deployment.
+node_modules
+.next
+.next-dev
+out
+coverage
+.env.local
+tsconfig.tsbuildinfo
