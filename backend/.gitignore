@@ -7,3 +7,5 @@ adspace.db
 migration_*.db
 uploads/
 .pytest_cache/
+.vercel
+.env*
