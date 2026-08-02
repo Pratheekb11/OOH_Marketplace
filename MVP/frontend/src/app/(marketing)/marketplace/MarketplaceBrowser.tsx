@@ -6,7 +6,9 @@ import { api, ApiError } from "@/lib/api";
 import FilterBar from "@/components/marketplace/FilterBar";
 import ListingGrid from "@/components/marketplace/ListingGrid";
 import MapPanel from "@/components/marketplace/MapPanel";
-import type { ListingOut } from "@/components/marketplace/types";
+import type { ListingOut, ListingPage } from "@/components/marketplace/types";
+
+const PAGE_SIZE = 24;
 
 /**
  * Owns the split-pane body: fetches from GET /listings server-side-filtered
@@ -28,25 +30,36 @@ export function MarketplaceBrowser() {
   const pathname = usePathname();
 
   const [listings, setListings] = useState<ListingOut[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const queryString = searchParams.toString();
 
+  // First page. Refetches whenever any filter changes; `listings` is replaced
+  // rather than appended so a filter change never shows stale rows.
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    api<ListingOut[]>(`/listings${queryString ? `?${queryString}` : ""}`)
+    const params = new URLSearchParams(queryString);
+    params.set("limit", String(PAGE_SIZE));
+    params.set("offset", "0");
+
+    api<ListingPage>(`/listings?${params.toString()}`)
       .then((data) => {
-        if (!cancelled) setListings(data);
+        if (cancelled) return;
+        setListings(data.items);
+        setTotal(data.total);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
         const message = err instanceof ApiError ? String(err.detail ?? err.message) : "Something went wrong.";
         setError(message);
         setListings([]);
+        setTotal(0);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -57,7 +70,26 @@ export function MarketplaceBrowser() {
     };
   }, [queryString]);
 
-  const hasActiveFilters = queryString.length > 0;
+  const loadMore = () => {
+    setLoadingMore(true);
+    const params = new URLSearchParams(queryString);
+    params.set("limit", String(PAGE_SIZE));
+    params.set("offset", String(listings.length));
+
+    api<ListingPage>(`/listings?${params.toString()}`)
+      .then((data) => {
+        // Append, and re-sync the total in case inventory changed underneath.
+        setListings((current) => [...current, ...data.items]);
+        setTotal(data.total);
+      })
+      .catch(() => undefined)
+      .finally(() => setLoadingMore(false));
+  };
+
+  // `sort` alone is not a filter — it never changes which listings match.
+  const hasActiveFilters = Array.from(searchParams.keys()).some(
+    (key) => key !== "sort" && key !== "limit" && key !== "offset",
+  );
 
   return (
     <div className="flex min-h-0 flex-col">
@@ -71,9 +103,16 @@ export function MarketplaceBrowser() {
                 Discover Spaces
               </h1>
               <p className="mt-1 text-sm text-on-surface-variant">
-                {loading ? "Loading premium OOH spaces…" : `${listings.length} premium OOH space${listings.length === 1 ? "" : "s"} available in Bengaluru`}
+                {loading
+                  ? "Loading premium OOH spaces…"
+                  : `${total.toLocaleString("en-IN")} premium OOH space${total === 1 ? "" : "s"} available in Bengaluru`}
               </p>
             </div>
+            {!loading && total > listings.length ? (
+              <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+                Showing {listings.length.toLocaleString("en-IN")}
+              </p>
+            ) : null}
           </div>
 
           <ListingGrid
@@ -83,6 +122,21 @@ export function MarketplaceBrowser() {
             hasActiveFilters={hasActiveFilters}
             onClearFilters={() => router.replace(pathname)}
           />
+
+          {!loading && !error && listings.length < total ? (
+            <div className="mt-8 flex justify-center">
+              <button
+                type="button"
+                onClick={loadMore}
+                disabled={loadingMore}
+                className="rounded-lg border-2 border-primary px-8 py-3 text-xs font-bold uppercase tracking-widest text-primary transition-all hover:bg-primary hover:text-white disabled:opacity-50"
+              >
+                {loadingMore
+                  ? "Loading…"
+                  : `Load more (${(total - listings.length).toLocaleString("en-IN")} remaining)`}
+              </button>
+            </div>
+          ) : null}
         </aside>
 
         <MapPanel listings={listings} className="lg:w-[32%]" />

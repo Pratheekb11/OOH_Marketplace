@@ -16,7 +16,16 @@ function formatFootfall(value: number | null): string {
 export function StatsGrid({ listing }: StatsGridProps) {
   const stats = [
     { icon: "group", label: "Daily Footfall", value: formatFootfall(listing.footfall_estimate) },
-    { icon: "straighten", label: "Size", value: `${listing.width_ft}x${listing.height_ft} ft` },
+    {
+      icon: "straighten",
+      label: "Size",
+      // Not every space publishes dimensions (bus shelters are sold by a
+      // size bucket), so fall back rather than rendering "nullxnull ft".
+      value:
+        listing.width_ft && listing.height_ft
+          ? `${listing.width_ft}x${listing.height_ft} ft`
+          : (typeof listing.extra?.size_bucket === "string" && listing.extra.size_bucket) || "—",
+    },
     { icon: "visibility", label: "Visibility", value: listing.extra?.visibility_radius ?? "—" },
     { icon: "schedule", label: "Peak Hours", value: listing.extra?.peak_hours ?? "—" },
   ];
