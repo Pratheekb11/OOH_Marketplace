@@ -115,6 +115,21 @@ does not always publish a size (bus shelters are sold by a Small/Medium/Large
 bucket, kept in `extra.size_bucket`). Anything rendering dimensions must degrade
 rather than print `null x null`.
 
+## Deployments
+
+Two targets, and they are not equivalent:
+
+- **Vercel** (`MVP/DEPLOY_VERCEL.md`) — the real deployment. Frontend and
+  backend are separate Vercel projects rooted at `MVP/frontend` and
+  `MVP/backend`; the API runs as a serverless function via `api/index.py`, with
+  Postgres on Neon. Writes work, so login/cart/checkout work.
+- **GitHub Pages** — a read-only mirror. Static host, no backend; see below.
+
+`Settings.sqlalchemy_url` rewrites `postgres://`/`postgresql://` to
+`postgresql+psycopg://`. Hosted Postgres providers hand out the bare scheme and
+SQLAlchemy would otherwise reach for psycopg2, which is not installed. Use a
+provider's *pooled* endpoint: serverless opens many short-lived connections.
+
 ## Static snapshot (GitHub Pages)
 
 Pages is a static host with no backend. `MVP/frontend/src/lib/listings-source.ts`

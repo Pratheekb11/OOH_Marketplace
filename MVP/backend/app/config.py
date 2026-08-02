@@ -12,6 +12,22 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property
+    def sqlalchemy_url(self) -> str:
+        """DATABASE_URL with an explicit driver.
+
+        Hosted Postgres (Neon, Vercel, Render, Heroku) hands out
+        `postgresql://` or `postgres://`. SQLAlchemy maps both to psycopg2,
+        which is not installed - only psycopg 3 is - so the app would die at
+        import with a ModuleNotFoundError that says nothing about the cause.
+        """
+        url = self.database_url
+        if url.startswith("postgres://"):
+            url = f"postgresql://{url[len('postgres://'):]}"
+        if url.startswith("postgresql://"):
+            url = f"postgresql+psycopg://{url[len('postgresql://'):]}"
+        return url
+
+    @property
     def origins(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
