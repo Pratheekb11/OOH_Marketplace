@@ -1,5 +1,9 @@
-# GitHub
-.github/
+# GitHub — local-only helpers stay ignored, but workflows must be committed
+# or Actions never sees them. (A `.github/` directory exclusion cannot be
+# undone by a later negation, because git does not descend into an excluded
+# directory; excluding the contents instead is what makes the re-include work.)
+.github/*
+!.github/workflows/
 
 # Architecture and documentation
 Ui_Prototype_MVP_Prep/arch/
@@ -20,3 +24,14 @@ yarn-error.log
 *.swo
 *~
 .DS_Store
+
+# Scraper artefacts
+backend/data/
+backend/.scrape_cache/
+
+# Local database backups taken before destructive imports
+*.bak-*
+*.old-schema
+
+# Claude Code local working directory (incl. scratch worktrees)
+.claude/

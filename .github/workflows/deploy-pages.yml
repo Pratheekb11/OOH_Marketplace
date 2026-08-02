@@ -1,0 +1,99 @@
+name: Deploy MVP frontend to GitHub Pages
+
+# GitHub Pages serves static files only. This deploys the Next.js frontend
+# as a static export (MVP/frontend, `npm run build:pages`). It does NOT and
+# cannot deploy MVP/backend — FastAPI needs a running process. Point the
+# deployed UI at a hosted API by setting the repository variable
+# NEXT_PUBLIC_API_BASE_URL (Settings -> Secrets and variables -> Actions ->
+# Variables). It is a variable, not a secret, because it is baked into the
+# client bundle at build time and is therefore public either way.
+
+on:
+  push:
+    branches: [MVP]
+    paths:
+      - "MVP/frontend/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+# Least privilege for the OIDC-based Pages deployment.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; queue rather than cancel so an in-flight
+# deployment is not left half-applied.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # GitHub-hosted runner. Nothing here needs a self-hosted runner: the build
+    # is Node-only, has no local services and no access to private hardware.
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: MVP/frontend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Resolve Pages URL and base path
+        id: pages
+        uses: actions/configure-pages@v5
+        # `static_site_generator` is deliberately NOT set: that input rewrites
+        # next.config for you, and this repo sets basePath itself from the
+        # base_path output below.
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: MVP/frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static export
+        env:
+          NEXT_OUTPUT: export
+          # "/OOH_Marketplace" for a project site, "" for a user/org site.
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          # Unset by default. Pages has no backend, and a build without this
+          # falls back to http://127.0.0.1:8000/api/v1 (src/lib/api.ts) which
+          # the browser refuses to reach from an https origin. The marketplace
+          # therefore serves public/data/listings.json instead (see
+          # src/lib/listings-source.ts) and stays browsable but read-only.
+          # Set the repository variable to a public API URL to make the
+          # deployed site live rather than a snapshot.
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+        run: npm run build:pages
+
+      - name: Disable Jekyll processing
+        # Belt and braces: the Actions deployment path does not run Jekyll,
+        # but without this a future switch to branch-based Pages would strip
+        # the underscore-prefixed `_next/` directory and blank the whole site.
+        run: touch out/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Relative to the workspace root — `defaults.run.working-directory`
+          # only applies to `run` steps, not to action inputs.
+          path: MVP/frontend/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

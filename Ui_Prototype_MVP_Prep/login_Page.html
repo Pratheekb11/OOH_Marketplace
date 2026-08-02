@@ -108,12 +108,12 @@
           </header>
 
           <!-- Login Form -->
-          <form class="space-y-6">
+          <form class="space-y-6" id="login-form">
             <div class="space-y-5">
               <!-- Email Input -->
               <div class="group">
                 <label class="block text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant mb-2 ml-1">Email Address</label>
-                <input class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="name@company.com" type="email" />
+                <input id="email" class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="name@company.com" type="email" required />
               </div>
 
               <!-- Password Input -->
@@ -122,7 +122,7 @@
                   <label class="text-xs font-bold font-label uppercase tracking-widest text-on-surface-variant">Password</label>
                   <a class="text-xs font-bold text-secondary hover:text-secondary-container transition-colors" href="#">Forgot Password?</a>
                 </div>
-                <input class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="••••••••" type="password" />
+                <input id="password" class="w-full bg-surface-container-highest border-0 rounded-xl px-4 py-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="••••••••" type="password" required />
               </div>
             </div>
 
@@ -187,5 +187,16 @@
         </div>
       </div>
     </footer>
+    <script src="./js/api.js"></script>
+    <script>
+      document.getElementById('login-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        try {
+          const result = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email: email.value, password: password.value }) });
+          localStorage.setItem('adspace_access_token', result.access_token);
+          window.location.href = './listing_page.html';
+        } catch (error) { alert(error.message); }
+      });
+    </script>
   </body>
 </html>
