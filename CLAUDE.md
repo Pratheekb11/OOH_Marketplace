@@ -119,7 +119,7 @@ rather than print `null x null`.
 
 Two targets, and they are not equivalent:
 
-- **Vercel** (`MVP/DEPLOY_VERCEL.md`) — the real deployment. Frontend and
+- **Vercel** — <https://adspace-ooh.vercel.app>, the real deployment (`MVP/DEPLOY_VERCEL.md`). Frontend and
   backend are separate Vercel projects rooted at `MVP/frontend` and
   `MVP/backend`; the API runs as a serverless function via `api/index.py`, with
   Postgres on Neon. Writes work, so login/cart/checkout work.
