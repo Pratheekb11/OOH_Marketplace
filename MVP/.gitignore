@@ -1,0 +1,20 @@
+# Python (backend)
+.venv/
+__pycache__/
+*.py[cod]
+*.db
+
+# Env files (both halves)
+.env
+.env.local
+
+# Next.js (frontend)
+.next/
+.next-dev/
+.next-export/
+out/
+node_modules/
+
+# public/images/ must NOT be ignored — those binaries are committed on
+# purpose (see frontend/public/images/*/.gitkeep).
+!frontend/public/images/

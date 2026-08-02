@@ -1,0 +1,13 @@
+# Keep the serverless bundle to the application itself. Everything here is
+# either local-only or would push the function toward the size limit.
+.venv/
+.venv.incomplete/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+tests/
+scripts/
+*.db
+*.db.bak-*
+*.old-schema
+.env

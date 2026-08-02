@@ -8,6 +8,7 @@ This repo has two mostly-independent halves that are being wired together:
 
 - `Ui_Prototype_MVP_Prep/` — static HTML/CSS/Tailwind prototype of the marketplace (no build step, no bundler; open files directly or serve as static files).
 - `backend/` — a FastAPI + SQLAlchemy + Alembic REST API for the same product. This is the source of truth for business logic; the frontend is being progressively connected to it (see "Frontend/backend wiring" below).
+- `backend/scraper/` — a standalone CLI that collects competitor OOH inventory into JSONL/CSV and optionally imports it as `pending_approval` listings. It imports from `app.*` but nothing in `app/` imports it, and the API never invokes it. See `backend/scraper/README.md`.
 
 The root `index.html` is just a meta-refresh redirect into `Ui_Prototype_MVP_Prep/index.html` (the marketplace landing page).
 
@@ -72,6 +73,82 @@ Pricing (in `app/main.py`, `VAS_RATES`): booking base = inclusive days × `listi
 When a booking includes VAS items at checkout, those line items are persisted with the booking and a linked `VASOrder` is created once payment is confirmed; a standalone VAS order (no booking) is created immediately; a VAS *reorder* against an existing space requires an active booking.
 
 Full endpoint list: `backend/docs/API.md`. Base path is `/api/v1`; protected routes take `Authorization: Bearer <token>`.
+
+## Scraper
+
+```bash
+cd backend && source .venv/bin/activate
+python -m scraper.cli scrape themediaant --location "Bangalore, Karnataka, India" \
+    --location-id "ChIJbU60yXAWrjsR4E9-UejD3_g" --images --out data/bangalore
+python -m scraper.cli import data/bangalore/listings.jsonl
+```
+
+Needs `beautifulsoup4` + `lxml`; `playwright` only for `scraper/browser.py`, which
+is for sites that build their listings client-side (themediaant does not).
+
+Scraped rows land in `listings` as `pending_approval` under a synthetic
+`scraped-inventory@internal.invalid` owner, with provenance in `scraped_listings`
+(unique `source_url`, so re-imports update in place). Never auto-approve them —
+they go through the same admin review as owner submissions.
+
+Adapters live in `scraper/adapters/`; everything shared (HTTP politeness,
+parsing, images, output) sits outside them. An adapter that can report
+`expected_counts()` lets the CLI reconcile a run against the source's own totals
+— on sites with unstable pagination that is the only way to know a run finished.
+Add per-site quirks to `scraper/README.md`, not to the adapter's docstring alone.
+
+## Marketplace browse contract
+
+`GET /listings` (both backends) returns a **paged envelope**
+`{items, total, limit, offset}`, not a bare list — a real city catalogue is
+thousands of rows. It filters on `q`, `space_type`, `lighting`/`illumination`,
+price, width/height/area ranges, exact `size` ("40W X 20H"), `min_footfall` and
+`has_dimensions`, with `sort` and `limit`/`offset`.
+
+`GET /listings/facets` returns the dropdown options (space types, lightings,
+common sizes, price range) derived from live inventory. The UI must read filter
+options from it rather than hardcoding lists that drift from the data. It is
+declared **before** `/listings/{listing_id}` so the literal path wins.
+
+`Listing.width_ft`/`height_ft` are **nullable** in `MVP/backend`: real inventory
+does not always publish a size (bus shelters are sold by a Small/Medium/Large
+bucket, kept in `extra.size_bucket`). Anything rendering dimensions must degrade
+rather than print `null x null`.
+
+## Deployments
+
+Two targets, and they are not equivalent:
+
+- **Vercel** (`MVP/DEPLOY_VERCEL.md`) — the real deployment. Frontend and
+  backend are separate Vercel projects rooted at `MVP/frontend` and
+  `MVP/backend`; the API runs as a serverless function via `api/index.py`, with
+  Postgres on Neon. Writes work, so login/cart/checkout work.
+- **GitHub Pages** — a read-only mirror. Static host, no backend; see below.
+
+`Settings.sqlalchemy_url` rewrites `postgres://`/`postgresql://` to
+`postgresql+psycopg://`. Hosted Postgres providers hand out the bare scheme and
+SQLAlchemy would otherwise reach for psycopg2, which is not installed. Use a
+provider's *pooled* endpoint: serverless opens many short-lived connections.
+
+## Static snapshot (GitHub Pages)
+
+Pages is a static host with no backend. `MVP/frontend/src/lib/listings-source.ts`
+tries the API first and falls back to `public/data/*.json`, so the deployed site
+stays browsable; booking and checkout still need a real API. The fallback only
+triggers on a transport failure — a 4xx/5xx from a reachable API is surfaced, not
+masked with stale data.
+
+Regenerate the snapshot whenever the catalogue changes, or the deployed site
+keeps showing the old inventory:
+
+```bash
+cd MVP/backend && source .venv/bin/activate
+python -m scripts.export_static      # -> ../frontend/public/data/{listings,facets}.json
+```
+
+`generateStaticParams` for `/listings/[id]` reads that same snapshot, so detail
+pages and the catalogue cannot drift. The snapshot filter/sort logic mirrors
+`browse_listings` in `MVP/backend/app/main.py`; change one and change the other.
 
 ## Frontend/backend wiring
 
