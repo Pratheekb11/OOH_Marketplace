@@ -9,16 +9,35 @@ if this becomes a real product you need a paid plan.
 
 ---
 
-## 1. Create the database (Neon)
+## 1. Create the database
 
-1. Sign up at <https://neon.tech> and create a project (region `ap-southeast-1`
-   or whatever is nearest — it should match the Vercel region).
-2. Copy the **pooled** connection string. It has `-pooler` in the host and looks
-   like:
-   `postgresql://user:pass@ep-xxx-pooler.region.aws.neon.tech/neondb?sslmode=require`
+Vercel has no database of its own — functions run on an ephemeral filesystem, so
+a SQLite file would be wiped on every cold start. Its Postgres offering is a
+marketplace integration **powered by Neon**, so either route below gives you the
+same database; it is only a question of where you click "create".
 
-Use the pooled one. Serverless opens a lot of short-lived connections and the
-direct endpoint will run out.
+**Recommended — provision from inside Vercel** (one account, no copy-paste):
+
+1. Create the backend project first (step 3), then open it →
+   **Storage** → **Create Database** → Postgres (Neon).
+2. Vercel injects the connection variables into that project automatically,
+   including `DATABASE_URL`, which is the one this app reads. Nothing to set by
+   hand.
+3. For step 2 below you still need the string locally — copy it from
+   Storage → your database → `.env.local` tab, or run `vercel env pull`.
+
+**Alternative — sign up at <https://neon.tech>** and create a project, then paste
+its connection string into the backend project as `DATABASE_URL` yourself. Pick a
+region near your Vercel region.
+
+Either way, use the **pooled** connection string — the host contains `-pooler`:
+
+```
+postgresql://user:pass@ep-xxx-pooler.region.aws.neon.tech/neondb?sslmode=require
+```
+
+Serverless opens many short-lived connections and the direct endpoint will run
+out of them.
 
 The `postgresql://` prefix is handled for you — `Settings.sqlalchemy_url`
 rewrites it to `postgresql+psycopg://`, because SQLAlchemy otherwise looks for
@@ -46,11 +65,11 @@ Photos are **not** uploaded anywhere — they are static files under
 New Vercel project → import this repo → set **Root Directory** to `MVP/backend`.
 Vercel will detect `vercel.json` and build `api/index.py`.
 
-Environment variables:
+Environment variables (Settings → Environment Variables):
 
 | Name | Value |
 | --- | --- |
-| `DATABASE_URL` | your Neon **pooled** connection string |
+| `DATABASE_URL` | injected automatically if you provisioned storage from inside Vercel; otherwise your **pooled** Neon string |
 | `SECRET_KEY` | a fresh random string, 32+ chars (`openssl rand -hex 32`) |
 | `APP_ENV` | `production` |
 | `ALLOWED_HOSTS` | `.vercel.app` |
