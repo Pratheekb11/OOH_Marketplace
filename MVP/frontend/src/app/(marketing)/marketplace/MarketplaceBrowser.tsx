@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { api, ApiError } from "@/lib/api";
+import { ApiError } from "@/lib/api";
+import { fetchListings } from "@/lib/listings-source";
 import FilterBar from "@/components/marketplace/FilterBar";
 import ListingGrid from "@/components/marketplace/ListingGrid";
 import MapPanel from "@/components/marketplace/MapPanel";
@@ -48,7 +49,7 @@ export function MarketplaceBrowser() {
     params.set("limit", String(PAGE_SIZE));
     params.set("offset", "0");
 
-    api<ListingPage>(`/listings?${params.toString()}`)
+    fetchListings(params.toString())
       .then((data) => {
         if (cancelled) return;
         setListings(data.items);
@@ -76,7 +77,7 @@ export function MarketplaceBrowser() {
     params.set("limit", String(PAGE_SIZE));
     params.set("offset", String(listings.length));
 
-    api<ListingPage>(`/listings?${params.toString()}`)
+    fetchListings(params.toString())
       .then((data) => {
         // Append, and re-sync the total in case inventory changed underneath.
         setListings((current) => [...current, ...data.items]);

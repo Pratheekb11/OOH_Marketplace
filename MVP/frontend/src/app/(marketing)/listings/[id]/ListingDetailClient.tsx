@@ -7,7 +7,8 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
 import Skeleton from "@/components/ui/Skeleton";
-import { api, ApiError } from "@/lib/api";
+import { ApiError } from "@/lib/api";
+import { fetchListing } from "@/lib/listings-source";
 import type { ListingOut } from "@/components/marketplace/types";
 import BentoGallery from "@/components/listing/BentoGallery";
 import StatsGrid from "@/components/listing/StatsGrid";
@@ -61,7 +62,7 @@ export default function ListingDetailClient({ id }: { id: string }) {
     let cancelled = false;
     setState({ phase: "loading" });
 
-    api<ListingOut>(`/listings/${id}`)
+    fetchListing(id)
       .then((listing) => {
         if (!cancelled) setState({ phase: "ready", listing });
       })

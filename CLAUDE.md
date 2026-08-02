@@ -115,6 +115,26 @@ does not always publish a size (bus shelters are sold by a Small/Medium/Large
 bucket, kept in `extra.size_bucket`). Anything rendering dimensions must degrade
 rather than print `null x null`.
 
+## Static snapshot (GitHub Pages)
+
+Pages is a static host with no backend. `MVP/frontend/src/lib/listings-source.ts`
+tries the API first and falls back to `public/data/*.json`, so the deployed site
+stays browsable; booking and checkout still need a real API. The fallback only
+triggers on a transport failure — a 4xx/5xx from a reachable API is surfaced, not
+masked with stale data.
+
+Regenerate the snapshot whenever the catalogue changes, or the deployed site
+keeps showing the old inventory:
+
+```bash
+cd MVP/backend && source .venv/bin/activate
+python -m scripts.export_static      # -> ../frontend/public/data/{listings,facets}.json
+```
+
+`generateStaticParams` for `/listings/[id]` reads that same snapshot, so detail
+pages and the catalogue cannot drift. The snapshot filter/sort logic mirrors
+`browse_listings` in `MVP/backend/app/main.py`; change one and change the other.
+
 ## Frontend/backend wiring
 
 `Ui_Prototype_MVP_Prep/js/api.js` is the only integration point so far: a tiny `api(path, options)` helper that reads `window.OOH_API_BASE_URL` (default `http://127.0.0.1:8000/api/v1`), attaches the JWT from `localStorage` (`adspace_access_token`), and throws on non-OK responses. `login_Page.html` is the only page currently wired to it (posts to `/auth/login`, stores the token, redirects to `listing_page.html`).

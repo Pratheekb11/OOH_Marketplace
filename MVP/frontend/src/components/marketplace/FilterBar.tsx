@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { api } from "@/lib/api";
+import { fetchFacets } from "@/lib/listings-source";
 import Icon from "@/components/ui/Icon";
 import SelectField from "@/components/ui/SelectField";
 import TextField from "@/components/ui/TextField";
@@ -71,7 +71,7 @@ export function FilterBar() {
 
   useEffect(() => {
     let cancelled = false;
-    api<ListingFacets>("/listings/facets")
+    fetchFacets()
       .then((data) => {
         if (!cancelled) setFacets(data);
       })

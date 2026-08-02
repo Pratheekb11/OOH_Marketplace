@@ -6,7 +6,8 @@ import EmptyState from "@/components/ui/EmptyState";
 import Icon from "@/components/ui/Icon";
 import Skeleton from "@/components/ui/Skeleton";
 import { api, ApiError } from "@/lib/api";
-import type { ListingOut, ListingPage } from "@/components/marketplace/types";
+import type { ListingOut } from "@/components/marketplace/types";
+import { fetchListings } from "@/lib/listings-source";
 
 export interface SearchModalProps {
   open: boolean;
@@ -55,7 +56,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
     const trimmed = query.trim();
     const handle = setTimeout(() => {
       // GET /listings returns a paged envelope; the modal shows a short preview.
-      api<ListingPage>(`/listings?q=${encodeURIComponent(trimmed)}&limit=8`)
+      fetchListings(`q=${encodeURIComponent(trimmed)}&limit=8`)
         .then((data) => setResults(data.items))
         .catch((err: unknown) => {
           setError(err instanceof ApiError ? String(err.detail ?? err.message) : "Something went wrong.");
