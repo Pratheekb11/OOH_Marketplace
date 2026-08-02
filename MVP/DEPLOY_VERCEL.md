@@ -79,11 +79,28 @@ Environment variables (Settings → Environment Variables):
 | `DATABASE_URL` | injected automatically if you provisioned storage from inside Vercel; otherwise your **pooled** Neon string |
 | `SECRET_KEY` | a fresh random string, 32+ chars (`openssl rand -hex 32`) |
 | `APP_ENV` | `production` |
-| `ALLOWED_HOSTS` | `.vercel.app` |
+| `ALLOWED_HOSTS` | `*.vercel.app,localhost,127.0.0.1` |
 | `CORS_ORIGINS` | the frontend URL — fill in after step 4, see step 5 |
 
-Deploy, then check `https://<backend>.vercel.app/api/v1/listings?limit=1`. You
-should get JSON with `"total":2114`.
+The wildcard matters: Starlette's TrustedHostMiddleware only treats a pattern
+as a suffix match when it *starts* with `*`, so a bare `.vercel.app` matches
+nothing and every request comes back `400 Invalid host header`.
+
+Deploy, then check in order — each failure means something different:
+
+| URL | Expected | If not |
+| --- | --- | --- |
+| `/health` | `{"status":"ok",...}` | routing or host header |
+| `/openapi.json` | 200 | `vercel.json` routing (see below) |
+| `/api/v1/listings?limit=1` | `"total":2114` | database not connected or not seeded |
+
+`vercel.json` uses the `builds`/`routes` form on purpose. The newer
+`rewrites` form (`/(.*)` -> `/api/index`) collapses every request to the same
+path, so FastAPI sees `/api/index` for everything and 404s every route.
+
+Note the deployment-specific URL (the one with a build hash) is protected by
+Vercel Authentication and will 302 to an SSO page. Test the project's plain
+production URL instead.
 
 Note `/docs` is disabled when `APP_ENV=production`. Drop that variable if you
 want the interactive docs while testing.
