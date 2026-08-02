@@ -18,19 +18,26 @@ same database; it is only a question of where you click "create".
 
 **Recommended — provision from inside Vercel** (one account, no copy-paste):
 
-1. Create the backend project first (step 3), then open it →
-   **Storage** → **Create Database** → Postgres (Neon).
-2. Vercel injects the connection variables into that project automatically,
-   including `DATABASE_URL`, which is the one this app reads. Nothing to set by
-   hand.
-3. For step 2 below you still need the string locally — copy it from
-   Storage → your database → `.env.local` tab, or run `vercel env pull`.
+1. **Storage** lives in the *dashboard* top nav, alongside Projects — not in the
+   project sidebar. Go there and choose **Create Database → Neon**. If it is not
+   offered, install it straight from <https://vercel.com/marketplace/neon>.
+2. Pick a region and the free plan, and name the database.
+3. **Connect it to the project**: Storage → your database → **Connect Project**,
+   select the backend project and tick Development, Preview and Production.
+   Skipping this leaves the variables uninjected and the deploy will fall back
+   to SQLite on an ephemeral disk.
+4. That injects `DATABASE_URL` — already the **pooled** (PgBouncer) string, and
+   already the variable this app reads. Nothing to set by hand.
+   (`DATABASE_URL_UNPOOLED` is the direct connection; do not use it here.)
+5. For step 2 below you still need the string locally — copy it from
+   Storage → your database, or run `vercel env pull`.
 
 **Alternative — sign up at <https://neon.tech>** and create a project, then paste
 its connection string into the backend project as `DATABASE_URL` yourself. Pick a
 region near your Vercel region.
 
-Either way, use the **pooled** connection string — the host contains `-pooler`:
+If you signed up at Neon directly, use the **pooled** connection string — the
+host contains `-pooler`:
 
 ```
 postgresql://user:pass@ep-xxx-pooler.region.aws.neon.tech/neondb?sslmode=require
