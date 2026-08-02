@@ -24,3 +24,14 @@ yarn-error.log
 *.swo
 *~
 .DS_Store
+
+# Scraper artefacts
+backend/data/
+backend/.scrape_cache/
+
+# Local database backups taken before destructive imports
+*.bak-*
+*.old-schema
+
+# Claude Code local working directory (incl. scratch worktrees)
+.claude/

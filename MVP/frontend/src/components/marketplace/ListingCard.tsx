@@ -14,6 +14,17 @@ function formatCount(value: number | null): string {
   return String(value);
 }
 
+/** Dimensions are optional: bus shelters are sold by a size bucket with no
+ * measurements published, so fall back to that before showing nothing. */
+function formatSize(listing: ListingOut): string | null {
+  if (listing.width_ft && listing.height_ft) {
+    const area = Math.round(listing.width_ft * listing.height_ft).toLocaleString("en-IN");
+    return `${listing.width_ft}×${listing.height_ft} ft · ${area} sq ft`;
+  }
+  const bucket = listing.extra?.size_bucket;
+  return typeof bucket === "string" && bucket ? `${bucket} format` : null;
+}
+
 export interface ListingCardProps {
   listing: ListingOut;
 }
@@ -30,6 +41,7 @@ export function ListingCard({ listing }: ListingCardProps) {
   const displayPrice = listing.extra?.display_price;
   const displayUnit = listing.extra?.display_unit;
   const verified = listing.extra?.verified === true;
+  const size = formatSize(listing);
 
   return (
     <Link
@@ -78,10 +90,20 @@ export function ListingCard({ listing }: ListingCardProps) {
           </div>
         </div>
 
-        <p className="mb-3 flex items-center gap-1 text-[10px] text-on-surface-variant">
+        <p className="mb-2 flex items-center gap-1 text-[10px] text-on-surface-variant">
           <Icon name="location_on" className="!text-xs" />
-          {listing.location}
+          <span className="truncate">{listing.location}</span>
         </p>
+
+        {size ? (
+          <p className="mb-3 flex items-center gap-1 text-[10px] font-semibold text-on-surface-variant">
+            <Icon name="straighten" className="!text-xs" />
+            {size}
+            {listing.lighting ? <span className="text-on-surface-variant/70">· {listing.lighting}</span> : null}
+          </p>
+        ) : (
+          <div className="mb-3" />
+        )}
 
         <div className="flex items-center justify-between border-t border-surface-container-low pt-3">
           <span className="flex items-center gap-1 text-[11px] font-extrabold text-primary">

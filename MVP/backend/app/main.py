@@ -4,7 +4,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import delete, or_, select
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from slowapi import _rate_limit_exceeded_handler
@@ -15,7 +15,7 @@ from app.database import Base, engine, get_db
 from app.models import Booking, BookingStatus, CartItem, Listing, ListingStatus, Payment, PaymentStatus, Role, User
 from app.pricing import ADDON_CATALOG, quote_cart, quote_line
 from app.schemas import (AddonOut, BookingOut, CartItemCreate, CartItemOut, CartItemUpdate,
-                         CartResponse, CheckoutRequest, CheckoutResponse, ListingCreate, ListingOut,
+                         CartResponse, CheckoutRequest, CheckoutResponse, ListingCreate, ListingFacets, ListingOut, ListingPage,
                          ListingUpdate, LoginRequest, PaymentDetailOut, RegisterRequest, Token, UserOut)
 from app.security import (bearer, create_token, current_user, limiter,
                           password_context, require_roles)
@@ -83,22 +83,109 @@ def optional_user(credentials: HTTPAuthorizationCredentials | None = Depends(_op
         return None
 
 
+#: Dimensions are optional, so unsized rows sort last rather than vanishing.
+AREA = Listing.width_ft * Listing.height_ft
+
 SORTS = {
-    "footfall_desc": Listing.footfall_estimate.desc(),
+    "footfall_desc": Listing.footfall_estimate.desc().nullslast(),
     "price_asc": Listing.price_per_day.asc(),
+    "price_desc": Listing.price_per_day.desc(),
+    "size_desc": AREA.desc().nullslast(),
+    "size_asc": AREA.asc().nullslast(),
+    "newest": Listing.created_at.desc(),
 }
 
 
-@app.get("/api/v1/listings", response_model=list[ListingOut])
-def browse_listings(q: str | None = None, space_type: str | None = None, lighting: str | None = None, min_price: float | None = None, max_price: float | None = None, sort: str = "footfall_desc", db: Session = Depends(get_db)):
-    query = select(Listing).where(Listing.status == ListingStatus.active)
-    if q: query = query.where(or_(Listing.title.ilike(f"%{q}%"), Listing.location.ilike(f"%{q}%")))
-    if space_type: query = query.where(Listing.space_type == space_type)
-    if lighting: query = query.where(Listing.lighting == lighting)
-    if min_price is not None: query = query.where(Listing.price_per_day >= min_price)
-    if max_price is not None: query = query.where(Listing.price_per_day <= max_price)
-    query = query.order_by(SORTS.get(sort, SORTS["footfall_desc"]))
-    return db.scalars(query).all()
+@app.get("/api/v1/listings", response_model=ListingPage)
+def browse_listings(
+    q: str | None = None,
+    space_type: str | None = None,
+    lighting: str | None = None,
+    min_price: float | None = None,
+    max_price: float | None = None,
+    min_width: float | None = None,
+    max_width: float | None = None,
+    min_height: float | None = None,
+    max_height: float | None = None,
+    min_area: float | None = None,
+    max_area: float | None = None,
+    size: str | None = None,
+    min_footfall: int | None = None,
+    has_dimensions: bool | None = None,
+    sort: str = "footfall_desc",
+    limit: int = 24,
+    offset: int = 0,
+    db: Session = Depends(get_db),
+):
+    """Browse active inventory.
+
+    Returns a page envelope rather than a bare list: a real city catalogue runs
+    to thousands of rows and the grid needs the total to paginate.
+    """
+    limit = max(1, min(limit, 100))
+    offset = max(0, offset)
+
+    filters = [Listing.status == ListingStatus.active]
+    if q: filters.append(or_(Listing.title.ilike(f"%{q}%"), Listing.location.ilike(f"%{q}%")))
+    if space_type: filters.append(Listing.space_type == space_type)
+    if lighting: filters.append(Listing.lighting == lighting)
+    if min_price is not None: filters.append(Listing.price_per_day >= min_price)
+    if max_price is not None: filters.append(Listing.price_per_day <= max_price)
+    if min_width is not None: filters.append(Listing.width_ft >= min_width)
+    if max_width is not None: filters.append(Listing.width_ft <= max_width)
+    if min_height is not None: filters.append(Listing.height_ft >= min_height)
+    if max_height is not None: filters.append(Listing.height_ft <= max_height)
+    if min_area is not None: filters.append(AREA >= min_area)
+    if max_area is not None: filters.append(AREA <= max_area)
+    if min_footfall is not None: filters.append(Listing.footfall_estimate >= min_footfall)
+    if has_dimensions is True: filters.append(Listing.width_ft.is_not(None))
+    if has_dimensions is False: filters.append(Listing.width_ft.is_(None))
+    if size:
+        # "40W X 20H", exactly as the Dimensions dropdown renders it.
+        try:
+            width_text, height_text = size.upper().replace("H", "").split("X")
+            filters.append(Listing.width_ft == float(width_text.replace("W", "").strip()))
+            filters.append(Listing.height_ft == float(height_text.strip()))
+        except (ValueError, AttributeError):
+            raise HTTPException(status_code=422, detail="size must look like '40W X 20H'")
+
+    total = db.scalar(select(func.count()).select_from(Listing).where(*filters)) or 0
+    items = db.scalars(
+        select(Listing).where(*filters)
+        .order_by(SORTS.get(sort, SORTS["footfall_desc"]))
+        .limit(limit).offset(offset)
+    ).all()
+    return ListingPage(items=items, total=total, limit=limit, offset=offset)
+
+
+@app.get("/api/v1/listings/facets", response_model=ListingFacets)
+def listing_facets(db: Session = Depends(get_db)):
+    """Filter options taken from live inventory, so the UI hardcodes nothing.
+
+    Declared before `/listings/{listing_id}` so the literal path wins.
+    """
+    active = Listing.status == ListingStatus.active
+
+    def distinct(column):
+        return [v for (v,) in db.execute(
+            select(column).where(active, column.is_not(None)).distinct().order_by(column)
+        ).all() if v]
+
+    sizes = db.execute(
+        select(Listing.width_ft, Listing.height_ft, func.count())
+        .where(active, Listing.width_ft.is_not(None), Listing.height_ft.is_not(None))
+        .group_by(Listing.width_ft, Listing.height_ft)
+        .order_by(func.count().desc()).limit(40)
+    ).all()
+
+    return ListingFacets(
+        space_types=distinct(Listing.space_type),
+        lightings=distinct(Listing.lighting),
+        sizes=[f"{w:g}W X {h:g}H" for w, h, _ in sizes],
+        price_min=db.scalar(select(func.min(Listing.price_per_day)).where(active)),
+        price_max=db.scalar(select(func.max(Listing.price_per_day)).where(active)),
+        total=db.scalar(select(func.count()).select_from(Listing).where(active)) or 0,
+    )
 
 
 @app.get("/api/v1/listings/{listing_id}", response_model=ListingOut)

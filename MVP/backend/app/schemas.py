@@ -35,8 +35,10 @@ class ListingCreate(BaseModel):
     space_type: str
     description: str = ""
     location: str
-    width_ft: float = Field(gt=0)
-    height_ft: float = Field(gt=0)
+    # Optional, and still positive when given: some formats (bus shelters) are
+    # sold by a size bucket with no dimensions published anywhere.
+    width_ft: float | None = Field(default=None, gt=0)
+    height_ft: float | None = Field(default=None, gt=0)
     price_per_day: float = Field(gt=0)
     footfall_estimate: int | None = Field(default=None, ge=0)
     lighting: str | None = None
@@ -50,8 +52,26 @@ class ListingUpdate(ListingCreate):
 
 class ListingOut(ORMModel):
     id: int; owner_id: int; title: str; space_type: str; description: str; location: str
-    width_ft: float; height_ft: float; price_per_day: float; footfall_estimate: int | None
+    width_ft: float | None; height_ft: float | None; price_per_day: float; footfall_estimate: int | None
     status: ListingStatus; rejection_reason: str | None; lighting: str | None; image_url: str | None; extra: dict | None
+
+
+class ListingPage(BaseModel):
+    """Browse results are paged; a city catalogue is too large to return whole."""
+    items: list[ListingOut]
+    total: int
+    limit: int
+    offset: int
+
+
+class ListingFacets(BaseModel):
+    """Filter options and ranges derived from live inventory."""
+    space_types: list[str]
+    lightings: list[str]
+    sizes: list[str]
+    price_min: float | None
+    price_max: float | None
+    total: int
 
 # Later agents append listing/cart/checkout schemas below.
 

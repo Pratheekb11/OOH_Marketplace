@@ -54,8 +54,11 @@ class Listing(Timestamped, Base):
     space_type: Mapped[str] = mapped_column(String(50))
     description: Mapped[str] = mapped_column(Text, default="")
     location: Mapped[str] = mapped_column(String(255))
-    width_ft: Mapped[float] = mapped_column(Float)
-    height_ft: Mapped[float] = mapped_column(Float)
+    # Nullable: real OOH inventory does not always publish a physical size.
+    # Bus shelters in particular are sold by a Small/Medium/Large bucket
+    # (kept in `extra.size_bucket`) with no dimensions quoted anywhere.
+    width_ft: Mapped[float | None] = mapped_column(Float, nullable=True)
+    height_ft: Mapped[float | None] = mapped_column(Float, nullable=True)
     price_per_day: Mapped[float] = mapped_column(Float)
     footfall_estimate: Mapped[int | None] = mapped_column(Integer, nullable=True)
     status: Mapped[ListingStatus] = mapped_column(Enum(ListingStatus, native_enum=False, length=30), default=ListingStatus.active)

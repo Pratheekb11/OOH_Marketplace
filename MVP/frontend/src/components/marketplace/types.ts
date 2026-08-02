@@ -18,8 +18,10 @@ export interface ListingOut {
   space_type: string;
   description: string;
   location: string;
-  width_ft: number;
-  height_ft: number;
+  /** Null when the source publishes no physical size (e.g. bus shelters,
+   * which are sold by a Small/Medium/Large bucket in `extra.size_bucket`). */
+  width_ft: number | null;
+  height_ft: number | null;
   price_per_day: number;
   footfall_estimate: number | null;
   status: ListingStatus;
@@ -57,5 +59,31 @@ export interface ListingsQuery {
   lighting?: string;
   min_price?: string;
   max_price?: string;
+  size?: string;
+  min_area?: string;
+  max_area?: string;
+  min_footfall?: string;
+  has_dimensions?: string;
   sort?: string;
+  limit?: string;
+  offset?: string;
+}
+
+/** GET /listings — paged envelope; the catalogue is thousands of rows. */
+export interface ListingPage {
+  items: ListingOut[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/** GET /listings/facets — filter options taken from live inventory, so the
+ * UI never hardcodes a dropdown that drifts from the data. */
+export interface ListingFacets {
+  space_types: string[];
+  lightings: string[];
+  sizes: string[];
+  price_min: number | null;
+  price_max: number | null;
+  total: number;
 }
