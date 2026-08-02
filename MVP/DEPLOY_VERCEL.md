@@ -1,5 +1,18 @@
 # Deploying the MVP to Vercel
 
+**Live: <https://adspace-ooh.vercel.app>**
+
+One public URL serves both the app and the API. `MVP/frontend/vercel.json`
+rewrites `/api/v1/*` to the backend deployment, and `NEXT_PUBLIC_API_BASE_URL`
+is the relative `/api/v1`, so the browser only ever talks to one origin and
+CORS never enters the picture. The backend project
+(`ooh-marketplace-virid.vercel.app`) still exists but is an implementation
+detail behind that proxy.
+
+Both projects are Git-connected with root directories `MVP/frontend` and
+`MVP/backend`; pushes to `main` deploy automatically.
+
+
 Two Vercel projects from this one repo — the Next.js frontend and the FastAPI
 backend — plus a free Neon Postgres. Everything in the repo is already prepared;
 what follows is only the part that needs your accounts.
