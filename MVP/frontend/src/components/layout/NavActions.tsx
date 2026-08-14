@@ -15,7 +15,7 @@ import CartBadge from "./CartBadge";
  *   - advertiser       -> CartBadge + account menu (email + Sign out)
  *   - owner            -> "List Media" -> /list-your-space + account menu
  */
-export function NavActions() {
+export function NavActions({ onDark = false }: { onDark?: boolean } = {}) {
   const { status, user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -35,8 +35,15 @@ export function NavActions() {
   }
 
   if (status === "unauthenticated") {
+    // Over the landing hero the nav is unpainted, where a bg-primary button
+    // would sink into the photograph — the amber CTA is the readable one.
     return (
-      <Button href="/login" variant="primary" size="sm">
+      <Button
+        href="/login"
+        variant="primary"
+        size="sm"
+        className={onDark ? "!bg-accent !text-[#05070f] hover:!bg-white" : ""}
+      >
         Sign In
       </Button>
     );
@@ -47,7 +54,9 @@ export function NavActions() {
       <button
         type="button"
         onClick={() => setMenuOpen((open) => !open)}
-        className="flex items-center gap-2 rounded-lg p-2 text-on-surface-variant transition-colors hover:bg-surface-container"
+        className={`flex items-center gap-2 rounded-lg p-2 transition-colors ${
+          onDark ? "text-white hover:bg-white/10" : "text-on-surface-variant hover:bg-surface-container"
+        }`}
         aria-haspopup="menu"
         aria-expanded={menuOpen}
       >
@@ -75,7 +84,12 @@ export function NavActions() {
   if (user.role === "owner") {
     return (
       <div className="flex items-center gap-4">
-        <Button href="/list-your-space" variant="primary" size="sm">
+        <Button
+          href="/list-your-space"
+          variant="primary"
+          size="sm"
+          className={onDark ? "!bg-accent !text-[#05070f] hover:!bg-white" : ""}
+        >
           List Media
         </Button>
         {accountMenu}

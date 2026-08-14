@@ -166,4 +166,128 @@
   .border-accent {
     border-left: 4px solid #855300;
   }
+
+  /* ---------------------------------------------------------------------
+     Landing page — "night" register.
+
+     The marketplace sells lit surfaces, so the landing page runs on two
+     light temperatures only: sodium amber (--color-accent) against a cold
+     near-black. No third hue, so the photography carries the colour.
+     --------------------------------------------------------------------- */
+  .night {
+    background-color: #05070f;
+  }
+
+  .night-panel {
+    background-color: #0e1424;
+  }
+
+  /* Hairline rule that reads on the dark sections without going to pure
+     white, which would out-contrast the body copy sitting next to it. */
+  .hairline-light {
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  /* Scroll-triggered entrance, driven by components/marketing/Reveal.tsx. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Hero load sequence: the eyebrow, three headline lines, the sub and the
+     CTAs come up in order, then the slot card last. Delays are set inline
+     per element via --rise-delay. */
+  .rise {
+    animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Play-out loop (components/marketing/HeroSlots.tsx). The fill duration
+     mirrors SLOT_MS there — change both together. */
+  .slot-in {
+    animation: slot-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes slot-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .slot-fill {
+    animation: slot-fill 6s linear both;
+  }
+
+  .slot-card:hover .slot-fill,
+  .slot-card:focus-within .slot-fill {
+    animation-play-state: paused;
+  }
+
+  @keyframes slot-fill {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  /* Nav underline, inverted for the transparent nav over the hero. */
+  .nav-link-light::after {
+    background: #fea619;
+  }
+
+  /* Format tiles: unlit until pointed at, then the panel switches on. */
+  .tile-scrim {
+    background: linear-gradient(
+      to top,
+      rgba(5, 7, 15, 0.92) 0%,
+      rgba(5, 7, 15, 0.55) 45%,
+      rgba(5, 7, 15, 0.15) 100%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .rise,
+  .slot-in,
+  .slot-fill {
+    animation: none;
+  }
+
+  .slot-fill {
+    width: 100%;
+  }
 }

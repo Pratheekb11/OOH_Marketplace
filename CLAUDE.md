@@ -150,6 +150,26 @@ python -m scripts.export_static      # -> ../frontend/public/data/{listings,face
 pages and the catalogue cannot drift. The snapshot filter/sort logic mirrors
 `browse_listings` in `MVP/backend/app/main.py`; change one and change the other.
 
+## Landing page (`MVP/frontend/src/app/(marketing)/page.tsx`)
+
+Runs in its own "night" register — two light temperatures only (amber
+`--color-accent` against near-black `#05070f`), with the photography carrying
+the rest of the colour. Display type is **Syne**; Manrope stays on body, Inter
+on data/labels. `NavShellA` renders unpainted and `fixed` over the hero on `/`
+only, and paints its white bar once `scrollY > 64`.
+
+Its signature element is `components/marketing/HeroSlots.tsx`, a play-out loop
+mirroring how digital OOH sells a rotation. The fill-bar duration lives in two
+places — `SLOT_MS` there and the `slot-fill` keyframe in `globals.css` — change
+both together. Scroll entrances go through `components/marketing/Reveal.tsx`;
+every animation is neutralised under `prefers-reduced-motion`.
+
+The section copy quotes the real catalogue (2,113 Bengaluru sites — Bus Shelter
+1,101, Hoarding 710, Skywalk 151, Digital OOH 124; ₹400–₹1,26,667 per day), and
+the format tiles deep-link into `/marketplace?space_type=…`. Re-check those
+numbers whenever the static snapshot is regenerated. Photography provenance is
+in `MVP/frontend/public/images/CREDITS.md`.
+
 ## Frontend/backend wiring
 
 `Ui_Prototype_MVP_Prep/js/api.js` is the only integration point so far: a tiny `api(path, options)` helper that reads `window.OOH_API_BASE_URL` (default `http://127.0.0.1:8000/api/v1`), attaches the JWT from `localStorage` (`adspace_access_token`), and throws on non-OK responses. `login_Page.html` is the only page currently wired to it (posts to `/auth/login`, stores the token, redirects to `listing_page.html`).
