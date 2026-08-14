@@ -1,34 +1,44 @@
 import type { Metadata } from "next";
-import { Epilogue, Manrope, Inter, Syne } from "next/font/google";
+import localFont from "next/font/local";
 import Providers from "./providers";
 import "./globals.css";
 
-// next/font drives the CSS variables consumed by tailwind.config.ts'
-// fontFamily.{headline,body,label,epilogue,manrope,inter,syne} keys.
-const epilogue = Epilogue({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+// Fonts are self-hosted rather than pulled through `next/font/google`.
+// next/font/google downloads the woff2 files during `next build`, so a build
+// machine that cannot reach fonts.gstatic.com fails the whole build — that is
+// exactly how the Vercel deploy broke ("Failed to fetch `Inter` from Google
+// Fonts"). These are the same Google-served latin variable faces, committed
+// under src/app/fonts, so the build has no network dependency at all and the
+// browser never calls out to a third-party origin at runtime.
+//
+// Each file is the variable font, so one file covers the full weight range the
+// design uses. Refresh them from
+// https://fonts.googleapis.com/css2?family=<Family>:wght@<range> if a family
+// changes. All four are licensed under the SIL Open Font License 1.1.
+const epilogue = localFont({
+  src: "./fonts/Epilogue.woff2",
+  weight: "300 900",
   variable: "--font-epilogue",
   display: "swap",
 });
 
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+const manrope = localFont({
+  src: "./fonts/Manrope.woff2",
+  weight: "300 700",
   variable: "--font-manrope",
   display: "swap",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+const inter = localFont({
+  src: "./fonts/Inter.woff2",
+  weight: "300 700",
   variable: "--font-inter",
   display: "swap",
 });
 
-const syne = Syne({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+const syne = localFont({
+  src: "./fonts/Syne.woff2",
+  weight: "400 800",
   variable: "--font-syne",
   display: "swap",
 });

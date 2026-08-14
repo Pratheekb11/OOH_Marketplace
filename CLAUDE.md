@@ -150,6 +150,19 @@ python -m scripts.export_static      # -> ../frontend/public/data/{listings,face
 pages and the catalogue cannot drift. The snapshot filter/sort logic mirrors
 `browse_listings` in `MVP/backend/app/main.py`; change one and change the other.
 
+## Fonts
+
+`MVP/frontend/src/app/layout.tsx` loads all four faces (Epilogue, Manrope,
+Inter, Syne) through `next/font/local` from committed woff2 files in
+`src/app/fonts/`. Do not move them back to `next/font/google`: that fetches the
+files during `next build`, so a build machine that cannot reach
+fonts.gstatic.com fails the entire build — which is how the Vercel deploy broke
+once. Each file is the latin variable face, so one file covers a family's whole
+weight range.
+
+Material Symbols is still a runtime `<link>` in the same file. That is a browser
+request, not a build-time one, so it cannot break a build.
+
 ## Landing page (`MVP/frontend/src/app/(marketing)/page.tsx`)
 
 Runs in its own "night" register — two light temperatures only (amber
