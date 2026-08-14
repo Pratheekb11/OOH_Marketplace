@@ -117,9 +117,9 @@ export function FilterBar() {
   const hasActiveFilters = FILTER_KEYS.some((key) => searchParams.get(key));
 
   return (
-    <section className="sticky top-0 z-40 border-b border-surface-container bg-surface-container-lowest px-8 py-4 shadow-sm">
-      <div className="mx-auto flex max-w-full flex-wrap items-center gap-6">
-        <div className="flex min-w-[200px] flex-col gap-1">
+    <section className="sticky top-0 z-40 border-b border-surface-container bg-surface-container-lowest px-4 py-4 shadow-sm sm:px-8">
+      <div className="mx-auto grid max-w-full grid-cols-2 items-end gap-x-3 gap-y-4 sm:flex sm:flex-wrap sm:items-center sm:gap-6">
+        <div className="col-span-2 flex flex-col gap-1 sm:min-w-[200px]">
           <TextField
             label="Location"
             containerClassName="gap-1"
@@ -133,7 +133,7 @@ export function FilterBar() {
         <SelectField
           label="Ad Options"
           containerClassName="gap-1"
-          className="!p-2 min-w-[160px] text-sm font-medium"
+          className="!p-2 w-full sm:min-w-[160px] text-sm font-medium"
           value={spaceType}
           onChange={(e) => updateParams({ space_type: e.target.value })}
         >
@@ -148,7 +148,7 @@ export function FilterBar() {
         <SelectField
           label="Lighting"
           containerClassName="gap-1"
-          className="!p-2 min-w-[140px] text-sm font-medium"
+          className="!p-2 w-full sm:min-w-[140px] text-sm font-medium"
           value={lighting}
           onChange={(e) => updateParams({ lighting: e.target.value })}
         >
@@ -163,7 +163,7 @@ export function FilterBar() {
         <SelectField
           label="Dimensions (in feet)"
           containerClassName="gap-1"
-          className="!p-2 min-w-[150px] text-sm font-medium"
+          className="!p-2 w-full sm:min-w-[150px] text-sm font-medium"
           value={size}
           onChange={(e) => updateParams({ size: e.target.value, min_area: "", max_area: "" })}
         >
@@ -178,7 +178,7 @@ export function FilterBar() {
         <SelectField
           label="Size Band"
           containerClassName="gap-1"
-          className="!p-2 min-w-[170px] text-sm font-medium"
+          className="!p-2 w-full sm:min-w-[170px] text-sm font-medium"
           value={activeAreaBand.label}
           onChange={(e) => {
             const band = AREA_BANDS.find((b) => b.label === e.target.value) ?? AREA_BANDS[0];
@@ -196,7 +196,7 @@ export function FilterBar() {
         <SelectField
           label="Price Range"
           containerClassName="gap-1"
-          className="!p-2 min-w-[160px] text-sm font-medium"
+          className="!p-2 w-full sm:min-w-[160px] text-sm font-medium"
           value={activePriceBand.label}
           onChange={(e) => {
             const band = PRICE_BANDS.find((b) => b.label === e.target.value) ?? PRICE_BANDS[0];
@@ -210,11 +210,11 @@ export function FilterBar() {
           ))}
         </SelectField>
 
-        <div className="mx-2 h-10 w-px bg-outline-variant" />
+        <div className="mx-2 hidden h-10 w-px bg-outline-variant sm:block" />
 
         <SelectField
           label="Sort By"
-          containerClassName="ml-auto gap-1"
+          containerClassName="col-span-2 gap-1 sm:ml-auto"
           className="!p-0 border-none bg-transparent text-sm font-bold text-primary"
           value={sort}
           onChange={(e) => updateParams({ sort: e.target.value })}
@@ -233,7 +233,7 @@ export function FilterBar() {
               setQInput("");
               router.replace(pathname);
             }}
-            className="flex items-center gap-1 rounded-lg px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+            className="col-span-2 flex items-center justify-center gap-1 rounded-lg px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary sm:col-auto sm:justify-start"
           >
             <Icon name="close" className="!text-sm" />
             Clear

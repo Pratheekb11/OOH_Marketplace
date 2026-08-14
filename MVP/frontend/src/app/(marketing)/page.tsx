@@ -17,7 +17,7 @@ import Reveal from "@/components/marketing/Reveal";
 // the medium being sold. Everything around it stays quiet.
 //
 // Numbers below are the real catalogue (MVP/frontend/public/data/listings.json:
-// 2,113 Bengaluru sites — Bus Shelter 1,101, Hoarding 710, Skywalk 151,
+// 2,114 rows, 2,113 of them Bengaluru — Bus Shelter 1,101, Hoarding 710, Skywalk 151,
 // Digital OOH 124; ₹400–₹1,26,667 per day). Re-check them when the snapshot is
 // regenerated (`python -m scripts.export_static`).
 
@@ -105,8 +105,9 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#05070f] via-[#05070f]/55 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#05070f] via-transparent to-[#05070f]/45" />
 
-        <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-between gap-10 px-6 pb-12 pt-24 sm:px-8 lg:pt-28">
-          <div className="max-w-4xl">
+        <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-7xl items-center px-6 pb-16 pt-28 sm:px-8">
+          <div className="grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-8">
             <p
               className="rise mb-7 flex items-center gap-3 font-inter text-[11px] font-semibold uppercase tracking-[0.28em] text-accent"
               style={{ "--rise-delay": "80ms" } as React.CSSProperties}
@@ -115,7 +116,7 @@ export default function LandingPage() {
               Bengaluru out-of-home
             </p>
 
-            <h1 className="font-syne text-[clamp(1.95rem,4.5vw,4rem)] font-extrabold leading-[0.95] tracking-[-0.03em] text-white">
+            <h1 className="font-syne text-[clamp(1.95rem,4.3vw,3.6rem)] font-extrabold leading-[0.95] tracking-[-0.03em] text-white">
               {/* The three-line break is a desktop composition; below sm the
                   headline flows as one sentence rather than breaking twice. */}
               <span className="rise inline sm:block" style={{ "--rise-delay": "160ms" } as React.CSSProperties}>
@@ -133,7 +134,7 @@ export default function LandingPage() {
               className="rise mt-7 max-w-xl text-base font-light leading-relaxed text-white/70 md:text-lg"
               style={{ "--rise-delay": "460ms" } as React.CSSProperties}
             >
-              2,113 verified sites across the city — hoardings, bus shelters, skywalks and
+              2,114 verified sites — hoardings, bus shelters, skywalks and
               digital screens. Published rates, live dates, print and install on the same bill.
             </p>
 
@@ -143,24 +144,25 @@ export default function LandingPage() {
             >
               <Link
                 href="/marketplace"
-                className="group inline-flex items-center gap-3 bg-accent px-9 py-4 font-inter text-xs font-bold uppercase tracking-[0.18em] text-[#05070f] transition-colors hover:bg-white"
+                className="group inline-flex w-full items-center justify-center gap-3 bg-accent px-9 py-4 font-inter text-xs font-bold uppercase tracking-[0.18em] text-[#05070f] transition-colors hover:bg-white sm:w-auto"
               >
                 Browse inventory
                 <Icon name="arrow_forward" className="!text-base transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 href="/list-your-space"
-                className="inline-flex items-center gap-3 border border-white/25 px-9 py-4 font-inter text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-accent hover:text-accent"
+                className="inline-flex w-full items-center justify-center gap-3 border border-white/25 px-9 py-4 font-inter text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors hover:border-accent hover:text-accent sm:w-auto"
               >
                 List your space
               </Link>
             </div>
           </div>
 
-          <div className="flex justify-start lg:justify-end">
+          <div className="flex justify-start lg:col-span-4 lg:justify-end">
             <div className="rise w-full max-w-sm" style={{ "--rise-delay": "700ms" } as React.CSSProperties}>
               <HeroSlots />
             </div>
+          </div>
           </div>
         </div>
       </section>
@@ -184,7 +186,7 @@ export default function LandingPage() {
               href="/marketplace"
               className="group inline-flex shrink-0 items-center gap-2 font-inter text-xs font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:text-accent"
             >
-              See all 2,113
+              See all 2,114
               <Icon name="north_east" className="!text-sm transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
           </Reveal>

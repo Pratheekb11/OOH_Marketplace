@@ -32,15 +32,22 @@ export function SupportSearch({ entries }: { entries: SupportSearchEntry[] }) {
   }
 
   return (
-    <div className="flex items-center rounded-full bg-surface-container-highest p-1 pr-2">
-      <Icon name="search" className="px-6 text-on-surface-variant" />
-      <input
-        type="text"
-        placeholder="Search FAQs, then press Enter…"
-        className="w-full border-none bg-transparent py-4 font-medium text-on-surface placeholder:text-outline focus:ring-0"
-        onKeyDown={handleKeyDown}
-      />
-      <Link href="#faq" className="shrink-0 rounded-full bg-primary px-8 py-3 text-sm font-bold text-white">
+    // On a phone the button and the field cannot share one pill without
+    // squeezing the placeholder to a couple of characters, so they stack.
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:rounded-full sm:bg-surface-container-highest sm:p-1 sm:pr-2">
+      <div className="flex min-w-0 items-center rounded-full bg-surface-container-highest px-2 sm:flex-1 sm:bg-transparent sm:px-0">
+        <Icon name="search" className="px-4 text-on-surface-variant sm:px-6" />
+        <input
+          type="text"
+          placeholder="Search FAQs, then press Enter…"
+          className="w-full min-w-0 border-none bg-transparent py-4 font-medium text-on-surface placeholder:text-outline focus:ring-0"
+          onKeyDown={handleKeyDown}
+        />
+      </div>
+      <Link
+        href="#faq"
+        className="shrink-0 rounded-full bg-primary px-8 py-3 text-center text-sm font-bold text-white"
+      >
         Browse FAQs
       </Link>
     </div>
