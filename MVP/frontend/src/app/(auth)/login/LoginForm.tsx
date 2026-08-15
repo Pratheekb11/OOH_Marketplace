@@ -106,7 +106,7 @@ export function LoginForm() {
               </label>
               <Link
                 href="/support"
-                className="text-xs font-bold text-secondary transition-colors hover:text-secondary-container"
+                className="-my-2 py-2 text-xs font-bold text-secondary transition-colors hover:text-secondary-container"
               >
                 Forgot Password?
               </Link>
@@ -125,7 +125,7 @@ export function LoginForm() {
           </div>
         </div>
 
-        <div className="ml-1 flex items-center space-x-3">
+        <label htmlFor="remember" className="ml-1 flex cursor-pointer items-center space-x-3 py-2">
           <input
             id="remember"
             type="checkbox"
@@ -133,10 +133,10 @@ export function LoginForm() {
             onChange={(event) => setRememberMe(event.target.checked)}
             className="h-5 w-5 rounded border-0 bg-surface-container-highest text-secondary focus:ring-2 focus:ring-secondary/20 focus:ring-offset-0"
           />
-          <label htmlFor="remember" className="text-sm font-medium text-on-surface-variant">
+          <span className="text-sm font-medium text-on-surface-variant">
             Keep me signed in for 30 days
-          </label>
-        </div>
+          </span>
+        </label>
 
         {error ? (
           <p role="alert" className="rounded-xl bg-error-container px-4 py-3 text-sm font-medium text-on-error-container">
@@ -187,7 +187,7 @@ export function LoginForm() {
       <footer className="pt-4 text-center">
         <p className="font-medium text-on-surface-variant">
           New to the marketplace?
-          <Link href="/register" className="ml-1 font-bold text-secondary hover:underline">
+          <Link href="/register" className="-my-2 ml-1 inline-block py-2 font-bold text-secondary hover:underline">
             Create Account
           </Link>
         </p>

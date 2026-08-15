@@ -10,10 +10,10 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
   return (
     <div>
       <h5 className="mb-8 text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">{title}</h5>
-      <ul className="space-y-4 text-xs font-medium">
+      <ul className="space-y-1 text-xs font-medium">
         {links.map((link) => (
           <li key={link.label}>
-            <Link href={link.href} className="transition-colors hover:text-secondary">
+            <Link href={link.href} className="block py-2 transition-colors hover:text-secondary">
               {link.label}
             </Link>
           </li>

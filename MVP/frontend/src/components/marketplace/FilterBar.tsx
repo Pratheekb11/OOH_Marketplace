@@ -215,7 +215,7 @@ export function FilterBar() {
         <SelectField
           label="Sort By"
           containerClassName="col-span-2 gap-1 sm:ml-auto"
-          className="!p-0 border-none bg-transparent text-sm font-bold text-primary"
+          className="!py-2 sm:!p-0 border-none bg-transparent text-sm font-bold text-primary"
           value={sort}
           onChange={(e) => updateParams({ sort: e.target.value })}
         >

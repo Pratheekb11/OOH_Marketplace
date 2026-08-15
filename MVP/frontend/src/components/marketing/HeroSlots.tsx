@@ -83,7 +83,7 @@ export default function HeroSlots() {
             onClick={() => setIndex(i)}
             aria-label={`Show slot ${i + 1}: ${s.tag}`}
             aria-current={i === index}
-            className="group h-6 flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="group flex h-8 flex-1 items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <span className="block h-[3px] w-full bg-white/15">
               <span

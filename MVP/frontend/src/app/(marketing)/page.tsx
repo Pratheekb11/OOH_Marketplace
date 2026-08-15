@@ -184,7 +184,7 @@ export default function LandingPage() {
             </div>
             <Link
               href="/marketplace"
-              className="group inline-flex shrink-0 items-center gap-2 font-inter text-xs font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:text-accent"
+              className="group inline-flex shrink-0 items-center gap-2 py-2 font-inter text-xs font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:text-accent"
             >
               See all 2,114
               <Icon name="north_east" className="!text-sm transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />

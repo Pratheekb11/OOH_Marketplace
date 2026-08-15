@@ -226,7 +226,7 @@ export function RegisterForm() {
       <footer className="pt-4 text-center">
         <p className="font-medium text-on-surface-variant">
           Already have an account?
-          <Link href="/login" className="ml-1 font-bold text-secondary hover:underline">
+          <Link href="/login" className="-my-2 ml-1 inline-block py-2 font-bold text-secondary hover:underline">
             Sign In
           </Link>
         </p>

@@ -93,7 +93,7 @@ export function NavShellA() {
       <div className="relative z-50 flex w-full items-center justify-between">
       <Link
         href="/"
-        className="font-syne text-xl font-extrabold uppercase tracking-tight transition-opacity hover:opacity-80"
+        className="-my-2 py-2 font-syne text-xl font-extrabold uppercase tracking-tight transition-opacity hover:opacity-80"
       >
         Ad<span className={onDark ? "text-accent" : "text-secondary"}>Space</span>
       </Link>
