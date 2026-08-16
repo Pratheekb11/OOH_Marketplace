@@ -1,0 +1,301 @@
+{
+  "$schema_note": "Machine-readable map of this repository for coding agents. Prose companion for Claude Code specifically is CLAUDE.md at repo root; this file is broader-purpose and tool-agnostic. Regenerate by re-deriving from source rather than hand-editing stale facts.",
+  "generated_at": "2026-08-16",
+  "generated_from_ref": "landing-redesign",
+  "repo_name": "physical_ads_and_OOH",
+  "remote": "github.com/Pratheekb11/OOH_Marketplace",
+
+  "product": {
+    "one_liner": "AdSpace Horizon: a Bengaluru-focused marketplace for out-of-home (OOH) advertising space (hoardings, bus shelters, skywalks, digital OOH) connecting ad-space owners, advertisers, and a marketplace admin/ops team.",
+    "prd_files": [
+      "AdSpace_Marketplace_PRD.html (title: 'AdSpace Marketplace - PRD v0.1'; gitignored, present on disk but not tracked in git)",
+      "AdSpace_Marketplace_PRD_v0.1.docx (same content, .docx form; gitignored)"
+    ],
+    "personas": [
+      "Advertiser (browses inventory, books space, orders add-ons)",
+      "Ad-space Owner (lists inventory, manages own listings)",
+      "Admin/Ops (approves listings, runs the VAS job queue) - only implemented in the legacy backend/"
+    ],
+    "vas_meaning": "Value-Added Services: printing, installation, maintenance/monitoring work related to an ad space. In legacy backend/ these are first-class VASOrder entities; in MVP/backend they are simplified to booking add-ons.",
+    "live_urls": {
+      "production_app": "https://adspace-ooh.vercel.app",
+      "production_api": "https://ooh-marketplace-virid.vercel.app/api/v1 (also proxied at https://adspace-ooh.vercel.app/api/v1)",
+      "static_mirror": "https://pratheekb11.github.io/OOH_Marketplace/"
+    }
+  },
+
+  "repo_shape": {
+    "summary": "Three generations of the same product live side by side. MVP/ is the current, deployed one (Next.js + a trimmed FastAPI). Ui_Prototype_MVP_Prep/ is the original static HTML prototype. backend/ is the fuller FastAPI service with the complete domain model (VAS orders, invoices, admin review, scraper) that MVP/backend was cut down from.",
+    "top_level_entry_point": "index.html - meta-refresh redirect into Ui_Prototype_MVP_Prep/index.html (the old prototype landing page). Not what the Vercel deployment serves.",
+    "which_half_is_authoritative": "For anything deployed, MVP/. For domain rules not yet ported (VAS lifecycle, admin listing review, invoices, notifications, audit log, scraper provenance), backend/.",
+    "directories": {
+      "MVP/frontend/": "Next.js 15.5.22 App Router + React 19 + Tailwind 3 frontend. The deployed UI. 2252 tracked files, most of them listing photography under public/images/.",
+      "MVP/backend/": "Trimmed FastAPI + SQLAlchemy 2 API that the deployed frontend talks to. 20 routes. Runs on Vercel as a serverless function via api/index.py.",
+      "MVP/DEPLOY_VERCEL.md": "Vercel deployment runbook for both MVP projects.",
+      "MVP/IMPLEMENTATION_NOTES.md": "Running notes on the MVP build.",
+      "Ui_Prototype_MVP_Prep/": "Original static HTML/CSS/Tailwind UI prototype. No build step, no bundler; open files directly or serve as static files. One hand-authored CSS file and Tailwind config per page under css/ and js/, not shared.",
+      "backend/": "Legacy/fuller FastAPI service. 26 routes, 10 entities, Alembic migrations, Docker Compose, and backend/docs/ (the most detailed prose docs in the repo). Not deployed.",
+      "backend/scraper/": "Standalone CLI that collects competitor OOH inventory into JSONL/CSV and optionally imports it as pending_approval listings. Imports from app.* but nothing in app/ imports it, and the API never invokes it.",
+      ".github/workflows/": "deploy-pages.yml only. Root .gitignore excludes .github/* then re-includes workflows/, so other .github content stays local.",
+      "index.html": "Root redirect into the old prototype."
+    }
+  },
+
+  "git_state": {
+    "default_branch": "main",
+    "branches": {
+      "main": "Production. Currently identical to MVP.",
+      "MVP": "Same commit as main. Triggers the GitHub Pages workflow on pushes touching MVP/frontend/**.",
+      "landing-redesign": "Active work. 4 commits ahead of main, main is a strict ancestor. Contains the night-register landing page rebuild, self-hosted fonts, and the mobile/tap-target passes."
+    },
+    "history_note": "On 2026-08-16 all branches were rewritten to strip Co-Authored-By/Claude-Session trailers and to normalise the author identity to Pratheek B <bpratheek122@gmail.com>, then force-pushed. File content was unchanged (tree hashes identical). Old clones need a fresh clone or a hard reset.",
+    "deleted_branch_note": "worktree-repo-context-doc was deleted from origin on 2026-08-16. It forked before MVP/ existed, so Vercel could not build it: the frontend project's Root Directory MVP/frontend did not exist on that branch and every preview deploy failed at checkout.",
+    "gitignored_but_present_on_disk": [
+      "AdSpace_Marketplace_PRD.html and .docx (the PRD)",
+      "MVP/backend/.venv/, .env, .env.local, adspace_mvp.db",
+      "MVP/frontend/node_modules/, .next/, out/",
+      "backend/data/ and backend/.scrape_cache/ (scraper artefacts)",
+      ".claude/ (incl. scratch worktrees)"
+    ],
+    "deliberately_committed_binaries": "MVP/frontend/public/images/ (2135 files, ~36 MB) and MVP/frontend/src/app/fonts/*.woff2. The fonts must stay committed - see fonts note below."
+  },
+
+  "frontend_mvp": {
+    "path": "MVP/frontend",
+    "stack": "Next.js 15.5.22 (App Router, Turbopack in dev), React 19.1.0, TypeScript 5, Tailwind CSS 3.4 (+ @tailwindcss/forms, @tailwindcss/container-queries), zod 4 for wizard schemas. No component library.",
+    "commands": {
+      "dev": "npm run dev (NEXT_DIST_DIR=.next-dev next dev --turbopack)",
+      "build": "npm run build",
+      "build_static_export": "npm run build:pages (NEXT_OUTPUT=export)",
+      "lint": "npm run lint"
+    },
+    "env_vars": {
+      "NEXT_PUBLIC_API_BASE_URL": "API base. Defaults to http://127.0.0.1:8000/api/v1 in src/lib/api.ts. On Vercel it is the relative /api/v1, proxied by vercel.json to the backend project, so the browser only ever talks to one origin and CORS is out of the picture.",
+      "NEXT_PUBLIC_BASE_PATH": "'/OOH_Marketplace' for the GitHub Pages project site, '' otherwise.",
+      "NEXT_OUTPUT": "Set to 'export' for the static build.",
+      "NEXT_DIST_DIR": "Keeps the dev build output out of .next so a dev server and a production build can coexist.",
+      "NEXT_EXPORT_LISTING_IDS": "Limits which listing detail pages are pre-rendered, for faster local export runs."
+    },
+    "route_groups": {
+      "(marketing)": "/ (landing), /marketplace, /listings/[id], /partnerships, /support",
+      "(app)": "/analytics, /cart, /checkout, /list-your-space (5-step wizard: location, details, pricing, availability, review)",
+      "(auth)": "/login, /register"
+    },
+    "build_scale": "2133 pre-rendered pages, of which 2114 are /listings/[id] via generateStaticParams reading the static snapshot.",
+    "key_libs": {
+      "src/lib/api.ts": "fetch wrapper; reads NEXT_PUBLIC_API_BASE_URL, attaches the bearer token.",
+      "src/lib/listings-source.ts": "Tries the API first, falls back to public/data/*.json. The fallback only triggers on a transport failure - a 4xx/5xx from a reachable API is surfaced, not masked with stale data. Its filter/sort logic mirrors browse_listings in MVP/backend/app/main.py; change one and change the other.",
+      "src/lib/cart-context.tsx": "Client cart state.",
+      "src/lib/wizard/": "Reducer, zod schema, context and payload mapper for the list-your-space wizard.",
+      "src/lib/pages-image-loader.ts": "Image loader for the basePath-prefixed static export."
+    },
+    "fonts": {
+      "rule": "All four faces (Epilogue, Manrope, Inter, Syne) load through next/font/local from committed woff2 files in src/app/fonts/. Do NOT move them back to next/font/google.",
+      "why": "next/font/google fetches the files during next build, so a build machine that cannot reach fonts.gstatic.com fails the entire build - which is how the Vercel deploy broke once.",
+      "detail": "Each file is the latin variable face, so one file covers a family's whole weight range. Material Symbols is still a runtime <link> in layout.tsx, which is a browser request rather than a build-time one and therefore cannot break a build."
+    },
+    "landing_page": {
+      "file": "src/app/(marketing)/page.tsx",
+      "design_register": "Its own 'night' register - two light temperatures only (amber --color-accent against near-black #05070f), with the photography carrying the rest of the colour. Display type is Syne; Manrope on body, Inter on data/labels.",
+      "nav": "NavShellA renders unpainted and fixed over the hero on / only, and paints its white bar once scrollY > 64.",
+      "signature_element": "components/marketing/HeroSlots.tsx - a play-out loop mirroring how digital OOH sells a rotation. The fill-bar duration lives in TWO places: SLOT_MS there and the slot-fill keyframe in globals.css. Change both together.",
+      "motion": "Scroll entrances go through components/marketing/Reveal.tsx; every animation is neutralised under prefers-reduced-motion.",
+      "copy_is_data_backed": "Section copy quotes the real catalogue and the format tiles deep-link into /marketplace?space_type=... Re-check the numbers whenever the static snapshot is regenerated.",
+      "imagery_policy": "Real photographs with free commercial-use licensing only - no AI-generated imagery. Provenance is recorded in MVP/frontend/public/images/CREDITS.md."
+    },
+    "verification_expectations": "Frontend changes are expected to be checked with real interaction tests (a CDP harness driving actual routes), not just a passing build: horizontal overflow at 360/390/414px, runtime JS errors, keyboard focus, prefers-reduced-motion, and hero fit at 1024/1280/1440/1920."
+  },
+
+  "backend_mvp": {
+    "path": "MVP/backend",
+    "stack": "FastAPI 0.140, SQLAlchemy 2.0.51 (Mapped/mapped_column style), Alembic 1.18, Pydantic Settings, python-jose JWT, passlib+bcrypt, slowapi rate limiting, psycopg 3 for Postgres.",
+    "modules": {
+      "app/main.py": "All 20 routes, authorization checks, workflow orchestration.",
+      "app/models.py": "User, Listing, CartItem, Booking, Payment + Role/ListingStatus/BookingStatus/PaymentStatus enums.",
+      "app/schemas.py": "Pydantic request/response schemas.",
+      "app/pricing.py": "ADDON_CATALOG, GST_RATE, inclusive_days, quote_line, quote_cart.",
+      "app/security.py": "create_token, current_user, require_roles.",
+      "app/config.py": "Settings. sqlalchemy_url rewrites postgres://|postgresql:// to postgresql+psycopg:// because hosted providers hand out the bare scheme and SQLAlchemy would otherwise reach for psycopg2, which is not installed.",
+      "app/database.py": "Engine, session factory, get_db dependency.",
+      "api/index.py": "Vercel serverless entrypoint. Puts the package root on sys.path and re-exports app. Deployment glue only - uvicorn app.main:app locally stays the source of truth.",
+      "scripts/export_static.py": "Writes ../frontend/public/data/{listings,facets}.json.",
+      "scripts/seed.py, scripts/import_scraped.py, scripts/fetch_prototype_images.py": "Data loading helpers."
+    },
+    "settings_env_vars": {
+      "app_env": "development",
+      "database_url": "sqlite:///./adspace_mvp.db by default. Use a provider's POOLED Postgres endpoint in production - serverless opens many short-lived connections.",
+      "secret_key": "change-me-in-production",
+      "access_token_expire_minutes": 1440,
+      "cors_origins": "http://localhost:3000,http://127.0.0.1:5500",
+      "allowed_hosts": "localhost,127.0.0.1"
+    },
+    "entities": {
+      "User": "email (unique), full_name, password_hash, role.",
+      "Listing": "owner_id, title, space_type, description, location, width_ft/height_ft (NULLABLE), price_per_day, footfall_estimate, status, rejection_reason, lighting, image_url, extra (JSON).",
+      "CartItem": "user_id, listing_id, start_date, end_date, addons (JSON).",
+      "Booking": "listing_id, advertiser_id, date window, base_amount, addons_amount, addons, gst_amount, total_amount, status.",
+      "Payment": "user_id, booking_ids (JSON), amount, status, provider_order_id (unique), method_label (default 'Dummy Card')."
+    },
+    "enums": {
+      "Role": ["advertiser", "owner", "admin"],
+      "ListingStatus": ["pending_approval", "active", "rejected", "paused", "archived"],
+      "BookingStatus": ["pending_payment", "booked", "active", "cancelled"],
+      "PaymentStatus": ["created", "paid", "failed"]
+    },
+    "pricing": {
+      "base": "inclusive_days(start, end) * listing.price_per_day",
+      "gst_rate": 0.18,
+      "gst_basis": "flat 18% over base + addons",
+      "addon_catalog": {
+        "printing": "Premium Printing, 25000.0",
+        "installation": "Expert Install, 15000.0",
+        "monitoring": "24/7 Monitoring, 8000.0"
+      },
+      "money_type": "Float in the schema. Not yet safe for real settlement."
+    },
+    "routes": [
+      "GET /health",
+      "POST /api/v1/auth/register", "POST /api/v1/auth/login", "GET /api/v1/auth/me",
+      "GET /api/v1/listings", "GET /api/v1/listings/facets", "GET /api/v1/listings/{listing_id}",
+      "POST /api/v1/listings", "PUT /api/v1/listings/{listing_id}", "DELETE /api/v1/listings/{listing_id}",
+      "GET /api/v1/owner/listings",
+      "GET /api/v1/cart", "POST /api/v1/cart/items", "PATCH /api/v1/cart/items/{item_id}", "DELETE /api/v1/cart/items/{item_id}", "DELETE /api/v1/cart",
+      "POST /api/v1/checkout", "GET /api/v1/payments/{payment_id}",
+      "GET /api/v1/bookings", "GET /api/v1/addons"
+    ],
+    "migrations": ["1152e615efe4_initial_mvp_schema", "a4d9c1b2f883_listing_dimensions_optional"],
+    "tests": "MVP/backend/tests: test_auth, test_cart, test_checkout, test_listings. conftest.py builds a fresh in-memory SQLite DB per test and overrides the FastAPI DB dependency.",
+    "run_commands": {
+      "setup": "cd MVP/backend && source .venv/bin/activate && cp .env.example .env",
+      "migrate": "alembic upgrade head",
+      "serve": "uvicorn app.main:app --reload  (docs at /docs)",
+      "test": "pytest -q",
+      "export_snapshot": "python -m scripts.export_static"
+    }
+  },
+
+  "backend_legacy": {
+    "path": "backend",
+    "status": "Not deployed. Still the most complete expression of the domain and the only place several workflows exist. Keep as reference; do not assume the deployed API has these routes.",
+    "extra_entities_not_in_mvp": ["VASOrder", "Notification", "Invoice", "AuditLog", "ScrapedListing", "ListingDocument"],
+    "extra_capabilities": [
+      "Admin listing review (pending queue + approve/reject)",
+      "Owner listing status transitions and document upload",
+      "VAS order lifecycle: unassigned -> scheduled -> in_progress -> completed, or cancelled",
+      "Advertiser and owner dashboards",
+      "Invoices and notifications",
+      "app/integrations.py: GST validation, Google Maps geocoding, S3/local file storage, SMTP, invoice PDF generation - thin adapters, each falling back to a no-op/local behaviour when unconfigured"
+    ],
+    "pricing_differs": "VAS is priced per unit (printing 25, installation 1500, maintenance 750) rather than as the flat MVP add-on catalogue. GST is 18% over base+VAS in both.",
+    "payment_warning": "POST /payments/{id}/confirm is a development-only simulated endpoint, disabled when APP_ENV=production. There is no real payment gateway webhook. Never wire a frontend confirm button to production traffic against it.",
+    "entity_lifecycles": {
+      "Listing": "pending_approval -> active|rejected; active can be paused/resumed",
+      "Booking": "pending_payment -> booked -> active, or cancelled",
+      "VASOrder": "unassigned -> scheduled -> in_progress -> completed, or cancelled. May be linked to a booking or standalone.",
+      "Payment": "created -> paid|failed"
+    },
+    "architecture_note": "Flat module set - no service or repository layer. app/main.py holds routes, authorization, pricing math and workflow orchestration. alembic/ is the only path allowed to change the schema; the schema is never created via create_all().",
+    "docker": "docker compose up --build -d runs alembic upgrade head then Uvicorn. Requires APP_ENV=production, a real DATABASE_URL, a 32+ char SECRET_KEY, and restrictive CORS_ORIGINS/ALLOWED_HOSTS.",
+    "known_gaps_before_public_launch": [
+      "No payment gateway webhooks",
+      "Money stored as Float rather than Decimal",
+      "Notification dispatch is synchronous",
+      "Document URLs are unsigned",
+      "No DB-level booking concurrency locks"
+    ]
+  },
+
+  "scraper": {
+    "path": "backend/scraper",
+    "purpose": "Collect competitor OOH inventory into JSONL/CSV and optionally import it as pending_approval listings.",
+    "commands": [
+      "python -m scraper.cli scrape themediaant --location 'Bangalore, Karnataka, India' --location-id 'ChIJbU60yXAWrjsR4E9-UejD3_g' --images --out data/bangalore",
+      "python -m scraper.cli import data/bangalore/listings.jsonl"
+    ],
+    "deps": "beautifulsoup4 + lxml; playwright only for scraper/browser.py, which is for sites that build their listings client-side (themediaant does not).",
+    "provenance": "Scraped rows land in listings as pending_approval under a synthetic scraped-inventory@internal.invalid owner, with provenance in scraped_listings (unique source_url, so re-imports update in place).",
+    "rule": "Never auto-approve scraped rows - they go through the same admin review as owner submissions.",
+    "adapter_convention": "Adapters live in scraper/adapters/; everything shared (HTTP politeness, parsing, images, output) sits outside them. An adapter that can report expected_counts() lets the CLI reconcile a run against the source's own totals - on sites with unstable pagination that is the only way to know a run finished. Per-site quirks go in scraper/README.md, not just the adapter docstring."
+  },
+
+  "marketplace_browse_contract": {
+    "applies_to": "Both backends.",
+    "GET /listings": "Returns a PAGED ENVELOPE {items, total, limit, offset}, not a bare list - a real city catalogue is thousands of rows.",
+    "filters": ["q", "space_type", "lighting/illumination", "price", "width/height/area ranges", "exact size ('40W X 20H')", "min_footfall", "has_dimensions"],
+    "also": ["sort", "limit", "offset"],
+    "GET /listings/facets": "Returns dropdown options (space_types, lightings, sizes, price_min, price_max, total) derived from live inventory. The UI must read filter options from it rather than hardcoding lists that drift from the data. Declared BEFORE /listings/{listing_id} so the literal path wins.",
+    "nullable_dimensions": "Listing.width_ft/height_ft are nullable. Real inventory does not always publish a size - bus shelters are sold by a Small/Medium/Large bucket kept in extra.size_bucket. Anything rendering dimensions must degrade rather than print 'null x null'."
+  },
+
+  "catalogue_snapshot": {
+    "source": "MVP/frontend/public/data/listings.json, regenerated by MVP/backend scripts/export_static.py",
+    "total_rows": 2114,
+    "bengaluru_rows": 2113,
+    "space_type_counts": {
+      "Bus Shelter": 1101,
+      "Hoarding": 710,
+      "Skywalk": 151,
+      "Digital OOH": 124,
+      "Digital Bus Shelter": 21,
+      "Road Median": 5,
+      "Pole Kiosk": 2
+    },
+    "price_per_day_range_inr": [400.0, 126667.0],
+    "regenerate_when": "The catalogue changes - otherwise the deployed static site keeps showing old inventory, and the landing-page copy that quotes these numbers goes stale."
+  },
+
+  "deployments": {
+    "vercel": {
+      "role": "The real deployment. Writes work, so login/cart/checkout work.",
+      "projects": "Frontend and backend are SEPARATE Vercel projects rooted at MVP/frontend and MVP/backend, under the same Vercel team.",
+      "backend_runtime": "Serverless function via api/index.py, configured by MVP/backend/vercel.json (version 2 builds/routes form - the rewrites form collapsed every request to one path and broke FastAPI routing).",
+      "single_origin": "MVP/frontend/vercel.json rewrites /api/v1/:path* to the backend deployment, so the browser only talks to one host and CORS is out of the picture.",
+      "database": "Postgres on Neon. Use the pooled endpoint.",
+      "vercelignore": "MVP/frontend/.vercelignore excludes out/ (the ~115 MB Pages export) - a plain CLI deploy aborted on it repeatedly.",
+      "allowed_hosts_gotcha": "ALLOWED_HOSTS needs *.vercel.app. Starlette only suffix-matches a pattern that starts with '*', so a bare .vercel.app matches nothing and every request returns 400 Invalid host header.",
+      "root_directory_gotcha": "Both projects set a Root Directory inside MVP/. Any branch that predates MVP/ fails at checkout with 'The specified Root Directory does not exist'. Do not push long-lived branches forked from before MVP/ existed.",
+      "runbook": "MVP/DEPLOY_VERCEL.md"
+    },
+    "github_pages": {
+      "role": "Read-only mirror. Static host, no backend; booking and checkout still need a real API.",
+      "workflow": ".github/workflows/deploy-pages.yml",
+      "triggers": "push to branch MVP touching MVP/frontend/** or the workflow itself, plus workflow_dispatch.",
+      "build": "npm ci then npm run build:pages with NEXT_OUTPUT=export, NEXT_PUBLIC_BASE_PATH from actions/configure-pages, NEXT_PUBLIC_API_BASE_URL from the repository variable of the same name (a variable, not a secret - it is baked into the client bundle and therefore public either way).",
+      "notes": "touch out/.nojekyll guards against a future switch to branch-based Pages stripping _next/. static_site_generator is deliberately not set on configure-pages because the repo sets basePath itself."
+    }
+  },
+
+  "frontend_backend_wiring": {
+    "mvp": "MVP/frontend talks to MVP/backend through src/lib/api.ts and src/lib/listings-source.ts. This is the live integration.",
+    "legacy_prototype": "Ui_Prototype_MVP_Prep/js/api.js is the only integration point on the old prototype: a tiny api(path, options) helper reading window.OOH_API_BASE_URL (default http://127.0.0.1:8000/api/v1), attaching the JWT from localStorage key adspace_access_token, throwing on non-OK. login_Page.html is the only page wired to it. Every other prototype page is presentation-only. Mapping for wiring more pages is in backend/docs/FRONTEND.md.",
+    "secrets_rule": "Never put secrets or provider keys in frontend JS. The API is the only caller of external providers (Maps, GST, SMTP, S3)."
+  },
+
+  "documentation_index": {
+    "CLAUDE.md": "Prose guidance for Claude Code. The closest thing to a single source of truth for conventions; this JSON mirrors it in structured form.",
+    "MVP/DEPLOY_VERCEL.md": "Vercel deployment runbook.",
+    "MVP/IMPLEMENTATION_NOTES.md": "Running MVP build notes.",
+    "MVP/frontend/public/images/CREDITS.md": "Photography provenance and licensing.",
+    "backend/README.md": "Legacy backend overview.",
+    "backend/docs/ARCHITECTURE.md": "Full entity lifecycles and module responsibilities.",
+    "backend/docs/API.md": "Full endpoint list for the legacy backend.",
+    "backend/docs/DEPLOYMENT.md": "Docker/production deployment for the legacy backend.",
+    "backend/docs/OPERATIONS.md": "Pre-launch gap list.",
+    "backend/docs/FRONTEND.md": "Prototype-page to endpoint mapping.",
+    "backend/docs/TESTING.md": "Test strategy.",
+    "backend/scraper/README.md": "Scraper usage and per-site quirks."
+  },
+
+  "paired_edits_to_remember": [
+    "HeroSlots.tsx SLOT_MS and the slot-fill keyframe in globals.css - change both together.",
+    "listings-source.ts filter/sort logic and browse_listings in MVP/backend/app/main.py - change one and change the other.",
+    "The catalogue numbers quoted in (marketing)/page.tsx and the static snapshot - re-check after every export_static run.",
+    "MVP/backend/app/models.py and a new Alembic migration - never rely on autocreate."
+  ],
+
+  "open_questions_for_a_human": [
+    "Is backend/ meant to be retired once MVP/backend catches up, or kept as the target architecture to port back to? Right now the two have diverged (VAS orders, admin review, invoices, notifications, scraper provenance exist only in backend/).",
+    "Ui_Prototype_MVP_Prep/ is superseded by MVP/frontend but root index.html still redirects into it. Should the redirect point at the MVP app instead?",
+    "landing-redesign has not been merged into main, so the deployed production landing page is still the pre-redesign one."
+  ]
+}
