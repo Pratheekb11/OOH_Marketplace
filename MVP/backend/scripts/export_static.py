@@ -17,10 +17,9 @@ import gzip
 import json
 from pathlib import Path
 
-from sqlalchemy import select
-
 from app.database import SessionLocal
 from app.models import Listing, ListingStatus
+from sqlalchemy import select
 
 
 def listing_json(listing: Listing) -> dict:

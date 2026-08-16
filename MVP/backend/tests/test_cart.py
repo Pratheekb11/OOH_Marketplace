@@ -5,7 +5,7 @@ tests/conftest.py -- no new fixtures are introduced here.
 """
 from datetime import date, timedelta
 
-from tests.test_listings import create_listing, listing_payload
+from tests.test_listings import create_listing
 
 TODAY = date(2026, 1, 1)
 

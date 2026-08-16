@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+import containerQueries from "@tailwindcss/container-queries";
+import forms from "@tailwindcss/forms";
 
 /**
  * Merged design-system config, extracted from the static prototype's five
@@ -103,7 +105,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("@tailwindcss/forms"), require("@tailwindcss/container-queries")],
+  plugins: [forms, containerQueries],
 };
 
 export default config;

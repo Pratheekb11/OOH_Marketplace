@@ -22,6 +22,7 @@ import argparse
 import json
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -47,9 +48,17 @@ def download_one(entry: dict, force: bool) -> str:
         return "skipped"
 
     dest.parent.mkdir(parents=True, exist_ok=True)
+    # The manifest is committed, but urlopen also honours file:// and custom
+    # schemes -- so a bad entry could read off the local disk instead of the
+    # network. Pin it to http(s) rather than trusting the manifest.
+    if urllib.parse.urlparse(entry["url"]).scheme not in ("http", "https"):
+        print(f"FAILED   {entry['dest']} <- {entry['url']} (unsupported URL scheme)")
+        return "failed"
     request = urllib.request.Request(entry["url"], headers={"User-Agent": USER_AGENT})
     try:
-        with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
+        # The scheme is pinned to http(s) a few lines above, which is exactly
+        # what bandit's B310 asks for; it just cannot see the guard from here.
+        with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:  # nosec B310
             data = response.read()
     except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError) as exc:
         print(f"FAILED   {entry['dest']} <- {entry['url']} ({exc})")

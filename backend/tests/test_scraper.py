@@ -6,19 +6,16 @@ like real themediaant payloads. Nothing here touches the network.
 import json
 
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
 from app.database import Base
 from app.models import Listing, ListingStatus, ScrapedListing
 from scraper.adapters.themediaant import TheMediaAntAdapter, _parse_reach
 from scraper.images import looks_like_hoarding_photo
 from scraper.importer import import_records
-from scraper.models import ScrapedHoarding
 from scraper.parse import parse_dimensions, parse_footfall, parse_price
 from scraper.writers import read_jsonl, write_csv, write_jsonl
-
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 # ---------------------------------------------------------------- parse.py
 

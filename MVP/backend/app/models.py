@@ -1,7 +1,9 @@
 import enum
 from datetime import date, datetime
-from sqlalchemy import Date, DateTime, Enum, Float, ForeignKey, Integer, JSON, String, Text, UniqueConstraint
+
+from sqlalchemy import JSON, Date, DateTime, Enum, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.database import Base
 
 

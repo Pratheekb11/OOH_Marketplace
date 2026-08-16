@@ -36,11 +36,10 @@ Sources (read, never modified):
 """
 import argparse
 
-from sqlalchemy import delete, select
-
 from app.database import SessionLocal
 from app.models import Booking, CartItem, Listing, ListingStatus, Payment, Role, User
 from app.security import password_context
+from sqlalchemy import delete, select
 
 OWNER_EMAIL = "owner@adspace.example"
 ADVERTISER_EMAIL = "advertiser@adspace.example"

@@ -7,7 +7,7 @@ import { fetchListings } from "@/lib/listings-source";
 import FilterBar from "@/components/marketplace/FilterBar";
 import ListingGrid from "@/components/marketplace/ListingGrid";
 import MapPanel from "@/components/marketplace/MapPanel";
-import type { ListingOut, ListingPage } from "@/components/marketplace/types";
+import type { ListingOut } from "@/components/marketplace/types";
 
 const PAGE_SIZE = 24;
 

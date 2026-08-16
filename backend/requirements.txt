@@ -12,9 +12,9 @@ slowapi==0.1.9
 httpx==0.28.1
 boto3==1.42.56
 reportlab==4.4.10
-python-multipart==0.0.22
+python-multipart==0.0.31
 beautifulsoup4==4.14.2
-lxml==6.0.2
+lxml==6.1.0
 # playwright is optional: only scraper/browser.py needs it
 # playwright==1.56.0
 pytest==9.1.1

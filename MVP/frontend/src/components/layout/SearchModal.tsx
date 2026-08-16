@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import EmptyState from "@/components/ui/EmptyState";
 import Icon from "@/components/ui/Icon";
 import Skeleton from "@/components/ui/Skeleton";
-import { api, ApiError } from "@/lib/api";
+import { ApiError } from "@/lib/api";
 import type { ListingOut } from "@/components/marketplace/types";
 import { fetchListings } from "@/lib/listings-source";
 

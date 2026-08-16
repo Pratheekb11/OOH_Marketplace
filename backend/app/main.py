@@ -7,21 +7,50 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from sqlalchemy import func, select
-from sqlalchemy.orm import Session
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.database import Base, engine, get_db
-from app.integrations import geocode, invoice_pdf, send_email, store_file, validate_gstin
-from app.models import (AuditLog, Booking, BookingStatus, Invoice, JobStatus, Listing, ListingDocument, ListingStatus,
-                        Notification, Payment, PaymentStatus, Role, User, VASOrder)
-from app.schemas import (BookingCreate, BookingOut, JobUpdate, ListingCreate, ListingFacets, ListingOut, ListingPage,
-                         ListingReview, LoginRequest, NotificationOut, PaymentConfirm,
-                         PaymentOut, RegisterRequest, Token, UserOut, VASOrderCreate,
-                         VASOrderOut)
+from app.database import get_db
+from app.integrations import geocode, invoice_pdf, store_file, validate_gstin
+from app.models import (
+    AuditLog,
+    Booking,
+    BookingStatus,
+    Invoice,
+    JobStatus,
+    Listing,
+    ListingDocument,
+    ListingStatus,
+    Notification,
+    Payment,
+    PaymentStatus,
+    Role,
+    User,
+    VASOrder,
+)
+from app.schemas import (
+    BookingCreate,
+    BookingOut,
+    JobUpdate,
+    ListingCreate,
+    ListingFacets,
+    ListingOut,
+    ListingPage,
+    ListingReview,
+    LoginRequest,
+    NotificationOut,
+    PaymentConfirm,
+    PaymentOut,
+    RegisterRequest,
+    Token,
+    UserOut,
+    VASOrderCreate,
+    VASOrderOut,
+)
 
 settings = get_settings()
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

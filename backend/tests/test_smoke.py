@@ -1,6 +1,6 @@
 """Minimal regression test; run after `alembic upgrade head` against a test database."""
-from fastapi.testclient import TestClient
 from app.main import app
+from fastapi.testclient import TestClient
 
 
 def test_health_sets_security_headers():

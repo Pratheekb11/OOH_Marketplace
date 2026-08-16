@@ -4,21 +4,38 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from sqlalchemy import delete, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from slowapi import _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
 
 from app.config import get_settings
-from app.database import Base, engine, get_db
+from app.database import get_db
 from app.models import Booking, BookingStatus, CartItem, Listing, ListingStatus, Payment, PaymentStatus, Role, User
 from app.pricing import ADDON_CATALOG, inclusive_days, quote_cart, quote_line
-from app.schemas import (AddonOut, BookingOut, CartItemCreate, CartItemOut, CartItemUpdate,
-                         CartResponse, CheckoutRequest, CheckoutResponse, ListingCreate, ListingFacets, ListingOut, ListingPage,
-                         ListingUpdate, LoginRequest, OwnerBookingOut, PaymentDetailOut, RegisterRequest, Token, UserOut)
-from app.security import (bearer, create_token, current_user, limiter,
-                          password_context, require_roles)
+from app.schemas import (
+    AddonOut,
+    BookingOut,
+    CartItemCreate,
+    CartItemOut,
+    CartItemUpdate,
+    CartResponse,
+    CheckoutRequest,
+    CheckoutResponse,
+    ListingCreate,
+    ListingFacets,
+    ListingOut,
+    ListingPage,
+    ListingUpdate,
+    LoginRequest,
+    OwnerBookingOut,
+    PaymentDetailOut,
+    RegisterRequest,
+    Token,
+    UserOut,
+)
+from app.security import create_token, current_user, limiter, password_context, require_roles
 
 settings = get_settings()
 

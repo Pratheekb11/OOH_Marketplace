@@ -1,10 +1,9 @@
 from types import SimpleNamespace
 
 import pytest
-from fastapi import HTTPException
-
 from app.models import Role
 from app.security import require_roles
+from fastapi import HTTPException
 
 
 def test_health_returns_ok_with_security_headers(client):

@@ -1,6 +1,6 @@
 """initial production schema"""
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 revision = "9e6fb23d291b"
 down_revision = None

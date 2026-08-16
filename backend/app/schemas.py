@@ -1,5 +1,7 @@
 from datetime import date, datetime
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
+
 from app.models import JobStatus, ListingStatus, Role
 
 

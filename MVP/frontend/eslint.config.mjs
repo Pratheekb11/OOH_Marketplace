@@ -15,6 +15,10 @@ const eslintConfig = [
     ignores: [
       "node_modules/**",
       ".next/**",
+      // `npm run dev` writes here (NEXT_DIST_DIR in package.json), so it only
+      // exists locally — but when it does, linting it buries the real findings
+      // under thousands of generated-code warnings.
+      ".next-dev/**",
       "out/**",
       "build/**",
       "next-env.d.ts",

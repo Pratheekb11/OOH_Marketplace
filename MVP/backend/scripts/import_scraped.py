@@ -18,10 +18,9 @@ import shutil
 import sys
 from pathlib import Path
 
-from sqlalchemy import delete, func, select
-
 from app.database import SessionLocal
 from app.models import Booking, CartItem, Listing, ListingStatus, Role, User
+from sqlalchemy import delete, func, select
 
 OWNER_EMAIL = "scraped-inventory@internal.invalid"
 OWNER_NAME = "Scraped Inventory (unclaimed)"

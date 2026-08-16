@@ -4,13 +4,12 @@ Tests interact only through the public HTTP API except where a diagram requires
 an external lifecycle event (a booked campaign becoming active).
 """
 import pytest
+from app.database import Base, get_db
+from app.main import app, limiter
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-
-from app.database import Base, get_db
-from app.main import app, limiter
 
 
 @pytest.fixture

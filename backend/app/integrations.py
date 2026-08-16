@@ -3,9 +3,11 @@ import io
 import smtplib
 from email.message import EmailMessage
 from pathlib import Path
+
 import boto3
 import httpx
 from reportlab.pdfgen import canvas
+
 from app.config import get_settings
 
 settings = get_settings()

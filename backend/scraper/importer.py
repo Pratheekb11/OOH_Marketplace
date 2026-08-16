@@ -12,10 +12,10 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from sqlalchemy.orm import Session
-
 from app.integrations import store_file
 from app.models import Listing, ListingStatus, Role, ScrapedListing, User
+from sqlalchemy.orm import Session
+
 from scraper.images import content_type_for
 from scraper.models import ScrapedHoarding
 
