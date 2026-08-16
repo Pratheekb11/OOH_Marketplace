@@ -24,7 +24,7 @@ A working proof-of-concept OOH (out-of-home) ad-space marketplace:
   schedule, and add-on numbers derived from your own bookings (see the
   dedicated section below for exactly what is and isn't real here).
 
-Backend: FastAPI + SQLAlchemy + Alembic + SQLite, 20 routes, 49 passing
+Backend: FastAPI + SQLAlchemy + Alembic + SQLite, 20 routes, 50 passing
 tests. Frontend: Next.js 15 / React 19 / Tailwind 3.4, 17 routes, production
 build green.
 
@@ -312,17 +312,6 @@ once in `app/providers.tsx`, shared across all three groups.
   and returns `paid` — there is no webhook, no async confirmation, and the
   card fields in `DummyPaymentForm` are cosmetic and never leave the
   browser.
-- **Checkout has a concurrency race under Postgres.** Safe today because
-  SQLite serializes all writers, so no second checkout can interleave
-  between the overlap-check `SELECT` and the booking `INSERT`. Under
-  Postgres at the default READ COMMITTED isolation level, two simultaneous
-  checkouts for overlapping dates on the same listing can both pass that
-  `SELECT` before either commits. The exact site is commented in
-  `app/main.py`'s `checkout()` (the "Authoritative overlap guard" block).
-  Fix: `SELECT ... FOR UPDATE` on the listing row to serialize concurrent
-  checkouts, or (better) a Postgres `btree_gist` `EXCLUDE` constraint on
-  `(listing_id WITH =, daterange(start_date, end_date, '[]') WITH &&)` so
-  the database itself rejects the overlapping insert.
 - **localStorage JWT is XSS-readable, and there's no `middleware.ts` route
   protection.** Server middleware can't see `localStorage`, so all guarding
   (`RequireAuth`, `RequireRole`) is client-side — an unauthenticated visitor
@@ -398,21 +387,76 @@ once in `app/providers.tsx`, shared across all three groups.
   `href={...}` site) and the `/images/...` existence audit both came back
   clean — nothing pointed at a route or image file that doesn't exist.
 
+## Double-booking: the checkout race, and how it is closed
+
+`checkout()` used to be a plain check-then-act: SELECT for a conflicting
+booking, then INSERT. SQLite hid that, because it serializes writers — but
+production runs Postgres (Neon), where at the default READ COMMITTED
+isolation two concurrent checkouts for the same listing and overlapping
+dates could both pass their SELECT before either committed, and the space
+was sold twice. This was reproduced against a real Postgres 16 before it was
+fixed: two simultaneous checkouts, two `201`s, two rows in `bookings` for the
+same listing and the same dates.
+
+It is closed in two independent layers, either of which is sufficient:
+
+1. **`SELECT ... FOR UPDATE` on the listing rows** (`app/main.py`), taken
+   before the overlap checks, over the distinct listing ids **ordered by
+   id** — the ordering is what stops two multi-item checkouts from
+   deadlocking on each other. `with_for_update()` emits nothing on SQLite,
+   which is correct: SQLite already allows one writer at a time.
+2. **A Postgres `EXCLUDE` constraint** (migration `c7f1a9d4e210`) on
+   `(listing_id WITH =, daterange(start_date, end_date, '[]') WITH &&)`
+   `WHERE status IN ('pending', 'booked', 'active')`. The database refuses
+   the overlapping row no matter who inserts it — a script, a future worker,
+   a second API process. `IntegrityError` from it is caught in `checkout()`
+   and returned as the same `409` the SELECT would have produced, so it
+   never surfaces as a 500.
+
+Two details that are easy to get wrong in that constraint:
+
+- The range is `[]` (both ends inclusive), matching the pricing rule that
+  bills the start *and* the end date.
+- The predicate lists enum **names**, not values. `Enum(BookingStatus,
+  native_enum=False)` persists the member name, so the column holds
+  `'pending'`, not `'pending_payment'`. `cancelled` is excluded so a
+  cancelled booking does not block a re-sale of those dates.
+
+The migration is Postgres-only and branches on the dialect, so
+`alembic upgrade head` on SQLite is a no-op — `tests/test_migrations.py`
+runs the whole chain up and back down on SQLite to keep that branch honest.
+
+**Deploy note:** the constraint needs the `btree_gist` extension. The
+migration issues `CREATE EXTENSION IF NOT EXISTS btree_gist`, which Neon
+allows; on a managed Postgres that does not, the migration fails loudly
+rather than silently skipping a safety constraint.
+
+Verified on Postgres 16 with the extension installed:
+
+| Configuration | Result |
+| --- | --- |
+| Neither layer (the old code) | 2 × `201`, two overlapping bookings — the bug |
+| EXCLUDE constraint only | `201` + `409`, one booking, no traceback |
+| Both layers (shipped) | `201` + `409`, one booking, no traceback |
+
 ## Testing
 
 ```bash
-cd MVP/backend && source .venv/bin/activate && pytest -q   # 36 tests
+cd MVP/backend && source .venv/bin/activate && pytest -q   # 50 tests
 cd MVP/frontend && npm run build                            # the real gate
 ```
 
 Backend tests (`tests/test_auth.py`, `test_listings.py`, `test_cart.py`,
-`test_checkout.py`) cover: registration/login/role-guard rejection, listing
+`test_checkout.py`, `test_owner_dashboard.py`, `test_migrations.py`) cover: registration/login/role-guard rejection, listing
 CRUD + ownership checks (404-not-403 on cross-owner writes), archived
 listings staying hidden from browse but visible to their owner, every
 filter/sort combination, cart idempotency and 409s (bad addon code, inverted
 dates, inactive listing, overlapping bookings), and checkout's happy path,
 empty-cart 409, intra-cart self-conflict 409, and full-rollback-on-overlap
-behavior. `tests/conftest.py` gives every test a fresh in-memory SQLite DB
+behavior, the owner view of bookings (`/owner/bookings`: own inventory only,
+owner-only, archived listings retained, counterparty fields), and that the
+whole migration chain runs up and back down on SQLite. `tests/conftest.py`
+gives every test a fresh in-memory SQLite DB
 via a FastAPI dependency override — nothing touches `adspace_mvp.db`.
 
 `npm run build` is the real frontend gate, not `npm run dev`: dev mode
@@ -497,10 +541,8 @@ repo; it is a per-repository setting.
    land on `failed`.
 2. `Decimal` money end-to-end (schema + Pydantic + frontend formatting)
    instead of `Float`.
-3. `SELECT ... FOR UPDATE` or a Postgres `EXCLUDE` constraint to close the
-   checkout concurrency race (only matters once you're off SQLite).
-4. Real file upload for the wizard's compliance-step document dropzones.
-5. The still-deferred features: maps/geocoding, an impression/reach/
+3. Real file upload for the wizard's compliance-step document dropzones.
+4. The still-deferred features: maps/geocoding, an impression/reach/
    footfall-tracking backend (would let `/analytics`'s "Not instrumented"
    section become real), 2FA, admin listing review (the schema already has
    `pending_approval`/`rejected`/`rejection_reason` sitting unused).

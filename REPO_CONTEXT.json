@@ -1,10 +1,9 @@
 {
   "$schema_note": "Machine-readable map of this repository for coding agents. Prose companion for Claude Code specifically is CLAUDE.md at repo root; this file is broader-purpose and tool-agnostic. Regenerate by re-deriving from source rather than hand-editing stale facts.",
   "generated_at": "2026-08-16",
-  "generated_from_ref": "landing-redesign",
+  "generated_from_ref": "main",
   "repo_name": "physical_ads_and_OOH",
   "remote": "github.com/Pratheekb11/OOH_Marketplace",
-
   "product": {
     "one_liner": "AdSpace Horizon: a Bengaluru-focused marketplace for out-of-home (OOH) advertising space (hoardings, bus shelters, skywalks, digital OOH) connecting ad-space owners, advertisers, and a marketplace admin/ops team.",
     "prd_files": [
@@ -23,7 +22,6 @@
       "static_mirror": "https://pratheekb11.github.io/OOH_Marketplace/"
     }
   },
-
   "repo_shape": {
     "summary": "Three generations of the same product live side by side. MVP/ is the current, deployed one (Next.js + a trimmed FastAPI). Ui_Prototype_MVP_Prep/ is the original static HTML prototype. backend/ is the fuller FastAPI service with the complete domain model (VAS orders, invoices, admin review, scraper) that MVP/backend was cut down from.",
     "top_level_entry_point": "index.html - meta-refresh redirect into Ui_Prototype_MVP_Prep/index.html (the old prototype landing page). Not what the Vercel deployment serves.",
@@ -40,7 +38,6 @@
       "index.html": "Root redirect into the old prototype."
     }
   },
-
   "git_state": {
     "default_branch": "main",
     "branches": {
@@ -59,7 +56,6 @@
     ],
     "deliberately_committed_binaries": "MVP/frontend/public/images/ (2135 files, ~36 MB) and MVP/frontend/src/app/fonts/*.woff2. The fonts must stay committed - see fonts note below."
   },
-
   "frontend_mvp": {
     "path": "MVP/frontend",
     "stack": "Next.js 15.5.22 (App Router, Turbopack in dev), React 19.1.0, TypeScript 5, Tailwind CSS 3.4 (+ @tailwindcss/forms, @tailwindcss/container-queries), zod 4 for wizard schemas. No component library.",
@@ -105,7 +101,6 @@
     },
     "verification_expectations": "Frontend changes are expected to be checked with real interaction tests (a CDP harness driving actual routes), not just a passing build: horizontal overflow at 360/390/414px, runtime JS errors, keyboard focus, prefers-reduced-motion, and hero fit at 1024/1280/1440/1920."
   },
-
   "backend_mvp": {
     "path": "MVP/backend",
     "stack": "FastAPI 0.140, SQLAlchemy 2.0.51 (Mapped/mapped_column style), Alembic 1.18, Pydantic Settings, python-jose JWT, passlib+bcrypt, slowapi rate limiting, psycopg 3 for Postgres.",
@@ -137,10 +132,29 @@
       "Payment": "user_id, booking_ids (JSON), amount, status, provider_order_id (unique), method_label (default 'Dummy Card')."
     },
     "enums": {
-      "Role": ["advertiser", "owner", "admin"],
-      "ListingStatus": ["pending_approval", "active", "rejected", "paused", "archived"],
-      "BookingStatus": ["pending_payment", "booked", "active", "cancelled"],
-      "PaymentStatus": ["created", "paid", "failed"]
+      "Role": [
+        "advertiser",
+        "owner",
+        "admin"
+      ],
+      "ListingStatus": [
+        "pending_approval",
+        "active",
+        "rejected",
+        "paused",
+        "archived"
+      ],
+      "BookingStatus": [
+        "pending_payment",
+        "booked",
+        "active",
+        "cancelled"
+      ],
+      "PaymentStatus": [
+        "created",
+        "paid",
+        "failed"
+      ]
     },
     "pricing": {
       "base": "inclusive_days(start, end) * listing.price_per_day",
@@ -155,29 +169,53 @@
     },
     "routes": [
       "GET /health",
-      "POST /api/v1/auth/register", "POST /api/v1/auth/login", "GET /api/v1/auth/me",
-      "GET /api/v1/listings", "GET /api/v1/listings/facets", "GET /api/v1/listings/{listing_id}",
-      "POST /api/v1/listings", "PUT /api/v1/listings/{listing_id}", "DELETE /api/v1/listings/{listing_id}",
+      "POST /api/v1/auth/register",
+      "POST /api/v1/auth/login",
+      "GET /api/v1/auth/me",
+      "GET /api/v1/listings",
+      "GET /api/v1/listings/facets",
+      "GET /api/v1/listings/{listing_id}",
+      "POST /api/v1/listings",
+      "PUT /api/v1/listings/{listing_id}",
+      "DELETE /api/v1/listings/{listing_id}",
       "GET /api/v1/owner/listings",
-      "GET /api/v1/cart", "POST /api/v1/cart/items", "PATCH /api/v1/cart/items/{item_id}", "DELETE /api/v1/cart/items/{item_id}", "DELETE /api/v1/cart",
-      "POST /api/v1/checkout", "GET /api/v1/payments/{payment_id}",
-      "GET /api/v1/bookings", "GET /api/v1/addons"
+      "GET /api/v1/owner/bookings",
+      "GET /api/v1/cart",
+      "POST /api/v1/cart/items",
+      "PATCH /api/v1/cart/items/{item_id}",
+      "DELETE /api/v1/cart/items/{item_id}",
+      "DELETE /api/v1/cart",
+      "POST /api/v1/checkout",
+      "GET /api/v1/payments/{payment_id}",
+      "GET /api/v1/bookings",
+      "GET /api/v1/addons"
     ],
-    "migrations": ["1152e615efe4_initial_mvp_schema", "a4d9c1b2f883_listing_dimensions_optional"],
-    "tests": "MVP/backend/tests: test_auth, test_cart, test_checkout, test_listings. conftest.py builds a fresh in-memory SQLite DB per test and overrides the FastAPI DB dependency.",
+    "migrations": [
+      "1152e615efe4_initial_mvp_schema",
+      "a4d9c1b2f883_listing_dimensions_optional",
+      "c7f1a9d4e210_booking_no_overlap_exclusion (Postgres-only EXCLUDE constraint stopping overlapping bookings on one listing; no-op on SQLite)"
+    ],
+    "tests": "MVP/backend/tests: test_auth, test_cart, test_checkout, test_listings, test_owner_dashboard, test_migrations. conftest.py builds a fresh in-memory SQLite DB per test and overrides the FastAPI DB dependency. test_migrations runs the whole chain up and back down on SQLite, which is what keeps the Postgres-only migration's dialect branch honest.",
     "run_commands": {
       "setup": "cd MVP/backend && source .venv/bin/activate && cp .env.example .env",
       "migrate": "alembic upgrade head",
       "serve": "uvicorn app.main:app --reload  (docs at /docs)",
       "test": "pytest -q",
       "export_snapshot": "python -m scripts.export_static"
-    }
+    },
+    "concurrency": "checkout() locks the listing rows with SELECT ... FOR UPDATE ordered by id (deadlock-safe, no-op on SQLite) and the EXCLUDE constraint from c7f1a9d4e210 backs it at the DB level; IntegrityError from it is returned as 409. The constraint predicate lists enum NAMES ('pending','booked','active') because Enum(native_enum=False) persists the member name, not the value. Needs the btree_gist extension - the migration creates it."
   },
-
   "backend_legacy": {
     "path": "backend",
     "status": "Not deployed. Still the most complete expression of the domain and the only place several workflows exist. Keep as reference; do not assume the deployed API has these routes.",
-    "extra_entities_not_in_mvp": ["VASOrder", "Notification", "Invoice", "AuditLog", "ScrapedListing", "ListingDocument"],
+    "extra_entities_not_in_mvp": [
+      "VASOrder",
+      "Notification",
+      "Invoice",
+      "AuditLog",
+      "ScrapedListing",
+      "ListingDocument"
+    ],
     "extra_capabilities": [
       "Admin listing review (pending queue + approve/reject)",
       "Owner listing status transitions and document upload",
@@ -204,7 +242,6 @@
       "No DB-level booking concurrency locks"
     ]
   },
-
   "scraper": {
     "path": "backend/scraper",
     "purpose": "Collect competitor OOH inventory into JSONL/CSV and optionally import it as pending_approval listings.",
@@ -217,16 +254,27 @@
     "rule": "Never auto-approve scraped rows - they go through the same admin review as owner submissions.",
     "adapter_convention": "Adapters live in scraper/adapters/; everything shared (HTTP politeness, parsing, images, output) sits outside them. An adapter that can report expected_counts() lets the CLI reconcile a run against the source's own totals - on sites with unstable pagination that is the only way to know a run finished. Per-site quirks go in scraper/README.md, not just the adapter docstring."
   },
-
   "marketplace_browse_contract": {
     "applies_to": "Both backends.",
     "GET /listings": "Returns a PAGED ENVELOPE {items, total, limit, offset}, not a bare list - a real city catalogue is thousands of rows.",
-    "filters": ["q", "space_type", "lighting/illumination", "price", "width/height/area ranges", "exact size ('40W X 20H')", "min_footfall", "has_dimensions"],
-    "also": ["sort", "limit", "offset"],
+    "filters": [
+      "q",
+      "space_type",
+      "lighting/illumination",
+      "price",
+      "width/height/area ranges",
+      "exact size ('40W X 20H')",
+      "min_footfall",
+      "has_dimensions"
+    ],
+    "also": [
+      "sort",
+      "limit",
+      "offset"
+    ],
     "GET /listings/facets": "Returns dropdown options (space_types, lightings, sizes, price_min, price_max, total) derived from live inventory. The UI must read filter options from it rather than hardcoding lists that drift from the data. Declared BEFORE /listings/{listing_id} so the literal path wins.",
     "nullable_dimensions": "Listing.width_ft/height_ft are nullable. Real inventory does not always publish a size - bus shelters are sold by a Small/Medium/Large bucket kept in extra.size_bucket. Anything rendering dimensions must degrade rather than print 'null x null'."
   },
-
   "catalogue_snapshot": {
     "source": "MVP/frontend/public/data/listings.json, regenerated by MVP/backend scripts/export_static.py",
     "total_rows": 2114,
@@ -240,10 +288,12 @@
       "Road Median": 5,
       "Pole Kiosk": 2
     },
-    "price_per_day_range_inr": [400.0, 126667.0],
+    "price_per_day_range_inr": [
+      400.0,
+      126667.0
+    ],
     "regenerate_when": "The catalogue changes - otherwise the deployed static site keeps showing old inventory, and the landing-page copy that quotes these numbers goes stale."
   },
-
   "deployments": {
     "vercel": {
       "role": "The real deployment. Writes work, so login/cart/checkout work.",
@@ -264,13 +314,11 @@
       "notes": "touch out/.nojekyll guards against a future switch to branch-based Pages stripping _next/. static_site_generator is deliberately not set on configure-pages because the repo sets basePath itself."
     }
   },
-
   "frontend_backend_wiring": {
     "mvp": "MVP/frontend talks to MVP/backend through src/lib/api.ts and src/lib/listings-source.ts. This is the live integration.",
     "legacy_prototype": "Ui_Prototype_MVP_Prep/js/api.js is the only integration point on the old prototype: a tiny api(path, options) helper reading window.OOH_API_BASE_URL (default http://127.0.0.1:8000/api/v1), attaching the JWT from localStorage key adspace_access_token, throwing on non-OK. login_Page.html is the only page wired to it. Every other prototype page is presentation-only. Mapping for wiring more pages is in backend/docs/FRONTEND.md.",
     "secrets_rule": "Never put secrets or provider keys in frontend JS. The API is the only caller of external providers (Maps, GST, SMTP, S3)."
   },
-
   "documentation_index": {
     "CLAUDE.md": "Prose guidance for Claude Code. The closest thing to a single source of truth for conventions; this JSON mirrors it in structured form.",
     "MVP/DEPLOY_VERCEL.md": "Vercel deployment runbook.",
@@ -285,14 +333,12 @@
     "backend/docs/TESTING.md": "Test strategy.",
     "backend/scraper/README.md": "Scraper usage and per-site quirks."
   },
-
   "paired_edits_to_remember": [
     "HeroSlots.tsx SLOT_MS and the slot-fill keyframe in globals.css - change both together.",
     "listings-source.ts filter/sort logic and browse_listings in MVP/backend/app/main.py - change one and change the other.",
     "The catalogue numbers quoted in (marketing)/page.tsx and the static snapshot - re-check after every export_static run.",
     "MVP/backend/app/models.py and a new Alembic migration - never rely on autocreate."
   ],
-
   "open_questions_for_a_human": [
     "Is backend/ meant to be retired once MVP/backend catches up, or kept as the target architecture to port back to? Right now the two have diverged (VAS orders, admin review, invoices, notifications, scraper provenance exist only in backend/).",
     "Ui_Prototype_MVP_Prep/ is superseded by MVP/frontend but root index.html still redirects into it. Should the redirect point at the MVP app instead?",

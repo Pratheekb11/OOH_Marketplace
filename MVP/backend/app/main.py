@@ -415,22 +415,36 @@ def checkout(payload: CheckoutRequest = CheckoutRequest(), advertiser: User = De
             if a.listing_id == b.listing_id and a.start_date <= b.end_date and b.start_date <= a.end_date:
                 raise HTTPException(status_code=409, detail=f"Cart items {a.id} and {b.id} overlap on the same listing")
 
+    # Lock every listing being bought, in a deterministic order, BEFORE the overlap checks
+    # below. The checks are check-then-act (SELECT for a conflict, then INSERT): under
+    # Postgres at READ COMMITTED, two concurrent checkouts for the same listing and
+    # overlapping dates could otherwise both pass their SELECT before either committed, and
+    # the space would be sold twice. Holding a row lock on the listing serializes those two
+    # transactions for the rest of this request.
+    #
+    # Ordering by id is what keeps two multi-item checkouts from deadlocking on each other
+    # (A locks 1 then 2 while B locks 2 then 1). `with_for_update()` is a no-op on SQLite --
+    # the dialect emits no FOR UPDATE clause -- which is correct there, since SQLite already
+    # allows only one writer at a time.
+    #
+    # This lock is the application-level half of the guard. The other half is the Postgres
+    # EXCLUDE constraint added in migration c7f1a9d4e210, which rejects an overlapping row
+    # regardless of who inserts it; the IntegrityError it raises is turned back into a 409
+    # below.
+    listing_ids = sorted({item.listing_id for item in items})
+    locked = db.scalars(
+        select(Listing).where(Listing.id.in_(listing_ids)).order_by(Listing.id).with_for_update()
+    ).all()
+    listings_by_id = {listing.id: listing for listing in locked}
+
     bookings: list[Booking] = []
     lines: list[dict] = []
     for item in items:
-        listing = db.get(Listing, item.listing_id)
+        listing = listings_by_id.get(item.listing_id)
         if not listing or listing.status != ListingStatus.active:
             raise HTTPException(status_code=409, detail=f"Listing {item.listing_id} is no longer available")
 
-        # Authoritative overlap guard (the cart-time check is advisory only). This SELECT is
-        # safe here because SQLite serializes all writers, so no second checkout can interleave
-        # between this read and the `db.flush()` below. Under Postgres at the default READ
-        # COMMITTED isolation level this is a check-then-act race: two concurrent checkouts for
-        # overlapping dates can both pass this SELECT before either has committed its INSERT.
-        # Closing that gap for real needs `SELECT ... FOR UPDATE` on the listing row (to
-        # serialize concurrent checkouts of the same listing) or, better, a Postgres
-        # `btree_gist` EXCLUDE constraint on (listing_id WITH =, daterange(start_date, end_date,
-        # '[]') WITH &&) so the database itself rejects the overlapping insert.
+        # Authoritative overlap guard (the cart-time check is advisory only).
         overlap = db.scalar(select(Booking).where(
             Booking.listing_id == item.listing_id,
             Booking.status.in_([BookingStatus.pending, BookingStatus.booked, BookingStatus.active]),
@@ -456,8 +470,15 @@ def checkout(payload: CheckoutRequest = CheckoutRequest(), advertiser: User = De
         db.add(booking)
         # Flush now (not just at the end): this assigns booking.id and -- critically -- makes
         # the row visible to the next iteration's overlap SELECT above, which is what catches
-        # a self-conflicting pair of cart items inside this same loop/transaction.
-        db.flush()
+        # a self-conflicting pair of cart items inside this same loop/transaction. It is also
+        # where the Postgres EXCLUDE constraint fires, if a conflicting booking was committed
+        # by someone else between this request's overlap SELECT and now; report that as the
+        # same 409 the SELECT would have raised rather than letting a 500 escape.
+        try:
+            db.flush()
+        except IntegrityError:
+            db.rollback()
+            raise HTTPException(status_code=409, detail=f"Listing {item.listing_id} is unavailable for the selected dates")
         bookings.append(booking)
         lines.append(quote)
 
@@ -478,7 +499,13 @@ def checkout(payload: CheckoutRequest = CheckoutRequest(), advertiser: User = De
     # Single commit point: if anything above raised, nothing here has happened yet, so the
     # rollback that FastAPI/SQLAlchemy performs on the failed request leaves zero bookings,
     # zero payments and an intact cart.
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        # Belt and braces: the EXCLUDE constraint is deferred-checkable in principle, and a
+        # future change could move the conflicting insert past the per-item flush above.
+        db.rollback()
+        raise HTTPException(status_code=409, detail="One of the selected spaces was just booked for those dates")
     db.refresh(payment)
     for b in bookings:
         db.refresh(b)
