@@ -1,0 +1,53 @@
+name: CodeQL
+
+# GitHub's own static analysis, over both languages in this repo. Free for
+# public repositories.
+#
+# NOTE: if CodeQL "default setup" is ever enabled in Settings -> Code security,
+# this workflow will fail with "CodeQL default setup is enabled" -- the two are
+# mutually exclusive. Pick one: either delete this file, or switch the
+# repository back to advanced setup.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "30 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, python]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialise CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          language: ${{ matrix.language }}
+          # security-extended adds lower-precision queries; the default suite
+          # keeps the signal-to-noise ratio sane for a codebase this size.
+          queries: security-and-quality
+
+      - name: Analyse
+        # No build step: both languages here are interpreted, so CodeQL's
+        # autobuild has nothing to do and the extractor works from source.
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

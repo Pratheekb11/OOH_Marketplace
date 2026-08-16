@@ -466,6 +466,52 @@ violations that `next build` hard-fails on. Several components
 (`CheckoutClient`'s `PaymentParamSync`, `LoginForm`, `FilterBar`,
 `EditModeSync`) carry comments explaining exactly this.
 
+## Continuous integration
+
+Four workflows, all on GitHub-hosted runners (`.github/workflows/`):
+
+| Workflow | Runs on | What it gates |
+| --- | --- | --- |
+| `ci.yml` | push to `main`/`MVP`, every PR | Frontend: `npm run lint`, `npx tsc --noEmit`, `npm run build`. Backend (matrix over **both** `MVP/backend` and `backend/`): `ruff check .`, `pytest -q`. |
+| `security.yml` | push, PR, weekly Monday cron | `bandit -ll` over application/script code, `pip-audit` over both pinned requirement files, `npm audit` (fails on **critical**, reports **high**). |
+| `dependency-review.yml` | PRs only | Fails a PR that *introduces* a dependency with a known critical vulnerability. |
+| `codeql.yml` | push/PR to `main`, weekly cron | GitHub's SAST over JavaScript/TypeScript and Python. |
+
+Plus `.github/dependabot.yml`: weekly grouped update PRs for npm, both pip
+directories, and the actions themselves. Minor/patch updates are batched into
+one PR per ecosystem; majors stay separate, because a Next or Tailwind major
+here is a deliberate, re-tested decision (see the Tailwind v3-not-v4 note
+above), not a rubber stamp.
+
+Notes on the gates, since a few are deliberately not "fail on everything":
+
+- **Lint config is narrow on purpose.** `ruff.toml` (repo root, covers both
+  services) selects pyflakes, import order, and syntax/module-level import
+  errors only. `E701`/`E702` are left out: both services declare compact
+  Pydantic schemas as `id: int; email: EmailStr; full_name: str`, and
+  enforcing one-statement-per-line would have flagged 170 lines of
+  intentional house style and buried the real findings.
+- **`npm audit` fails on critical, reports high.** Every current `high`
+  (postcss, sharp, nanoid) resolves only by upgrading Next 15 → 16 — a major
+  bump that needs its own re-test pass, not a blocked routine PR. The report
+  step still prints the list on every run.
+- **`pip-audit` runs with `--no-deps`**, auditing exactly the pinned lines,
+  which is what actually deploys.
+- **CodeQL advanced setup and CodeQL "default setup" are mutually
+  exclusive.** If default setup is ever switched on in Settings → Code
+  security, `codeql.yml` starts failing with `CodeQL default setup is
+  enabled`; pick one or the other.
+- **Dev tooling is pinned in `MVP/backend/requirements-dev.txt`**, separate
+  from `requirements.txt` so linters never ship into the Vercel bundle. An
+  unpinned linter turns someone else's release into a red build on an
+  unrelated PR.
+
+Enabling CI surfaced (and this pass fixed) real findings: 37 ruff errors
+across both backends, two ESLint errors in `tailwind.config.ts`, two unused
+imports, a `urlopen` that accepted any URL scheme from the image manifest,
+and five known CVEs in `python-multipart` 0.0.22 plus one in `lxml` 6.0.2 —
+both bumped to patched pins, with both test suites re-run after.
+
 ## Deployment: GitHub Pages (frontend only)
 
 `.github/workflows/deploy-pages.yml` builds `MVP/frontend` as a static export

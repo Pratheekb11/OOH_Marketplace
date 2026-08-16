@@ -4,6 +4,7 @@
 # directory; excluding the contents instead is what makes the re-include work.)
 .github/*
 !.github/workflows/
+!.github/dependabot.yml
 
 # Architecture and documentation
 Ui_Prototype_MVP_Prep/arch/

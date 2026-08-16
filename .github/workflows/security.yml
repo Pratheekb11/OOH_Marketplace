@@ -1,0 +1,90 @@
+name: Security
+
+# Two questions, asked on every push/PR and again weekly (a dependency that was
+# clean when it merged can be vulnerable a month later without anyone touching
+# the repo):
+#   1. does our own Python code contain a known-bad pattern?  -> bandit
+#   2. do our pinned dependencies have known CVEs?            -> pip-audit, npm audit
+
+on:
+  push:
+    branches: [main, MVP]
+  pull_request:
+  schedule:
+    # Mondays 06:00 UTC. Cron on GitHub is best-effort and can be delayed under
+    # load; this is a safety net, not a deadline.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python (bandit, pip-audit)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install security tooling
+        run: pip install -r MVP/backend/requirements-dev.txt
+
+      - name: Bandit (medium severity and up)
+        # -ll filters to medium+ so the job fails on things worth stopping for
+        # rather than on every `assert` in a test. Application and script code
+        # only: tests are not shipped, and alembic versions are generated.
+        run: |
+          bandit -q -ll -r \
+            MVP/backend/app MVP/backend/scripts MVP/backend/api \
+            backend/app backend/scraper
+
+      - name: pip-audit (MVP backend)
+        # --no-deps audits exactly the pinned lines, which is what we deploy;
+        # it also avoids pip-audit building a throwaway virtualenv to resolve
+        # the tree, which is slower and needs no extra signal here.
+        run: pip-audit --no-deps --disable-pip -r MVP/backend/requirements.txt
+
+      - name: pip-audit (legacy backend)
+        run: pip-audit --no-deps --disable-pip -r backend/requirements.txt
+
+  npm:
+    name: npm audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: MVP/frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: MVP/frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Report high-severity advisories
+        # Non-blocking on purpose. Today's `high` findings (postcss, sharp,
+        # nanoid) all resolve only by upgrading Next.js 15 -> 16, a major
+        # version bump that has to be a deliberate decision with a full
+        # re-test, not something a routine PR gets blocked on. Keep the report
+        # visible in the job log so the list is never a surprise.
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+      - name: Fail on critical advisories
+        # The actual gate. Critical means stop.
+        run: npm audit --audit-level=critical

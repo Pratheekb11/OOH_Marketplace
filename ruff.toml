@@ -1,0 +1,46 @@
+# Lint config for both FastAPI services (MVP/backend is the deployed one,
+# backend/ is the older fuller service). CI runs `ruff check .` with this file.
+#
+# The rule set is deliberately narrow: real defects (pyflakes), syntax/indent
+# errors, and import order. Style opinions beyond that are not enforced,
+# because this codebase was written by hand in a consistent style already and
+# a wholesale reformat would bury real findings in churn.
+target-version = "py310"
+line-length = 120
+
+exclude = [
+    ".venv",
+    "venv",
+    "node_modules",
+    ".next",
+    ".next-dev",
+    "out",
+    "MVP/frontend",
+    "Ui_Prototype_MVP_Prep",
+]
+
+[lint]
+select = [
+    "E4",   # module-level import placement
+    "E9",   # syntax and IO errors
+    "F",    # pyflakes: undefined names, unused imports/variables
+    "I",    # import sorting
+]
+
+# E701/E702 (`a: int; b: str` on one line) are deliberately NOT selected. Both
+# FastAPI services declare compact Pydantic schemas that way on purpose --
+# `id: int; email: EmailStr; full_name: str` -- and flagging 170 of those would
+# drown the real findings.
+
+# FastAPI's whole dependency system is `arg: X = Depends(...)` in a default,
+# which B008 flags; it is idiomatic here, not a bug. (B is not selected above,
+# but spell it out so a future widening of the rule set does not silently
+# start failing every route signature.)
+ignore = ["B008"]
+
+[lint.per-file-ignores]
+# Alembic revision scripts put `revision`/`down_revision` above the imports on
+# purpose: the identifiers are what Alembic reads, and keeping them at the top
+# makes the chain readable at a glance.
+"**/alembic/versions/*.py" = ["E402"]
+"**/alembic/env.py" = ["F401"]

@@ -1,0 +1,10 @@
+# CI-only tooling. Deliberately separate from requirements.txt so nothing here
+# ships to Vercel: the serverless bundle should carry the runtime and nothing
+# else. Pinned, because an unpinned linter turns someone else's release into a
+# red build on an unrelated PR.
+#
+# Covers both services -- MVP/backend (deployed) and backend/ (the older, fuller
+# one) -- since the lint and security jobs scan the whole repo.
+ruff==0.16.3          # lint + import order, config in the repo-root ruff.toml
+bandit==1.9.4         # Python security linter (medium severity and up)
+pip-audit==2.10.1     # known-vulnerability audit of the pinned requirements

@@ -1,0 +1,28 @@
+name: Dependency review
+
+# Runs only on pull requests: it diffs the manifests in the PR against the base
+# branch and fails if the PR *introduces* a dependency with a known
+# vulnerability. That is a different question from security.yml's audit, which
+# asks whether what we already have is currently vulnerable.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    name: Review dependency changes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/dependency-review-action@v4
+        with:
+          # Match security.yml's npm gate: block on critical, list the rest in
+          # the PR comment rather than blocking a routine change on a finding
+          # that needs a major-version upgrade to fix.
+          fail-on-severity: critical
+          comment-summary-in-pr: on-failure
