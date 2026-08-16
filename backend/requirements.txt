@@ -11,7 +11,7 @@ email-validator==2.3.0
 slowapi==0.1.9
 httpx==0.28.1
 boto3==1.42.56
-reportlab==4.4.10
+reportlab==5.0.0
 python-multipart==0.0.31
 beautifulsoup4==4.14.2
 lxml==6.1.0
