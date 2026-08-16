@@ -13,10 +13,10 @@ from slowapi.errors import RateLimitExceeded
 from app.config import get_settings
 from app.database import Base, engine, get_db
 from app.models import Booking, BookingStatus, CartItem, Listing, ListingStatus, Payment, PaymentStatus, Role, User
-from app.pricing import ADDON_CATALOG, quote_cart, quote_line
+from app.pricing import ADDON_CATALOG, inclusive_days, quote_cart, quote_line
 from app.schemas import (AddonOut, BookingOut, CartItemCreate, CartItemOut, CartItemUpdate,
                          CartResponse, CheckoutRequest, CheckoutResponse, ListingCreate, ListingFacets, ListingOut, ListingPage,
-                         ListingUpdate, LoginRequest, PaymentDetailOut, RegisterRequest, Token, UserOut)
+                         ListingUpdate, LoginRequest, OwnerBookingOut, PaymentDetailOut, RegisterRequest, Token, UserOut)
 from app.security import (bearer, create_token, current_user, limiter,
                           password_context, require_roles)
 
@@ -236,6 +236,48 @@ def archive_listing(listing_id: int, owner: User = Depends(require_roles(Role.ow
 @app.get("/api/v1/owner/listings", response_model=list[ListingOut])
 def owner_listings(owner: User = Depends(require_roles(Role.owner)), db: Session = Depends(get_db)):
     return db.scalars(select(Listing).where(Listing.owner_id == owner.id).order_by(Listing.created_at.desc())).all()
+
+
+@app.get("/api/v1/owner/bookings", response_model=list[OwnerBookingOut])
+def owner_bookings(owner: User = Depends(require_roles(Role.owner)), db: Session = Depends(get_db)):
+    """Every booking made against this owner's inventory, newest first.
+
+    Scoped by joining through Listing.owner_id rather than by any id passed in,
+    so an owner can only ever see bookings on spaces they actually own.
+    Archived listings stay in the result: their past bookings are still real
+    revenue and must not vanish from the owner's history when a space retires.
+    """
+    rows = db.execute(
+        select(Booking, Listing, User)
+        .join(Listing, Booking.listing_id == Listing.id)
+        .join(User, Booking.advertiser_id == User.id)
+        .where(Listing.owner_id == owner.id)
+        .order_by(Booking.created_at.desc(), Booking.id.desc())
+    ).all()
+    return [
+        {
+            "id": booking.id,
+            "listing_id": booking.listing_id,
+            "start_date": booking.start_date,
+            "end_date": booking.end_date,
+            "days": inclusive_days(booking.start_date, booking.end_date),
+            "base_amount": booking.base_amount,
+            "addons_amount": booking.addons_amount,
+            "addons": booking.addons or [],
+            "gst_amount": booking.gst_amount,
+            "total_amount": booking.total_amount,
+            "status": booking.status,
+            "created_at": booking.created_at,
+            "listing_title": listing.title,
+            "listing_location": listing.location,
+            "listing_image_url": listing.image_url,
+            "listing_status": listing.status,
+            "advertiser_id": advertiser.id,
+            "advertiser_name": advertiser.full_name,
+            "advertiser_email": advertiser.email,
+        }
+        for booking, listing, advertiser in rows
+    ]
 
 
 # --- Cart, checkout, payments -----------------------------------------------------

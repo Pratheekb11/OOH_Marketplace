@@ -2,19 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/auth/AuthProvider";
 import NavActions from "./NavActions";
 
 // Ported from checkout_page.html / listing_your_adspace.html's app-shell nav.
-// The prototype's "My Inventory" (an owner listings dashboard) has no route
-// or wired API yet (GET /dashboard/owner is unwired on the frontend) — rather
-// than link it at a 404-ing "/my-inventory" placeholder, it's dropped until
-// that dashboard exists. "Analytics" (Campaign_analytics.html) now has a
-// real route (/analytics), scoped to advertisers with real booking data.
-const APP_LINKS = [
-  { label: "Marketplace", href: "/marketplace" },
-  { label: "Analytics", href: "/analytics" },
-  { label: "Support", href: "/support" },
-];
+// The links are role-aware because the two analytics surfaces are role-gated
+// on the backend: /analytics reads the advertiser-only GET /bookings, and
+// /dashboard/owner (the prototype's "My Inventory") reads the owner-only
+// GET /owner/bookings + GET /owner/listings. Showing an owner a link that
+// RequireRole would immediately bounce them off would be worse than no link.
+const COMMON_LINKS = [{ label: "Marketplace", href: "/marketplace" }];
+const ADVERTISER_LINKS = [{ label: "Analytics", href: "/analytics" }];
+const OWNER_LINKS = [{ label: "My Inventory", href: "/dashboard/owner" }];
+const TRAILING_LINKS = [{ label: "Support", href: "/support" }];
 
 /**
  * App-shell nav, ported from checkout_page.html / listing_your_adspace.html.
@@ -25,6 +25,14 @@ const APP_LINKS = [
  */
 export function NavShellB() {
   const pathname = usePathname();
+  const { status, user } = useAuth();
+  const roleLinks =
+    status === "authenticated" && user.role === "owner"
+      ? OWNER_LINKS
+      : status === "authenticated" && user.role === "advertiser"
+        ? ADVERTISER_LINKS
+        : [];
+  const appLinks = [...COMMON_LINKS, ...roleLinks, ...TRAILING_LINKS];
 
   return (
     <nav className="sticky top-0 z-50 flex w-full items-center justify-between bg-slate-50/60 px-8 py-4 backdrop-blur-xl">
@@ -33,7 +41,7 @@ export function NavShellB() {
           Ad<span className="text-secondary">Space</span>
         </Link>
         <div className="hidden items-center gap-8 md:flex">
-          {APP_LINKS.map((link) => {
+          {appLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link

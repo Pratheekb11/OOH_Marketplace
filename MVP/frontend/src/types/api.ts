@@ -76,6 +76,30 @@ export interface Booking extends Quote {
   status: BookingStatus;
 }
 
+/** One row of `GET /owner/bookings` (`OwnerBookingOut` in schemas.py) — the
+ * media owner's view of a booking on their own inventory. Deliberately a
+ * different shape from `Booking`: it carries the counterparty (who booked and
+ * how to reach them) and the space that was booked, neither of which the
+ * advertiser-facing schema needs. `listing_status` is included because past
+ * bookings on an archived space are still real revenue and stay in the list. */
+export interface OwnerBooking extends Quote {
+  id: number;
+  listing_id: number;
+  start_date: string; // ISO date (YYYY-MM-DD)
+  end_date: string; // ISO date (YYYY-MM-DD)
+  days: number;
+  addons: AddonLine[] | null;
+  status: BookingStatus;
+  created_at: string;
+  listing_title: string;
+  listing_location: string;
+  listing_image_url: string | null;
+  listing_status: string;
+  advertiser_id: number;
+  advertiser_name: string;
+  advertiser_email: string;
+}
+
 /** `GET /addons` — public catalog, the only source of add-on prices. Codes
  * are `printing` | `installation` | `monitoring`. Never hardcode a price. */
 export interface Addon {

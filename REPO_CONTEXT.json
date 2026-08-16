@@ -78,7 +78,7 @@
     },
     "route_groups": {
       "(marketing)": "/ (landing), /marketplace, /listings/[id], /partnerships, /support",
-      "(app)": "/analytics, /cart, /checkout, /list-your-space (5-step wizard: location, details, pricing, availability, review)",
+      "(app)": "/analytics (advertiser), /dashboard/owner (media owner: bookings on own inventory, revenue, occupancy), /cart, /checkout, /list-your-space (5-step wizard: location, details, pricing, availability, review)",
       "(auth)": "/login, /register"
     },
     "build_scale": "2133 pre-rendered pages, of which 2114 are /listings/[id] via generateStaticParams reading the static snapshot.",
@@ -296,6 +296,6 @@
   "open_questions_for_a_human": [
     "Is backend/ meant to be retired once MVP/backend catches up, or kept as the target architecture to port back to? Right now the two have diverged (VAS orders, admin review, invoices, notifications, scraper provenance exist only in backend/).",
     "Ui_Prototype_MVP_Prep/ is superseded by MVP/frontend but root index.html still redirects into it. Should the redirect point at the MVP app instead?",
-    "landing-redesign has not been merged into main, so the deployed production landing page is still the pre-redesign one."
+    "backend/ and MVP/backend keep diverging: the owner dashboard (GET /owner/bookings) was added to MVP/backend only."
   ]
 }

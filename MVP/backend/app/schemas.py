@@ -147,6 +147,34 @@ class BookingOut(ORMModel):
     gst_amount: float; total_amount: float; status: BookingStatus
 
 
+class OwnerBookingOut(BaseModel):
+    """A booking on one of *your* spaces, seen from the media owner's side.
+
+    Deliberately a different shape from BookingOut: the owner needs the
+    counterparty (who booked, how to reach them) and which of their spaces was
+    booked, neither of which the advertiser-facing schema carries.
+    """
+    id: int
+    listing_id: int
+    start_date: date
+    end_date: date
+    days: int
+    base_amount: float
+    addons_amount: float
+    addons: list[dict] | None
+    gst_amount: float
+    total_amount: float
+    status: BookingStatus
+    created_at: datetime
+    listing_title: str
+    listing_location: str
+    listing_image_url: str | None
+    listing_status: ListingStatus
+    advertiser_id: int
+    advertiser_name: str
+    advertiser_email: EmailStr
+
+
 class CheckoutRequest(BaseModel):
     method_label: str | None = None
 

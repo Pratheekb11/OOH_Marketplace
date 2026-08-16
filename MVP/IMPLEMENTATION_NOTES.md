@@ -17,12 +17,15 @@ A working proof-of-concept OOH (out-of-home) ad-space marketplace:
   own listings.
 - Browse **Partnerships** (`/partnerships`) — an institutional marketing page
   for agencies/media owners.
+- As an owner: see who booked your spaces, for when and for how much, at
+  **`/dashboard/owner`** — real revenue, occupancy and per-space performance
+  (see the dedicated section below).
 - View **Campaign Analytics** (`/analytics`) as an advertiser — real spend,
   schedule, and add-on numbers derived from your own bookings (see the
   dedicated section below for exactly what is and isn't real here).
 
-Backend: FastAPI + SQLAlchemy + Alembic + SQLite, 19 routes, 36 passing
-tests. Frontend: Next.js 15 / React 19 / Tailwind 3.4, 16 routes, production
+Backend: FastAPI + SQLAlchemy + Alembic + SQLite, 20 routes, 49 passing
+tests. Frontend: Next.js 15 / React 19 / Tailwind 3.4, 17 routes, production
 build green.
 
 ### Deliberately out of scope
@@ -31,7 +34,6 @@ build green.
 | --- | --- |
 | Real payment gateway | `POST /checkout` simulates payment synchronously; no webhook exists (see Known gaps). |
 | Maps / geocoding | `MapPanel` is a static image, not a real map integration. |
-| Owner-side dashboard | No `/dashboard/owner` route wired up on the frontend yet; `GET /dashboard/owner` support depends on future work. `/analytics` (advertiser-only) exists — see below. |
 | 2FA / password reset / email verification | Auth is register + login only. |
 | Document file upload (wizard compliance step) | Dropzones render but are inert — "Document upload lands in a later milestone." |
 | Admin review workflow | `Listing.status` has `pending_approval`/`rejected` states and a `rejection_reason` column, but every submission auto-approves straight to `active`. |
@@ -167,7 +169,7 @@ stays in `app/main.py`.
 | --- | --- | --- |
 | `(marketing)` | `/`, `/marketplace`, `/listings/[id]`, `/support`, `/partnerships` | `NavShellA` — public marketing/marketplace top nav, ported from `index.html`/`listing_page.html`. Owns the search affordance (see Polish below). |
 | `(auth)` | `/login`, `/register` | No shared nav shell — full-bleed auth layout with `AuthVisualPanel`. |
-| `(app)` | `/cart`, `/checkout`, `/list-your-space/*`, `/analytics` | `NavShellB` — logged-in app shell, ported from `checkout_page.html`/`listing_your_adspace.html`. Normalized to `sticky` (the prototype mixed `fixed`+`pt-32` and `sticky` across pages). |
+| `(app)` | `/cart`, `/checkout`, `/list-your-space/*`, `/analytics`, `/dashboard/owner` | `NavShellB` — logged-in app shell, ported from `checkout_page.html`/`listing_your_adspace.html`. Normalized to `sticky` (the prototype mixed `fixed`+`pt-32` and `sticky` across pages). |
 
 `/partnerships` (ported from `Partnerships.html`) and `/analytics` (ported
 from `Campaign_analytics.html`) were the two prototype pages never carried
@@ -201,6 +203,48 @@ click-through rate all render as a muted "—" inside a dashed-border "Not
 instrumented in this POC" section with a `Badge`, rather than being invented
 or omitted silently. The empty-state (zero bookings) links to `/marketplace`;
 loading uses `Skeleton`.
+
+#### `/dashboard/owner`: the owner half of the marketplace
+
+Until this existed the owner side had no surface at all: `MyListingsPanel`
+(wizard sidebar) showed inventory, but nothing anywhere told an owner who had
+booked their spaces, for when, or for how much — `GET /bookings` is
+advertiser-only, and the join through `Listing.owner_id` had no endpoint.
+
+Backend: `GET /api/v1/owner/bookings` (owner-only) returns every booking made
+against the caller's inventory, joined to the listing and to the booking
+advertiser, newest first. Scoping is by the join (`Listing.owner_id ==
+caller`), never by an id in the request, so an owner cannot read another
+owner's bookings. Archived listings keep their bookings in the result — past
+bookings are still real revenue and must not disappear when a space retires.
+`OwnerBookingOut` is deliberately a different shape from `BookingOut`: it
+carries the counterparty (name + email, so the owner can actually contact
+them) and the space, neither of which the advertiser-facing schema needs.
+
+Frontend `/dashboard/owner` (`RequireRole role="owner"`, advertisers bounce to
+`/analytics`) derives everything from that endpoint plus `GET
+/owner/listings`:
+
+| Shown (real) | Source |
+| --- | --- |
+| Space revenue, add-on services, GST, gross booked value | `booking.base_amount` / `addons_amount` / `gst_amount` / `total_amount` |
+| On air / Upcoming / Completed counts | Computed from `start_date`/`end_date` vs. today — `booking.status` never transitions past `booked` in this build |
+| Next-90-day occupancy | Inclusive overlap of each booking with a fixed 90-day forward window, over `active` listings × 90 |
+| Per-space performance, incl. spaces with zero bookings | `GET /owner/listings` keyed by id, merged with the booking rollup — "which of my spaces isn't selling" is the point |
+| Who booked (name, mailto link) | `advertiser_name` / `advertiser_email` on each row |
+| CSV export | Built client-side from the same fetched rows |
+
+The money is labelled **booked value**, never "paid out": there is no payout
+or settlement pipeline in this build, so only the first band (space rate) is
+owner earnings — add-ons are platform-fulfilled and GST is statutory. Payouts
+settled, next payout date, proof of display and market-relative occupancy sit
+in a dashed "Not built yet" block, the same convention `/analytics` uses for
+its uninstrumented metrics.
+
+`NavShellB`'s links are role-aware as a result: an owner sees "My Inventory"
+(`/dashboard/owner`), an advertiser sees "Analytics" (`/analytics`). Linking
+both to everyone would just show each role a link `RequireRole` immediately
+bounces them off.
 
 #### `/support`: aligned to the prototype, with one deliberate gap
 
@@ -456,8 +500,7 @@ repo; it is a per-repository setting.
 3. `SELECT ... FOR UPDATE` or a Postgres `EXCLUDE` constraint to close the
    checkout concurrency race (only matters once you're off SQLite).
 4. Real file upload for the wizard's compliance-step document dropzones.
-5. The still-deferred features: maps/geocoding, an owner-side dashboard
-   (`/analytics` only covers the advertiser side), an impression/reach/
+5. The still-deferred features: maps/geocoding, an impression/reach/
    footfall-tracking backend (would let `/analytics`'s "Not instrumented"
    section become real), 2FA, admin listing review (the schema already has
    `pending_approval`/`rejected`/`rejection_reason` sitting unused).
