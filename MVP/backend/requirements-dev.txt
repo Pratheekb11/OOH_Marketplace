@@ -5,6 +5,6 @@
 #
 # Covers both services -- MVP/backend (deployed) and backend/ (the older, fuller
 # one) -- since the lint and security jobs scan the whole repo.
-ruff==0.16.3          # lint + import order, config in the repo-root ruff.toml
+ruff==0.16.4          # lint + import order, config in the repo-root ruff.toml
 bandit==1.9.4         # Python security linter (medium severity and up)
 pip-audit==2.10.1     # known-vulnerability audit of the pinned requirements
