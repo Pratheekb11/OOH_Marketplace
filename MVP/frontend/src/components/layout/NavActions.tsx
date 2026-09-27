@@ -15,7 +15,7 @@ import CartBadge from "./CartBadge";
  *   - advertiser       -> CartBadge + account menu (email + Sign out)
  *   - owner            -> "List Media" -> /list-your-space + account menu
  */
-export function NavActions({ onDark = false }: { onDark?: boolean } = {}) {
+export function NavActions() {
   const { status, user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -42,7 +42,6 @@ export function NavActions({ onDark = false }: { onDark?: boolean } = {}) {
         href="/login"
         variant="primary"
         size="sm"
-        className={onDark ? "!bg-accent !text-[#05070f] hover:!bg-white" : ""}
       >
         Sign In
       </Button>
@@ -54,9 +53,7 @@ export function NavActions({ onDark = false }: { onDark?: boolean } = {}) {
       <button
         type="button"
         onClick={() => setMenuOpen((open) => !open)}
-        className={`flex items-center gap-2 rounded-lg p-2 transition-colors ${
-          onDark ? "text-white hover:bg-white/10" : "text-on-surface-variant hover:bg-surface-container"
-        }`}
+        className="flex items-center gap-2 rounded-lg p-2 text-on-surface-variant transition-colors hover:bg-surface-container"
         aria-haspopup="menu"
         aria-expanded={menuOpen}
       >
@@ -88,7 +85,6 @@ export function NavActions({ onDark = false }: { onDark?: boolean } = {}) {
           href="/list-your-space"
           variant="primary"
           size="sm"
-          className={onDark ? "!bg-accent !text-[#05070f] hover:!bg-white" : ""}
         >
           List Media
         </Button>
@@ -106,7 +102,6 @@ export function NavActions({ onDark = false }: { onDark?: boolean } = {}) {
           href="/list-your-space"
           variant="primary"
           size="sm"
-          className={onDark ? "!bg-accent !text-[#05070f] hover:!bg-white" : ""}
         >
           List Media
         </Button>
