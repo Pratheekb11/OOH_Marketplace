@@ -135,4 +135,7 @@ def test_importer_stores_clean_description():
         "source_id": "abc",
     }
     fields = listing_fields(record, owner_id=1, image_url=None)
-    assert fields["description"] == "Skywalk Advertising in Ashok Nagar."
+    # Plain text, and our own: the source's marketing copy is not reused
+    # (see test_source_scrub).
+    assert "<" not in fields["description"]
+    assert "Skywalk Advertising in" not in fields["description"]
