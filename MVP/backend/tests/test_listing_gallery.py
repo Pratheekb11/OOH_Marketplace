@@ -220,3 +220,24 @@ def test_shipped_photos_are_web_sized():
 def test_some_listings_ship_more_than_one_photo():
     assert any(len(row.get("image_urls") or []) > 1 for row in _snapshot())
 
+
+
+def test_sharpest_photo_is_the_cover_and_thumbnails_are_dropped(tmp_path):
+    """The source sometimes lists a 300x125 card before the real photo. The
+    cover is what the marketplace card shows, so it must be the sharpest; a
+    thumbnail beside a real photo adds nothing to the gallery."""
+    thumb = write_photo(tmp_path / "thumb.png", size=(300, 125), fmt="PNG", color=(5, 5, 5))
+    real = write_photo(tmp_path / "real.jpg", size=(1280, 960), color=(220, 30, 30))
+    record = {"source_id": SOURCE_ID, "images": [image(thumb, "t"), image(real, "r")]}
+    public_dir = tmp_path / "public"
+
+    urls = copy_images(record, public_dir)
+
+    assert len(urls) == 1
+    assert pixels(public_dir, urls[0]) == (1280, 960)
+
+
+def test_thumbnail_is_kept_when_it_is_all_there_is(tmp_path):
+    thumb = write_photo(tmp_path / "thumb.jpg", size=(300, 125))
+    [url] = copy_images({"source_id": SOURCE_ID, "images": [image(thumb, "t")]}, tmp_path / "public")
+    assert url
