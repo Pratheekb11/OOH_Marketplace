@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
+from app.images import public_image_url
 from app.models import Booking, BookingStatus, CartItem, Listing, ListingStatus, Payment, PaymentStatus, Role, User
 from app.pricing import ADDON_CATALOG, inclusive_days, min_booking_days, quote_cart, quote_line
 from app.schemas import (
@@ -310,7 +311,7 @@ def owner_bookings(owner: User = Depends(require_roles(Role.owner)), db: Session
             "created_at": booking.created_at,
             "listing_title": listing.title,
             "listing_location": listing.location,
-            "listing_image_url": listing.image_url,
+            "listing_image_url": public_image_url(listing.image_url),
             "listing_status": listing.status,
             "advertiser_id": advertiser.id,
             "advertiser_name": advertiser.full_name,
@@ -363,7 +364,7 @@ def _cart_item_out(item: CartItem, listing: Listing) -> dict:
         "addons": item.addons or [],
         "listing_title": listing.title,
         "listing_location": listing.location,
-        "listing_image_url": listing.image_url,
+        "listing_image_url": public_image_url(listing.image_url),
         "listing_price_per_day": listing.price_per_day,
         "days": quote["days"],
         "base_amount": quote["base"],

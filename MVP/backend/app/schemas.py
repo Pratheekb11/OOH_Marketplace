@@ -2,6 +2,7 @@ from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
+from app.images import public_image_url
 from app.models import BookingStatus, ListingStatus, PaymentStatus, Role
 from app.pricing import ADDON_CATALOG, min_booking_days
 from app.text import html_to_text
@@ -88,8 +89,9 @@ class ListingOut(ORMModel):
 
     Built from the stored row, but not a mirror of it: the description is
     cleaned to plain text (rows imported before cleaning existed still hold
-    HTML), private `extra` keys are dropped, and the minimum booking term they
-    imply is published as `min_booking_days` instead.
+    HTML), private `extra` keys are dropped, the minimum booking term they
+    imply is published as `min_booking_days` instead, and a legacy
+    `scraped-<source_id>` image URL is swapped for its opaque name.
     """
     id: int; owner_id: int; title: str; space_type: str; description: str; location: str
     width_ft: float | None; height_ft: float | None; price_per_day: float; footfall_estimate: int | None
@@ -109,6 +111,7 @@ class ListingOut(ORMModel):
         fields["min_booking_days"] = max(derived, int(fields.get("min_booking_days") or 1))
         fields["extra"] = public_extra(extra)
         fields["description"] = html_to_text(fields.get("description"))
+        fields["image_url"] = public_image_url(fields.get("image_url"))
         return fields
 
 
