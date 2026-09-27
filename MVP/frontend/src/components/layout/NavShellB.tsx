@@ -26,12 +26,18 @@ const TRAILING_LINKS = [{ label: "Support", href: "/support" }];
 export function NavShellB() {
   const pathname = usePathname();
   const { status, user } = useAuth();
+  // An admin passes both role gates (see require_roles in backend/app/security.py
+  // and RequireRole), so it gets both links rather than having to know the URLs.
   const roleLinks =
-    status === "authenticated" && user.role === "owner"
-      ? OWNER_LINKS
-      : status === "authenticated" && user.role === "advertiser"
-        ? ADVERTISER_LINKS
-        : [];
+    status !== "authenticated"
+      ? []
+      : user.role === "admin"
+        ? [...ADVERTISER_LINKS, ...OWNER_LINKS]
+        : user.role === "owner"
+          ? OWNER_LINKS
+          : user.role === "advertiser"
+            ? ADVERTISER_LINKS
+            : [];
   const appLinks = [...COMMON_LINKS, ...roleLinks, ...TRAILING_LINKS];
 
   return (

@@ -14,6 +14,13 @@ export interface RequireRoleProps {
   children: ReactNode;
 }
 
+/** Admin is a superset of both product roles (mirrors `require_roles` in
+ * backend/app/security.py, where an admin passes every role gate), so an admin
+ * is allowed through an owner-only or advertiser-only page rather than bounced. */
+function satisfies(userRole: Role, required: Role): boolean {
+  return userRole === required || userRole === "admin";
+}
+
 export function RequireRole({ role, fallback = "/", children }: RequireRoleProps) {
   const { status, user } = useAuth();
   const router = useRouter();
@@ -22,12 +29,12 @@ export function RequireRole({ role, fallback = "/", children }: RequireRoleProps
   useEffect(() => {
     if (status === "unauthenticated") {
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);
-    } else if (status === "authenticated" && user.role !== role) {
+    } else if (status === "authenticated" && !satisfies(user.role, role)) {
       router.replace(fallback);
     }
   }, [status, user, role, fallback, router, pathname]);
 
-  if (status !== "authenticated" || user.role !== role) return null;
+  if (status !== "authenticated" || !satisfies(user.role, role)) return null;
   return <>{children}</>;
 }
 

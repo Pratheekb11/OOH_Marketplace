@@ -97,7 +97,25 @@ export function NavActions({ onDark = false }: { onDark?: boolean } = {}) {
     );
   }
 
-  // advertiser (and admin, defensively) get the cart badge.
+  // An admin works both halves of the product, so it gets the owner's submission
+  // entry point *and* the advertiser's cart rather than one or the other.
+  if (user.role === "admin") {
+    return (
+      <div className="flex items-center gap-4">
+        <Button
+          href="/list-your-space"
+          variant="primary"
+          size="sm"
+          className={onDark ? "!bg-accent !text-[#05070f] hover:!bg-white" : ""}
+        >
+          List Media
+        </Button>
+        <CartBadge />
+        {accountMenu}
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center gap-4">
       <CartBadge />
