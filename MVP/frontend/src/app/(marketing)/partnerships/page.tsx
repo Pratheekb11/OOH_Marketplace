@@ -72,7 +72,7 @@ export default function PartnershipsPage() {
       <section className="bg-surface-container-low py-12">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-12 px-8">
           {[
-            { icon: "verified_user", title: "BBMP Authorized", detail: "Regulatory License #2024-AD-BLR" },
+            { icon: "verified_user", title: "BBMP Authorized", detail: "[BBMP licence number]" },
             { icon: "train", title: "BMRCL Exclusive", detail: "Namma Metro Transit Rights" },
             { icon: "gavel", title: "Legal Compliance", detail: "Zero-Deviation Policy" },
             { icon: "location_on", title: "Strategic Zoning", detail: "Tier-1 Bengaluru Precincts" },
@@ -266,9 +266,7 @@ export default function PartnershipsPage() {
                   <div>
                     <h5 className="mb-1 font-bold text-white">Bengaluru Headquarters</h5>
                     <p className="text-sm text-on-primary-container">
-                      Prestige Trade Tower, Palace Road,
-                      <br />
-                      Bengaluru, Karnataka 560001
+                      [Office address]
                     </p>
                   </div>
                 </div>
@@ -278,7 +276,7 @@ export default function PartnershipsPage() {
                   <div>
                     <h5 className="mb-1 font-bold text-white">Partnership Desk</h5>
                     <p className="text-sm text-on-primary-container">
-                      +91 (80) 4555 9900
+                      [Phone number]
                       <br />
                       partners@adspace.example
                     </p>
