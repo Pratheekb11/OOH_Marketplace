@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 from app.database import SessionLocal
+from app.images import image_file_name
 from app.models import Booking, CartItem, Listing, ListingStatus, Role, User
 from app.text import html_to_text
 from sqlalchemy import delete, func, select
@@ -66,7 +67,8 @@ def copy_image(record: dict, public_dir: Path) -> str | None:
     if not source.exists():
         return None
     public_dir.mkdir(parents=True, exist_ok=True)
-    target = public_dir / f"scraped-{record['source_id']}{source.suffix}"
+    # Opaque name, not the source's id (see app/images.py).
+    target = public_dir / image_file_name(record["source_id"], source.suffix)
     shutil.copyfile(source, target)
     return f"/images/listings/{target.name}"
 

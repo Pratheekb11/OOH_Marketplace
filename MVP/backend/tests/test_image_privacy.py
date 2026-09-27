@@ -16,6 +16,7 @@ from app.models import Listing, ListingStatus
 from scripts.export_static import listing_json
 from scripts.import_scraped import copy_image
 from scripts.rename_scraped_images import rename_scraped_images
+
 from tests.test_listings import create_listing
 
 SOURCE_ID = "5c332ada62b4651323deb8fd"
