@@ -22,24 +22,10 @@ export function NavShellA() {
   const pathname = usePathname();
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // The landing hero is a full-bleed night photograph, so the nav rides over
-  // it unpainted and only takes on its white bar once the reader scrolls past
-  // the fold. Every other route keeps the original sticky white nav.
-  const overHero = pathname === "/";
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    if (!overHero) {
-      setScrolled(false);
-      return;
-    }
-    const onScroll = () => setScrolled(window.scrollY > 64);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [overHero]);
-
-  const onDark = overHero && !scrolled;
+  // Every route, "/" included, gets the prototype's plain sticky white bar.
+  // The landing page used to open on a full-bleed night photograph and the nav
+  // rode over it unpainted; the hero is light now, so white-on-white is the one
+  // thing that must not happen here.
 
   // Below lg the five primary links do not fit beside the logo and the
   // account actions — they collided at 768-1024px and were simply absent on a
@@ -80,22 +66,18 @@ export function NavShellA() {
 
   return (
     <nav
-      className={`z-50 w-full px-6 py-5 transition-colors duration-300 sm:px-8 ${
-        overHero ? "fixed inset-x-0 top-0" : "sticky top-0"
-      } ${
+      className={`sticky top-0 z-50 w-full px-6 py-5 transition-colors duration-300 sm:px-8 ${
         menuOpen
-          ? "border-b border-white/10 bg-[#05070f] text-white"
-          : onDark
-            ? "border-b border-transparent bg-transparent text-white"
-            : "border-b border-border-subtle bg-white/95 text-primary backdrop-blur-sm"
+          ? "border-b border-border-subtle bg-white text-primary"
+          : "border-b border-border-subtle bg-white/95 text-primary backdrop-blur-sm"
       }`}
     >
       <div className="relative z-50 flex w-full items-center justify-between">
       <Link
         href="/"
-        className="-my-2 py-2 font-syne text-xl font-extrabold uppercase tracking-tight transition-opacity hover:opacity-80"
+        className="-my-2 py-2 font-headline text-xl font-extrabold uppercase tracking-tight transition-opacity hover:opacity-80"
       >
-        Ad<span className={onDark ? "text-accent" : "text-secondary"}>Space</span>
+        Ad<span className="text-secondary">Space</span>
       </Link>
 
       <div className="hidden items-center space-x-8 text-[13px] font-semibold uppercase tracking-wider lg:flex xl:space-x-10">
@@ -107,17 +89,10 @@ export function NavShellA() {
               href={link.href}
               className={[
                 "nav-link transition-colors",
-                onDark ? "nav-link-light" : "",
                 isActive
-                  ? onDark
-                    ? "border-b-2 border-accent pb-1 text-accent"
-                    : "border-b-2 border-secondary pb-1 text-secondary"
-                  : onDark
-                    ? "text-white/70 hover:text-white"
-                    : "text-on-surface-variant hover:text-primary",
-              ]
-                .filter(Boolean)
-                .join(" ")}
+                  ? "border-b-2 border-secondary pb-1 text-secondary"
+                  : "text-on-surface-variant hover:text-primary",
+              ].join(" ")}
             >
               {link.label}
             </Link>
@@ -130,14 +105,12 @@ export function NavShellA() {
           type="button"
           aria-label="Search listings (Ctrl+K)"
           onClick={() => setSearchOpen(true)}
-          className={`hidden transition-opacity hover:opacity-70 sm:block ${
-            menuOpen || onDark ? "text-white" : "text-primary"
-          }`}
+          className="hidden text-primary transition-opacity hover:opacity-70 sm:block"
         >
           <Icon name="search" />
         </button>
         <div className="hidden sm:block">
-          <NavActions onDark={menuOpen || onDark} />
+          <NavActions />
         </div>
 
         <button
@@ -145,9 +118,7 @@ export function NavShellA() {
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((open) => !open)}
-          className={`-mr-2 p-2 transition-opacity hover:opacity-70 lg:hidden ${
-            menuOpen || onDark ? "text-white" : "text-primary"
-          }`}
+          className="-mr-2 p-2 text-primary transition-opacity hover:opacity-70 lg:hidden"
         >
           <Icon name={menuOpen ? "close" : "menu"} weight={400} />
         </button>
@@ -157,16 +128,16 @@ export function NavShellA() {
       {menuOpen ? (
         <div
           id="mobile-menu"
-          className="night fixed inset-0 z-40 flex flex-col overflow-y-auto px-6 pb-12 pt-28 sm:px-8 lg:hidden"
+          className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-white px-6 pb-12 pt-28 sm:px-8 lg:hidden"
         >
           <ul className="flex flex-col">
             {PRIMARY_LINKS.map((link) => (
-              <li key={link.label} className="hairline-light border-b">
+              <li key={link.label} className="border-b border-border-subtle">
                 <Link
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className={`block py-5 font-syne text-3xl font-bold tracking-tight ${
-                    pathname === link.href ? "text-accent" : "text-white"
+                  className={`block py-5 font-headline text-3xl font-bold tracking-tight ${
+                    pathname === link.href ? "text-secondary" : "text-primary"
                   }`}
                 >
                   {link.label}
@@ -181,7 +152,7 @@ export function NavShellA() {
               setMenuOpen(false);
               setSearchOpen(true);
             }}
-            className="hairline-light mt-8 flex items-center gap-3 border px-5 py-4 text-left font-inter text-xs font-semibold uppercase tracking-[0.18em] text-white/70 sm:hidden"
+            className="mt-8 flex items-center gap-3 border border-border-subtle px-5 py-4 text-left font-inter text-xs font-semibold uppercase tracking-[0.18em] text-on-surface-variant transition-colors hover:border-primary hover:text-primary sm:hidden"
           >
             <Icon name="search" className="!text-lg" />
             Search listings
@@ -190,13 +161,13 @@ export function NavShellA() {
           <Link
             href="/list-your-space"
             onClick={() => setMenuOpen(false)}
-            className="mt-4 inline-flex items-center justify-center gap-3 bg-accent px-8 py-4 font-inter text-xs font-bold uppercase tracking-[0.18em] text-[#05070f] sm:mt-10"
+            className="mt-4 inline-flex items-center justify-center gap-3 bg-primary px-8 py-4 font-inter text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-secondary sm:mt-10"
           >
             List your space
           </Link>
 
           <div className="mt-4 sm:hidden [&_a]:flex [&_a]:w-full [&_a]:justify-center [&_a]:py-4">
-            <NavActions onDark />
+            <NavActions />
           </div>
         </div>
       ) : null}

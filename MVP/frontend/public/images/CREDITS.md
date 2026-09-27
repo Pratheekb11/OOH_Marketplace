@@ -18,5 +18,11 @@ visitor to an out-of-home marketplace looks at first.
 | `misc/format-digital.jpg` | [pexels.com/photo/1827234](https://www.pexels.com/photo/1827234/) | Digital screen cluster, Piccadilly Circus |
 | `misc/owner-night.jpg` | [pexels.com/photo/12849349](https://www.pexels.com/photo/12849349/) | Building-scale LED facade at night |
 
+The landing page currently uses four of these: `hero/landing-hero.jpg` in the
+hero, and `format-digital` / `format-bus-shelter` / `format-skywalk` in the
+three Marketplace Selects cards. `format-hoarding.jpg` and `owner-night.jpg` are
+kept for the next slot that needs a real photograph rather than deleted and
+re-sourced.
+
 Everything under `images/listings/` comes from the scraper and is untouched by
 this set — see `backend/scraper/README.md`.

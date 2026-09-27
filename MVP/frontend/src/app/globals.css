@@ -168,22 +168,14 @@
   }
 
   /* ---------------------------------------------------------------------
-     Landing page — "night" register.
+     Landing page motion, on the prototype's light register.
 
-     The marketplace sells lit surfaces, so the landing page runs on two
-     light temperatures only: sodium amber (--color-accent) against a cold
-     near-black. No third hue, so the photography carries the colour.
+     The page itself is plain: off-white surface, navy type, one brown-gold
+     accent, hairline borders. Only the two dark sections (Institutional
+     Support, Monetize Your Media Assets) need a rule that reads on navy
+     without going to pure white, which would out-contrast the body copy
+     sitting next to it.
      --------------------------------------------------------------------- */
-  .night {
-    background-color: #05070f;
-  }
-
-  .night-panel {
-    background-color: #0e1424;
-  }
-
-  /* Hairline rule that reads on the dark sections without going to pure
-     white, which would out-contrast the body copy sitting next to it. */
   .hairline-light {
     border-color: rgba(255, 255, 255, 0.14);
   }
@@ -222,54 +214,24 @@
     }
   }
 
-  /* Play-out loop (components/marketing/HeroSlots.tsx). The fill duration
-     mirrors SLOT_MS there — change both together. */
-  .slot-in {
-    animation: slot-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* Counter-rotating rings behind the Institutional Support shield — the
+     prototype's own flourish, lifted out of the arbitrary-value arbitrary
+     syntax it was written in so prefers-reduced-motion can reach it. */
+  .ring-slow {
+    animation: ring-spin 60s linear infinite;
   }
 
-  @keyframes slot-in {
+  .ring-fast {
+    animation: ring-spin 30s linear infinite reverse;
+  }
+
+  @keyframes ring-spin {
     from {
-      opacity: 0;
-      transform: translateY(8px);
+      transform: rotate(0deg);
     }
     to {
-      opacity: 1;
-      transform: none;
+      transform: rotate(360deg);
     }
-  }
-
-  .slot-fill {
-    animation: slot-fill 6s linear both;
-  }
-
-  .slot-card:hover .slot-fill,
-  .slot-card:focus-within .slot-fill {
-    animation-play-state: paused;
-  }
-
-  @keyframes slot-fill {
-    from {
-      width: 0%;
-    }
-    to {
-      width: 100%;
-    }
-  }
-
-  /* Nav underline, inverted for the transparent nav over the hero. */
-  .nav-link-light::after {
-    background: #fea619;
-  }
-
-  /* Format tiles: unlit until pointed at, then the panel switches on. */
-  .tile-scrim {
-    background: linear-gradient(
-      to top,
-      rgba(5, 7, 15, 0.92) 0%,
-      rgba(5, 7, 15, 0.55) 45%,
-      rgba(5, 7, 15, 0.15) 100%
-    );
   }
 }
 
@@ -282,12 +244,8 @@
   }
 
   .rise,
-  .slot-in,
-  .slot-fill {
+  .ring-slow,
+  .ring-fast {
     animation: none;
-  }
-
-  .slot-fill {
-    width: 100%;
   }
 }

@@ -165,23 +165,31 @@ request, not a build-time one, so it cannot break a build.
 
 ## Landing page (`MVP/frontend/src/app/(marketing)/page.tsx`)
 
-Runs in its own "night" register — two light temperatures only (amber
-`--color-accent` against near-black `#05070f`), with the photography carrying
-the rest of the colour. Display type is **Syne**; Manrope stays on body, Inter
-on data/labels. `NavShellA` renders unpainted and `fixed` over the hero on `/`
-only, and paints its white bar once `scrollY > 64`.
+A port of `Ui_Prototype_MVP_Prep/index.html`, deliberately plain and
+institutional: off-white `--color-surface`, navy type, one brown-gold
+`--color-secondary`, hairline `--color-border-subtle`, square corners, `py-32`
+rhythm, uppercase micro-labels on `tracking-[0.2em]`. Display type is
+**Epilogue** (`font-headline`) with Inter on the labels. Section order, layout
+and copy are the prototype's — keep them that way; this page was once rebuilt in
+a dark "night" register with Syne and a play-out hero loop, and that was
+rejected.
 
-Its signature element is `components/marketing/HeroSlots.tsx`, a play-out loop
-mirroring how digital OOH sells a rotation. The fill-bar duration lives in two
-places — `SLOT_MS` there and the `slot-fill` keyframe in `globals.css` — change
-both together. Scroll entrances go through `components/marketing/Reveal.tsx`;
-every animation is neutralised under `prefers-reduced-motion`.
+`NavShellA` is the plain sticky white bar on every route, `/` included. It used
+to ride transparent over the landing hero; the hero is light now, so that would
+be white-on-white.
 
-The section copy quotes the real catalogue (2,113 Bengaluru sites — Bus Shelter
-1,101, Hoarding 710, Skywalk 151, Digital OOH 124; ₹400–₹1,26,667 per day), and
-the format tiles deep-link into `/marketplace?space_type=…`. Re-check those
-numbers whenever the static snapshot is regenerated. Photography provenance is
-in `MVP/frontend/public/images/CREDITS.md`.
+Two deliberate departures from the prototype: the four AI-generated photographs
+are replaced with real ones from `public/images` (provenance in
+`public/images/CREDITS.md` — the originals had garbled lettering on the
+billboards, the first thing an OOH buyer looks at), and the "Marketplace
+Selects" cards deep-link into `/marketplace?space_type=…` rather than one
+hardcoded listing id, which would rot on the next catalogue re-import.
+
+Motion is additive: scroll entrances via `components/marketing/Reveal.tsx`, the
+hero load sequence via `.rise`, the prototype's counter-rotating rings
+(`.ring-slow`/`.ring-fast`) and one `components/marketing/CountUp.tsx` on the
+hero stat. Every one is neutralised under `prefers-reduced-motion` in
+`globals.css` — keep new animation in that block.
 
 ## Frontend/backend wiring
 
