@@ -48,6 +48,10 @@ jobs:
         # "TypeScript" instead of burying it in build output.
         run: npx tsc --noEmit
 
+      - name: Unit tests
+        # Vitest + jsdom component tests (src/**/*.test.ts[x]).
+        run: npm test
+
       - name: Build
         # The real gate. `next dev` tolerates a missing <Suspense> around
         # useSearchParams(), un-awaited params/searchParams (both Promises in
