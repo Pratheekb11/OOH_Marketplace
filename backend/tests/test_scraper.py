@@ -348,3 +348,86 @@ def test_scraped_owner_account_cannot_be_logged_into(db):
     owner = db.query(User).one()
     # A bcrypt verify against this can never succeed.
     assert owner.password_hash == "!"
+
+
+# ------------------------------------------------- full-size reference photos
+
+S3 = "https://tma-live.s3.ap-south-1.amazonaws.com"
+CDN = "https://the-media-ant.mo.cloudinary.net"
+PHOTO_TX = "?tx=w_1280,c_limit"
+
+
+def _detail_with_artworks(*own, printing=(), own_option="Hoarding"):
+    """DETAIL plus `referenceArtworks` on the media's own option and on the
+    Printing/Mounting options, which carry the site's generic sample art."""
+    def artworks(urls):
+        return [{"url": url, "type": kind, "_id": str(n)} for n, (url, kind) in enumerate(urls)]
+
+    options = [
+        {**DETAIL["mediaOptions"][0], "name": own_option, "referenceArtworks": artworks(own)},
+        {"name": "Printing Charges", "referenceArtworks": artworks(printing)},
+        {"name": "Mounting Charges", "referenceArtworks": artworks(printing)},
+    ]
+    return {**DETAIL, "mediaOptions": options}
+
+
+def test_full_size_reference_photo_replaces_the_preview():
+    """`logo` is a 300x125 preview; the same shot is published at camera
+    resolution (3200x2400 observed) as the media option's reference artwork."""
+    preview = {**INDEX_ROW, "logo": f"{S3}/uploads/mediaLogos/1/308.jpg"}
+    detail = _detail_with_artworks((f"{S3}/uploads/referenceArtworks/9/308.%20Palace%20road.jpg", "image"))
+
+    record = _adapter()._record(preview, detail)
+
+    assert [image.url for image in record.images] == [
+        f"{CDN}/uploads/referenceArtworks/9/308.%20Palace%20road.jpg{PHOTO_TX}"
+    ]
+    assert record.images[0].trusted is True
+    assert record.extra["photo_source"] == "reference"
+
+
+def test_every_reference_photo_of_a_listing_is_collected_in_order():
+    detail = _detail_with_artworks(
+        (f"{S3}/uploads/referenceArtworks/1/a.jpg", "image"),
+        (f"{S3}/uploads/referenceArtworks/2/b.png", "image"),
+        (f"{S3}/uploads/referenceArtworks/3/c.jpeg", "image"),
+    )
+    record = _adapter()._record(INDEX_ROW, detail)
+    assert [image.url for image in record.images] == [
+        f"{CDN}/uploads/referenceArtworks/1/a.jpg{PHOTO_TX}",
+        f"{CDN}/uploads/referenceArtworks/2/b.png{PHOTO_TX}",
+        f"{CDN}/uploads/referenceArtworks/3/c.jpeg{PHOTO_TX}",
+    ]
+
+
+def test_printing_and_mounting_sample_art_is_not_a_site_photo():
+    detail = _detail_with_artworks(
+        (f"{S3}/uploads/referenceArtworks/1/a.jpg", "image"),
+        printing=[(f"{S3}/referenceArtworks/1639574786854/Printing_logo.jpg", "image")],
+    )
+    urls = [image.url for image in _adapter()._record(INDEX_ROW, detail).images]
+    assert urls == [f"{CDN}/uploads/referenceArtworks/1/a.jpg{PHOTO_TX}"]
+
+
+def test_non_image_reference_artwork_is_skipped():
+    detail = _detail_with_artworks(
+        (f"{S3}/uploads/referenceArtworks/1/spec.pdf", "pdf"),
+        (f"{S3}/uploads/referenceArtworks/2/a.jpg", "image"),
+    )
+    urls = [image.url for image in _adapter()._record(INDEX_ROW, detail).images]
+    assert urls == [f"{CDN}/uploads/referenceArtworks/2/a.jpg{PHOTO_TX}"]
+
+
+def test_logo_is_the_fallback_when_no_reference_photo_exists():
+    record = _adapter()._record(INDEX_ROW, _detail_with_artworks())
+    assert [image.url for image in record.images] == [f"{CDN}/medias/5d28/1562/site.jpg"]
+    assert record.extra["photo_source"] == "full"
+
+
+def test_reference_photos_are_read_from_the_template_option_too():
+    """Digital bus shelters are filed under a "Bus Shelter" media type, so the
+    own option is whichever one is not a Printing/Mounting charge."""
+    detail = _detail_with_artworks(
+        (f"{S3}/uploads/referenceArtworks/1/a.jpg", "image"), own_option="Digital Bus Shelter"
+    )
+    assert len(_adapter()._record(INDEX_ROW, detail).images) == 1
