@@ -77,14 +77,23 @@ jobs:
         run: npm ci
 
       - name: Report high-severity advisories
-        # Non-blocking on purpose. Today's `high` findings (postcss, sharp,
-        # nanoid) all resolve only by upgrading Next.js 15 -> 16, a major
-        # version bump that has to be a deliberate decision with a full
-        # re-test, not something a routine PR gets blocked on. Keep the report
-        # visible in the job log so the list is never a surprise.
+        # Non-blocking on purpose. What is left after next@15.5.26 is postcss,
+        # reachable only through Next's own dependency on it, and it resolves
+        # only by upgrading Next.js 15 -> 16 — a major version bump that has to
+        # be a deliberate decision with a full re-test, not something a routine
+        # PR gets blocked on. Keep the report visible in the job log so the
+        # list is never a surprise.
+        #
+        # Do not read this exemption as "highs are always deferred": sharp,
+        # nanoid and js-yaml were on this list too and turned out to be fixable
+        # in place. Check `fixAvailable` before assuming a finding is stuck
+        # behind the major.
         continue-on-error: true
         run: npm audit --audit-level=high
 
       - name: Fail on critical advisories
-        # The actual gate. Critical means stop.
+        # The actual gate. Critical means stop — and a critical is not
+        # automatically a major upgrade: the one that fired this (Next.js
+        # GHSA-p293-qw3h-jr36 / GHSA-2xp9-vwfh-vxw4, unauthenticated RCE) was
+        # fixed by a patch release inside 15.x.
         run: npm audit --audit-level=critical
