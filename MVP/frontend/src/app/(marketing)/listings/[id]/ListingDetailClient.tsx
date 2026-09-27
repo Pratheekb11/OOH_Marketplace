@@ -12,6 +12,7 @@ import { fetchListing } from "@/lib/listings-source";
 import type { ListingOut } from "@/components/marketplace/types";
 import BentoGallery from "@/components/listing/BentoGallery";
 import StatsGrid from "@/components/listing/StatsGrid";
+import ListingDescription from "@/components/listing/ListingDescription";
 import OwnerCard from "@/components/listing/OwnerCard";
 import BookingSidebar from "@/components/listing/BookingSidebar";
 
@@ -158,10 +159,10 @@ export default function ListingDetailClient({ id }: { id: string }) {
 
           <section>
             <h2 className="mb-6 text-3xl font-black">Strategic Overview</h2>
-            <p className="max-w-3xl text-lg leading-relaxed text-on-surface-variant">{description}</p>
+            <ListingDescription text={description} className="text-lg leading-relaxed text-on-surface-variant" />
           </section>
 
-          <OwnerCard />
+          <OwnerCard listing={listing} />
         </div>
 
         <BookingSidebar listing={listing} />

@@ -20,6 +20,7 @@ from pathlib import Path
 
 from app.database import SessionLocal
 from app.models import Booking, CartItem, Listing, ListingStatus, Role, User
+from app.text import html_to_text
 from sqlalchemy import delete, func, select
 
 OWNER_EMAIL = "scraped-inventory@internal.invalid"
@@ -79,7 +80,7 @@ def listing_fields(record: dict, owner_id: int, image_url: str | None) -> dict:
         owner_id=owner_id,
         title=record["title"][:180],
         space_type=space_type[:50],
-        description=record.get("description") or "",
+        description=html_to_text(record.get("description")),
         location=record["location"][:255],
         width_ft=record.get("width_ft"),
         height_ft=record.get("height_ft"),

@@ -66,3 +66,11 @@ export function inrFull(value: number): string {
     maximumFractionDigits: 2,
   }).format(value);
 }
+
+/** "2026-08-01" + 6 -> "2026-08-07". UTC arithmetic on the parsed parts,
+ * like inclusiveDays, so no timezone can shift the result by a day. */
+export function addDaysIso(iso: string, days: number): string {
+  const { y, m, d } = parseIsoParts(iso);
+  const date = new Date(Date.UTC(y, m - 1, d + days));
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
+}

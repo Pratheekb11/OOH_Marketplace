@@ -1,9 +1,10 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, model_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
 from app.models import BookingStatus, ListingStatus, PaymentStatus, Role
-from app.pricing import ADDON_CATALOG
+from app.pricing import ADDON_CATALOG, min_booking_days
+from app.text import html_to_text
 
 
 class ORMModel(BaseModel):
@@ -45,6 +46,18 @@ class UserOut(ORMModel):
     id: int; email: EmailStr; full_name: str; role: Role
 
 
+#: Keys the scraper importer writes into `Listing.extra` for its own use:
+#: provenance for re-imports, and the source's commercial terms. None of them
+#: may leave the API. `minimum_billing` still shapes `min_booking_days`.
+PRIVATE_EXTRA_KEYS = frozenset({"source_url", "source_site", "source_id", "card_rate", "minimum_billing", "warnings"})
+
+
+def public_extra(extra: dict | None) -> dict | None:
+    if extra is None:
+        return None
+    return {key: value for key, value in extra.items() if key not in PRIVATE_EXTRA_KEYS}
+
+
 class ListingCreate(BaseModel):
     title: str = Field(min_length=3, max_length=180)
     space_type: str
@@ -60,15 +73,43 @@ class ListingCreate(BaseModel):
     image_url: str | None = None
     extra: dict | None = None
 
+    @field_validator("description")
+    @classmethod
+    def _plain_description(cls, value: str) -> str:
+        return html_to_text(value)
+
 
 class ListingUpdate(ListingCreate):
     pass
 
 
 class ListingOut(ORMModel):
+    """The public face of a listing.
+
+    Built from the stored row, but not a mirror of it: the description is
+    cleaned to plain text (rows imported before cleaning existed still hold
+    HTML), private `extra` keys are dropped, and the minimum booking term they
+    imply is published as `min_booking_days` instead.
+    """
     id: int; owner_id: int; title: str; space_type: str; description: str; location: str
     width_ft: float | None; height_ft: float | None; price_per_day: float; footfall_estimate: int | None
     status: ListingStatus; rejection_reason: str | None; lighting: str | None; image_url: str | None; extra: dict | None
+    min_booking_days: int = 1
+
+    @model_validator(mode="before")
+    @classmethod
+    def _public_view(cls, data):
+        if isinstance(data, dict):
+            fields = dict(data)
+        else:
+            fields = {name: getattr(data, name) for name in cls.model_fields if hasattr(data, name)}
+        extra = fields.get("extra")
+        derived = min_booking_days(fields.get("price_per_day") or 0, extra)
+        # An already-public dict has lost `minimum_billing`; keep what it carries.
+        fields["min_booking_days"] = max(derived, int(fields.get("min_booking_days") or 1))
+        fields["extra"] = public_extra(extra)
+        fields["description"] = html_to_text(fields.get("description"))
+        return fields
 
 
 class ListingPage(BaseModel):
