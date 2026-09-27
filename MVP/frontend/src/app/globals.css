@@ -237,6 +237,10 @@
   /* Marketplace map pins (components/marketplace/MapPanel.tsx). Leaflet
      places the icon's top-left corner on the point; the translate hangs the
      price label above it instead. */
+  .adspace-map-tiles {
+    filter: grayscale(1) brightness(1.05) contrast(0.9);
+  }
+
   .adspace-map-pin {
     background: none;
     border: 0;
