@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.database import get_db
 from app.models import Booking, BookingStatus, CartItem, Listing, ListingStatus, Payment, PaymentStatus, Role, User
-from app.pricing import ADDON_CATALOG, inclusive_days, quote_cart, quote_line
+from app.pricing import ADDON_CATALOG, inclusive_days, min_booking_days, quote_cart, quote_line
 from app.schemas import (
     AddonOut,
     BookingOut,
@@ -338,6 +338,21 @@ def _active_booking_overlap(db: Session, listing_id: int, start_date, end_date) 
     )) is not None
 
 
+def _require_min_term(listing: Listing, start_date, end_date, status_code: int = 422) -> None:
+    """Reject a window shorter than the listing's minimum booking term.
+
+    422 at cart time (the request itself is invalid for this space); checkout
+    passes 409, because there the cart row was valid when added and the
+    owner has since raised the minimum.
+    """
+    minimum = min_booking_days(listing.price_per_day, listing.extra)
+    if inclusive_days(start_date, end_date) < minimum:
+        raise HTTPException(
+            status_code=status_code,
+            detail=f"{listing.title} has a minimum booking of {minimum} days; choose at least {minimum} days.",
+        )
+
+
 def _cart_item_out(item: CartItem, listing: Listing) -> dict:
     quote = quote_line(listing, item.start_date, item.end_date, item.addons or [])
     return {
@@ -380,6 +395,7 @@ def add_cart_item(payload: CartItemCreate, response: Response, user: User = Depe
         raise HTTPException(status_code=404, detail="Listing not found")
     if listing.status != ListingStatus.active:
         raise HTTPException(status_code=409, detail="Listing is not available for booking")
+    _require_min_term(listing, payload.start_date, payload.end_date)
     if _active_booking_overlap(db, listing.id, payload.start_date, payload.end_date):
         raise HTTPException(status_code=409, detail="Selected dates are unavailable for this listing")
 
@@ -409,6 +425,7 @@ def update_cart_item(item_id: int, payload: CartItemUpdate, user: User = Depends
     listing = db.get(Listing, item.listing_id)
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
+    _require_min_term(listing, payload.start_date, payload.end_date)
     if _active_booking_overlap(db, listing.id, payload.start_date, payload.end_date):
         raise HTTPException(status_code=409, detail="Selected dates are unavailable for this listing")
 
@@ -483,6 +500,7 @@ def checkout(payload: CheckoutRequest = CheckoutRequest(), advertiser: User = De
         listing = listings_by_id.get(item.listing_id)
         if not listing or listing.status != ListingStatus.active:
             raise HTTPException(status_code=409, detail=f"Listing {item.listing_id} is no longer available")
+        _require_min_term(listing, item.start_date, item.end_date, status_code=409)
 
         # Authoritative overlap guard (the cart-time check is advisory only).
         overlap = db.scalar(select(Booking).where(

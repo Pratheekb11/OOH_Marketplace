@@ -19,28 +19,15 @@ from pathlib import Path
 
 from app.database import SessionLocal
 from app.models import Listing, ListingStatus
+from app.schemas import ListingOut
 from sqlalchemy import select
 
 
 def listing_json(listing: Listing) -> dict:
-    """Mirror ListingOut so the snapshot and the API are interchangeable."""
-    return {
-        "id": listing.id,
-        "owner_id": listing.owner_id,
-        "title": listing.title,
-        "space_type": listing.space_type,
-        "description": listing.description or "",
-        "location": listing.location,
-        "width_ft": listing.width_ft,
-        "height_ft": listing.height_ft,
-        "price_per_day": listing.price_per_day,
-        "footfall_estimate": listing.footfall_estimate,
-        "status": listing.status.value if hasattr(listing.status, "value") else listing.status,
-        "rejection_reason": listing.rejection_reason,
-        "lighting": listing.lighting,
-        "image_url": listing.image_url,
-        "extra": listing.extra,
-    }
+    """Serialise through ListingOut itself, so the snapshot and the API cannot
+    drift: same cleaned description, same private-key filtering, same
+    `min_booking_days`."""
+    return ListingOut.model_validate(listing).model_dump(mode="json")
 
 
 def build_facets(rows: list[dict]) -> dict:

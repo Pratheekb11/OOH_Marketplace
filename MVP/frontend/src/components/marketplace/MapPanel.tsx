@@ -1,6 +1,10 @@
-import Image from "next/image";
-import Icon from "@/components/ui/Icon";
-import Money from "@/components/ui/Money";
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import type * as Leaflet from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { inrCompact } from "@/lib/format";
+import { toMapPoints, type MapPoint } from "@/lib/map/points";
 import type { ListingOut } from "./types";
 
 export interface MapPanelProps {
@@ -8,93 +12,129 @@ export interface MapPanelProps {
   className?: string;
 }
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+/** Central Bengaluru, used only until the first result set arrives. */
+const INITIAL_VIEW: [number, number] = [12.9716, 77.5946];
+
+// CARTO's light basemap: greyscale, so the navy pins carry the page, and free
+// for this volume with the attribution below.
+const TILE_URL = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+const TILE_ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+/** Popup body built as DOM nodes, so a title is always text and never markup. */
+function popupContent(point: MapPoint): HTMLElement {
+  const root = document.createElement("div");
+  root.className = "adspace-map-popup";
+
+  const title = document.createElement("p");
+  title.className = "adspace-map-popup__title";
+  title.textContent = point.title;
+
+  const price = document.createElement("p");
+  price.className = "adspace-map-popup__price";
+  price.textContent = `${inrCompact(point.price)} / day`;
+
+  const link = document.createElement("a");
+  link.className = "adspace-map-popup__link";
+  link.href = `${BASE_PATH}/listings/${point.id}`;
+  link.textContent = "View space →";
+
+  root.append(title, price, link);
+  return root;
+}
+
 /**
- * Static map image + pin overlays, ported from listing_page.html's right
- * rail. Presentational only — no maps library, per the build brief. Pin
- * positions are fixed (matching the prototype's hand-placed overlays); pin
- * labels/the "Active View" card pull real numbers from the current result
- * set so it doesn't read as pure fake chrome.
+ * The marketplace's map rail: a Leaflet map with one pin per result that has
+ * coordinates (`extra.latitude` / `extra.longitude`), framed to fit them.
+ *
+ * Leaflet touches `window` at import time, so it is loaded inside an effect
+ * rather than at module scope — this component still prerenders on the
+ * server and in the static Pages export.
  */
 export function MapPanel({ listings, className = "" }: MapPanelProps) {
-  const pins = listings.slice(0, 2);
-  const avgPerDay =
-    listings.length > 0
-      ? Math.round(listings.reduce((sum, l) => sum + l.price_per_day, 0) / listings.length)
-      : 0;
-  const focusListing = listings[0];
+  const points = useMemo(() => toMapPoints(listings), [listings]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const leafletRef = useRef<typeof Leaflet | null>(null);
+  const mapRef = useRef<Leaflet.Map | null>(null);
+  const layerRef = useRef<Leaflet.LayerGroup | null>(null);
+  const [ready, setReady] = useState(false);
+
+  // Create the map once.
+  useEffect(() => {
+    let cancelled = false;
+
+    import("leaflet").then((module) => {
+      const L = (module as unknown as { default?: typeof Leaflet }).default ?? (module as typeof Leaflet);
+      if (cancelled || !containerRef.current) return;
+
+      const map = L.map(containerRef.current, { scrollWheelZoom: false }).setView(INITIAL_VIEW, 11);
+      L.tileLayer(TILE_URL, { attribution: TILE_ATTRIBUTION, maxZoom: 19, subdomains: "abcd" }).addTo(map);
+
+      leafletRef.current = L;
+      mapRef.current = map;
+      layerRef.current = L.layerGroup().addTo(map);
+      setReady(true);
+    });
+
+    return () => {
+      cancelled = true;
+      mapRef.current?.remove();
+      mapRef.current = null;
+      layerRef.current = null;
+      leafletRef.current = null;
+    };
+  }, []);
+
+  // Redraw pins whenever the result set changes.
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    const layer = layerRef.current;
+    if (!ready || !L || !map || !layer) return;
+
+    layer.clearLayers();
+    for (const point of points) {
+      const icon = L.divIcon({
+        className: "adspace-map-pin",
+        html: `<span>${inrCompact(point.price)}</span>`,
+        iconSize: undefined,
+      });
+      L.marker([point.lat, point.lng], { icon, title: point.title, riseOnHover: true })
+        .bindPopup(popupContent(point))
+        .addTo(layer);
+    }
+
+    if (points.length > 1) {
+      map.fitBounds(L.latLngBounds(points.map((p) => [p.lat, p.lng] as [number, number])), {
+        padding: [40, 40],
+        maxZoom: 15,
+      });
+    } else if (points.length === 1) {
+      map.setView([points[0].lat, points[0].lng], 15);
+    }
+  }, [ready, points]);
+
+  const unmapped = listings.length - points.length;
 
   return (
     <section
-      className={`relative hidden overflow-hidden border-l border-surface-container bg-surface-container-high md:block ${className}`}
+      className={`relative isolate hidden overflow-hidden border-l border-surface-container bg-surface-container-high md:block ${className}`}
+      aria-label="Map of results"
     >
-      <div className="absolute inset-0 opacity-80 grayscale">
-        <Image
-          src="/images/map/bengaluru-static.png"
-          alt="Map of Bengaluru"
-          fill
-          sizes="(min-width: 1280px) 30vw, 40vw"
-          className="object-cover"
-        />
-      </div>
+      <div ref={containerRef} className="absolute inset-0" />
 
-      <div className="absolute right-6 top-6 z-10 flex flex-col gap-2">
-        <button
-          type="button"
-          aria-label="Zoom in"
-          className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl text-primary shadow-lg transition-all hover:bg-white"
-        >
-          <Icon name="add" className="!text-xl" />
-        </button>
-        <button
-          type="button"
-          aria-label="Zoom out"
-          className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl text-primary shadow-lg transition-all hover:bg-white"
-        >
-          <Icon name="remove" className="!text-xl" />
-        </button>
-        <button
-          type="button"
-          aria-label="My location"
-          className="glass-panel mt-4 flex h-10 w-10 items-center justify-center rounded-xl text-primary shadow-lg transition-all hover:bg-white"
-        >
-          <Icon name="my_location" className="!text-xl" />
-        </button>
-      </div>
-
-      {focusListing ? (
-        <div className="absolute bottom-6 left-6 right-6 z-10">
-          <div className="glass-panel flex items-center gap-4 rounded-xl border border-white/40 p-4 shadow-2xl">
-            <div className="flex-1 overflow-hidden">
-              <span className="text-[8px] font-black uppercase tracking-widest text-secondary">Active View</span>
-              <h4 className="truncate font-headline text-sm font-bold text-primary">{focusListing.location}</h4>
-              <p className="truncate text-[9px] text-on-surface-variant">{listings.length} slots available</p>
-            </div>
-            <div className="shrink-0 rounded-lg border border-white/20 bg-white/50 px-2 py-1 text-center">
-              <Money value={avgPerDay} mode="compact" className="block text-[10px] font-bold text-primary" />
-              <span className="text-[7px] font-bold uppercase text-outline">Avg/D</span>
-            </div>
-          </div>
+      {listings.length > 0 && points.length === 0 ? (
+        <div className="pointer-events-none absolute inset-x-6 top-6 z-[1000] border border-border-subtle bg-white px-4 py-3 text-xs text-on-surface-variant">
+          No mapped locations for these results yet.
+        </div>
+      ) : unmapped > 0 ? (
+        <div className="pointer-events-none absolute bottom-6 left-6 z-[1000] border border-border-subtle bg-white px-3 py-2 text-[11px] text-on-surface-variant">
+          {points.length.toLocaleString("en-IN")} of {listings.length.toLocaleString("en-IN")} shown on the map
         </div>
       ) : null}
-
-      {pins.map((listing, index) => (
-        <div
-          key={listing.id}
-          className="group absolute z-10 cursor-pointer"
-          style={index === 0 ? { top: "33%", left: "50%" } : { top: "66%", right: "25%" }}
-        >
-          <div className="relative flex flex-col items-center">
-            <div
-              className={`rounded-full border-2 border-white px-2 py-1 text-[9px] font-bold text-white shadow-xl transition-transform group-hover:scale-110 ${
-                index === 0 ? "bg-primary" : "bg-secondary"
-              }`}
-            >
-              <Money value={listing.extra?.display_price ?? listing.price_per_day} mode="compact" />
-            </div>
-            <div className={`h-2 w-0.5 ${index === 0 ? "bg-primary" : "bg-secondary"}`} />
-          </div>
-        </div>
-      ))}
     </section>
   );
 }

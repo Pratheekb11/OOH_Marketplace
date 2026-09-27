@@ -8,7 +8,7 @@ import Button from "@/components/ui/Button";
 import Money from "@/components/ui/Money";
 import { useToast } from "@/components/ui/Toast";
 import { api, ApiError } from "@/lib/api";
-import { formatIsoDate, inclusiveDays } from "@/lib/format";
+import { addDaysIso, formatIsoDate, inclusiveDays } from "@/lib/format";
 import AddonPicker from "./AddonPicker";
 import type { AddonOut, ListingOut } from "@/components/marketplace/types";
 
@@ -45,6 +45,10 @@ export function BookingSidebar({ listing }: BookingSidebarProps) {
   const pathname = usePathname();
   const { showToast } = useToast();
 
+  // The cart rejects a shorter window (see _require_min_term in app/main.py),
+  // so the picker starts at the minimum and never offers less.
+  const minDays = Math.max(1, Math.floor(listing.min_booking_days ?? 1));
+
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
@@ -61,8 +65,20 @@ export function BookingSidebar({ listing }: BookingSidebarProps) {
   useEffect(() => {
     const today = todayIso();
     setStartDate(today);
-    setEndDate(today);
-  }, []);
+    setEndDate(addDaysIso(today, minDays - 1));
+  }, [minDays]);
+
+  const earliestEnd = startDate ? addDaysIso(startDate, minDays - 1) : "";
+
+  function changeStart(value: string) {
+    setStartDate(value);
+    // Moving the start past the end would leave a window under the minimum;
+    // push the end out with it rather than making the user fix both fields.
+    if (value) {
+      const minimumEnd = addDaysIso(value, minDays - 1);
+      setEndDate((end) => (!end || end < minimumEnd ? minimumEnd : end));
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -88,7 +104,8 @@ export function BookingSidebar({ listing }: BookingSidebarProps) {
   }, []);
 
   const quote = useMemo(() => {
-    if (!startDate || !endDate) return { days: 0, base: 0, addonsAmount: 0, gst: 0, total: 0, validRange: false };
+    if (!startDate || !endDate)
+      return { days: 0, base: 0, addonsAmount: 0, gst: 0, total: 0, validRange: false, meetsMinimum: false };
     const days = inclusiveDays(startDate, endDate);
     const validRange = days >= 1;
     const base = validRange ? round2(days * listing.price_per_day) : 0;
@@ -97,8 +114,8 @@ export function BookingSidebar({ listing }: BookingSidebarProps) {
     );
     const gst = validRange ? round2((base + addonsAmount) * GST_RATE) : 0;
     const total = validRange ? round2(base + addonsAmount + gst) : 0;
-    return { days, base, addonsAmount, gst, total, validRange };
-  }, [startDate, endDate, selected, addons, listing.price_per_day]);
+    return { days, base, addonsAmount, gst, total, validRange, meetsMinimum: days >= minDays };
+  }, [startDate, endDate, selected, addons, listing.price_per_day, minDays]);
 
   async function handleAddToCart() {
     setInlineError(null);
@@ -113,6 +130,11 @@ export function BookingSidebar({ listing }: BookingSidebarProps) {
 
     if (!quote.validRange) {
       setInlineError("Pick a valid start and end date first.");
+      return;
+    }
+
+    if (!quote.meetsMinimum) {
+      setInlineError(`Book at least ${minDays} days for this space.`);
       return;
     }
 
@@ -142,7 +164,7 @@ export function BookingSidebar({ listing }: BookingSidebarProps) {
         ),
       });
     } catch (err) {
-      if (err instanceof ApiError && err.status === 409) {
+      if (err instanceof ApiError && (err.status === 409 || err.status === 422)) {
         setInlineError(typeof err.detail === "string" ? err.detail : "Those dates were just taken.");
       } else if (err instanceof ApiError && err.status === 404) {
         setInlineError("Cart isn't live yet — check back shortly.");
@@ -183,7 +205,7 @@ export function BookingSidebar({ listing }: BookingSidebarProps) {
                   type="date"
                   value={startDate}
                   min={startDate || undefined}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  onChange={(e) => changeStart(e.target.value)}
                   className="rounded-lg bg-surface-container-highest p-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </label>
@@ -192,14 +214,19 @@ export function BookingSidebar({ listing }: BookingSidebarProps) {
                 <input
                   type="date"
                   value={endDate}
-                  min={startDate || undefined}
+                  min={earliestEnd || undefined}
                   onChange={(e) => setEndDate(e.target.value)}
                   className="rounded-lg bg-surface-container-highest p-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </label>
             </div>
+            {minDays > 1 ? (
+              <p className="mt-2 text-[11px] font-bold text-on-surface-variant">Minimum booking: {minDays} days</p>
+            ) : null}
             {startDate && endDate && !quote.validRange ? (
               <p className="mt-2 text-xs text-error">End date must be on or after the start date.</p>
+            ) : startDate && endDate && !quote.meetsMinimum ? (
+              <p className="mt-2 text-xs text-error">Book at least {minDays} days for this space.</p>
             ) : startDate && endDate ? (
               <p className="mt-2 text-[11px] text-on-surface-variant">
                 {quote.days} day{quote.days === 1 ? "" : "s"} selected — {formatIsoDate(startDate)} to{" "}
@@ -252,7 +279,7 @@ export function BookingSidebar({ listing }: BookingSidebarProps) {
             variant="gradient"
             size="lg"
             className="w-full"
-            disabled={submitting || status === "loading" || (Boolean(startDate && endDate) && !quote.validRange)}
+            disabled={submitting || status === "loading" || (Boolean(startDate && endDate) && !quote.meetsMinimum)}
             onClick={handleAddToCart}
           >
             {buttonLabel}

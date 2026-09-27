@@ -233,6 +233,55 @@
       transform: rotate(360deg);
     }
   }
+
+  /* Marketplace map pins (components/marketplace/MapPanel.tsx). Leaflet
+     places the icon's top-left corner on the point; the translate hangs the
+     price label above it instead. */
+  .adspace-map-pin {
+    background: none;
+    border: 0;
+  }
+
+  .adspace-map-pin span {
+    display: inline-block;
+    transform: translate(-50%, calc(-100% - 4px));
+    white-space: nowrap;
+    border: 2px solid #fff;
+    background: var(--color-primary);
+    padding: 2px 6px;
+    font: 700 10px/1.4 var(--font-inter, system-ui), sans-serif;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 8, 30, 0.25);
+  }
+
+  .leaflet-marker-icon:hover .adspace-map-pin span,
+  .adspace-map-pin:hover span {
+    background: var(--color-secondary);
+  }
+
+  .adspace-map-popup {
+    min-width: 160px;
+    font-family: var(--font-inter, system-ui), sans-serif;
+  }
+
+  .adspace-map-popup__title {
+    margin: 0 0 4px;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .adspace-map-popup__price {
+    margin: 0 0 8px;
+    color: var(--color-secondary);
+  }
+
+  .adspace-map-popup__link {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary) !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

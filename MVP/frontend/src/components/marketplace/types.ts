@@ -29,6 +29,10 @@ export interface ListingOut {
   lighting: string | null;
   image_url: string | null;
   extra: ListingExtra | null;
+  /** Shortest bookable window in inclusive days; the cart rejects anything
+   * shorter. Optional because a static snapshot exported before the field
+   * existed does not carry it — treat missing as 1. */
+  min_booking_days?: number;
 }
 
 /** Freeform JSON blob — every key is optional, callers must degrade gracefully. */
