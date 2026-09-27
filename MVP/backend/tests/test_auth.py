@@ -74,3 +74,73 @@ def test_role_guard_rejects_wrong_role():
 
     owner = SimpleNamespace(role=Role.owner)
     assert guard(user=owner) is owner
+
+
+def test_role_guard_lets_admin_through_every_gate():
+    """Admin is a superset of both product roles, so one account can work the
+    owner surfaces and the advertiser surfaces without two logins."""
+    admin = SimpleNamespace(role=Role.admin)
+    for guard in (require_roles(Role.owner), require_roles(Role.advertiser)):
+        assert guard(user=admin) is admin
+
+
+def _password_headers(client, email):
+    login = client.post("/api/v1/auth/login", json={"email": email, "password": "secure-password-123"})
+    assert login.status_code == 200, login.text
+    return {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+
+def test_change_password_rotates_the_credential(actors):
+    client = actors["client"]
+    response = client.post("/api/v1/auth/password", json={
+        "current_password": "secure-password-123", "new_password": "Adspace@2026",
+    }, headers=actors["advertiser"])
+    assert response.status_code == 200, response.text
+
+    # The returned token works straight away, without a re-login round trip.
+    fresh = {"Authorization": f"Bearer {response.json()['access_token']}"}
+    assert client.get("/api/v1/auth/me", headers=fresh).status_code == 200
+
+    assert client.post("/api/v1/auth/login", json={
+        "email": "advertiser@example.com", "password": "Adspace@2026",
+    }).status_code == 200
+    assert client.post("/api/v1/auth/login", json={
+        "email": "advertiser@example.com", "password": "secure-password-123",
+    }).status_code == 401
+
+
+def test_change_password_requires_the_current_one(actors):
+    """A stolen bearer token alone must not be enough to seize the account."""
+    client = actors["client"]
+    response = client.post("/api/v1/auth/password", json={
+        "current_password": "not-the-password", "new_password": "Adspace@2026",
+    }, headers=actors["advertiser"])
+    assert response.status_code == 401
+    # The old credential still works -- nothing was written.
+    assert client.post("/api/v1/auth/login", json={
+        "email": "advertiser@example.com", "password": "secure-password-123",
+    }).status_code == 200
+
+
+def test_change_password_rejects_unauthenticated_and_weak_input(actors):
+    client = actors["client"]
+    assert client.post("/api/v1/auth/password", json={
+        "current_password": "secure-password-123", "new_password": "Adspace@2026",
+    }).status_code == 401  # no bearer token at all
+
+    for bad in ("short7c", "secure-password-123"):  # under 8 chars; unchanged from current
+        assert client.post("/api/v1/auth/password", json={
+            "current_password": "secure-password-123", "new_password": bad,
+        }, headers=actors["advertiser"]).status_code == 422
+
+
+def test_change_password_only_ever_touches_the_caller(actors):
+    """Even an admin cannot aim this at another account -- there is no target field."""
+    client = actors["client"]
+    assert client.post("/api/v1/auth/password", json={
+        "current_password": "secure-password-123", "new_password": "Adspace@2026",
+    }, headers=actors["admin"]).status_code == 200
+    # The owner's credential is untouched by the admin's rotation.
+    assert client.post("/api/v1/auth/login", json={
+        "email": "owner@example.com", "password": "secure-password-123",
+    }).status_code == 200

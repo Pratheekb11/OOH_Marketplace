@@ -30,6 +30,7 @@ from app.schemas import (
     ListingUpdate,
     LoginRequest,
     OwnerBookingOut,
+    PasswordChangeRequest,
     PaymentDetailOut,
     RegisterRequest,
     Token,
@@ -82,6 +83,28 @@ def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)
 @app.get("/api/v1/auth/me", response_model=UserOut)
 def me(user: User = Depends(current_user)):
     return user
+
+
+@app.post("/api/v1/auth/password", response_model=Token)
+@limiter.limit("5/minute")
+def change_password(request: Request, payload: PasswordChangeRequest, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Rotate the caller's own password and hand back a fresh token.
+
+    Rate-limited like login and register, since the current-password check makes this
+    an online guessing oracle otherwise. Only ever touches `user` -- the account the
+    bearer token resolved to -- so there is no way to aim it at somebody else, not even
+    for an admin.
+
+    Previously issued tokens stay valid until they expire: they carry no password
+    reference and the JWTs are stateless, so there is nothing to revoke. Real session
+    invalidation needs a token version column, which is out of scope for the POC.
+    """
+    if not password_context.verify(payload.current_password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
+    user.password_hash = password_context.hash(payload.new_password)
+    db.commit()
+    db.refresh(user)
+    return Token(access_token=create_token(user))
 
 # Later agents append listing/cart/checkout routes below.
 

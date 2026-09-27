@@ -40,8 +40,17 @@ def current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer), db
 
 
 def require_roles(*roles: Role):
+    """Guard a route on a set of roles, with admin as a superset of all of them.
+
+    An admin passes every role gate so a single account can work both halves of
+    the product -- the owner surfaces (/owner/*, listing submission) and the
+    advertiser surfaces (cart, checkout, /bookings). The endpoints themselves
+    still scope their queries by the caller's own id, so an admin sees its own
+    listings, cart and bookings rather than everybody's; this widens *access*,
+    never the blast radius of a single query.
+    """
     def checker(user: User = Depends(current_user)) -> User:
-        if user.role not in roles:
+        if user.role is not Role.admin and user.role not in roles:
             raise HTTPException(status_code=403, detail="Insufficient permissions")
         return user
     return checker

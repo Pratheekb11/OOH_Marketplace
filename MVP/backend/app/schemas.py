@@ -22,6 +22,20 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class PasswordChangeRequest(BaseModel):
+    """Self-service password change. `current_password` is required even though the
+    caller already holds a valid bearer token: a stolen token should not be enough to
+    lock the real owner out of their own account."""
+    current_password: str
+    new_password: str = Field(min_length=8, max_length=128)
+
+    @model_validator(mode="after")
+    def _must_differ(self):
+        if self.new_password == self.current_password:
+            raise ValueError("new_password must differ from current_password")
+        return self
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

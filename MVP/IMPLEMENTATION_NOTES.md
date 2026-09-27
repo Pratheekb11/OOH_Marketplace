@@ -157,7 +157,7 @@ stays in `app/main.py`.
 
 | Table | Lifecycle | Notes |
 | --- | --- | --- |
-| `users` | — | `role` is `advertiser` \| `owner` \| `admin` (enforced in route dependencies, not at the DB level). |
+| `users` | — | `role` is `advertiser` \| `owner` \| `admin` (enforced in route dependencies, not at the DB level). `admin` is a **superset of the other two**: `require_roles` lets it through every role gate, and `RequireRole` on the frontend mirrors that, so one admin account can work the owner surfaces and the advertiser surfaces. No route is gated on `admin` *alone* — it grants reach, not extra data: every endpoint still scopes its query to the caller's own id, so an admin sees its own listings/cart/bookings, never everybody's. |
 | `listings` | `pending_approval` → `active` → `archived` (soft delete); `rejected`/`paused` exist in the enum but are unused — every submission auto-approves to `active`. | `DELETE` always archives + purges referencing cart rows in the same transaction (see below). |
 | `cart_items` | ephemeral — created on add-to-cart, replaced on edit, deleted on remove/checkout/clear. | Unique on `(user_id, listing_id, start_date, end_date)`; add-to-cart is idempotent against that. Stores add-on **codes**, not prices. |
 | `bookings` | created `booked` directly at checkout (no `pending_payment` hop — see below); `active`/`cancelled` exist but nothing transitions to them yet. | Stores a **price snapshot** (`base_amount`, `addons_amount`, `gst_amount`, `total_amount`) — the immutable record of what was charged. |
