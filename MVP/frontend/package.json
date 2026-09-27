@@ -10,7 +10,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "next": "15.5.22",
+    "next": "15.5.26",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "zod": "^4.4.3"
@@ -24,7 +24,7 @@
     "@types/react-dom": "^19",
     "autoprefixer": "^10.5.4",
     "eslint": "^9",
-    "eslint-config-next": "15.5.22",
+    "eslint-config-next": "15.5.26",
     "postcss": "^8.5.25",
     "tailwindcss": "^3.4.19",
     "typescript": "^5"
