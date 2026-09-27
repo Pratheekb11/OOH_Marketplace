@@ -17,11 +17,13 @@ const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 /** Central Bengaluru, used only until the first result set arrives. */
 const INITIAL_VIEW: [number, number] = [12.9716, 77.5946];
 
-// CARTO's light basemap: greyscale, so the navy pins carry the page, and free
-// for this volume with the attribution below.
-const TILE_URL = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
-const TILE_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+// OpenStreetMap's standard tiles: keyless, and fine for this traffic under
+// OSM's tile usage policy as long as the attribution stays visible. CARTO's
+// basemaps were tried first and now answer an unregistered site with an
+// "API KEY REQUIRED" tile. The .adspace-map-tiles filter in globals.css
+// greys them so the navy pins carry the page.
+const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 /** Popup body built as DOM nodes, so a title is always text and never markup. */
 function popupContent(point: MapPoint): HTMLElement {
@@ -71,7 +73,7 @@ export function MapPanel({ listings, className = "" }: MapPanelProps) {
       if (cancelled || !containerRef.current) return;
 
       const map = L.map(containerRef.current, { scrollWheelZoom: false }).setView(INITIAL_VIEW, 11);
-      L.tileLayer(TILE_URL, { attribution: TILE_ATTRIBUTION, maxZoom: 19, subdomains: "abcd" }).addTo(map);
+      L.tileLayer(TILE_URL, { attribution: TILE_ATTRIBUTION, maxZoom: 19, className: "adspace-map-tiles" }).addTo(map);
 
       leafletRef.current = L;
       mapRef.current = map;
@@ -121,20 +123,26 @@ export function MapPanel({ listings, className = "" }: MapPanelProps) {
 
   return (
     <section
-      className={`relative isolate hidden overflow-hidden border-l border-surface-container bg-surface-container-high md:block ${className}`}
+      className={`relative isolate hidden overflow-clip border-l border-surface-container bg-surface-container-high md:block ${className}`}
       aria-label="Map of results"
     >
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* The section stretches to the full height of the results column (the
+          page scrolls, not the pane), so the map itself is pinned to the
+          viewport below the sticky filter bar; otherwise fitBounds would
+          frame the pins across thousands of pixels, mostly off-screen. */}
+      <div className="sticky top-24 h-[calc(100vh-6rem)]">
+        <div ref={containerRef} className="absolute inset-0" />
 
-      {listings.length > 0 && points.length === 0 ? (
-        <div className="pointer-events-none absolute inset-x-6 top-6 z-[1000] border border-border-subtle bg-white px-4 py-3 text-xs text-on-surface-variant">
-          No mapped locations for these results yet.
-        </div>
-      ) : unmapped > 0 ? (
-        <div className="pointer-events-none absolute bottom-6 left-6 z-[1000] border border-border-subtle bg-white px-3 py-2 text-[11px] text-on-surface-variant">
-          {points.length.toLocaleString("en-IN")} of {listings.length.toLocaleString("en-IN")} shown on the map
-        </div>
-      ) : null}
+        {listings.length > 0 && points.length === 0 ? (
+          <div className="pointer-events-none absolute inset-x-6 top-6 z-[1000] border border-border-subtle bg-white px-4 py-3 text-xs text-on-surface-variant">
+            No mapped locations for these results yet.
+          </div>
+        ) : unmapped > 0 ? (
+          <div className="pointer-events-none absolute bottom-6 left-6 z-[1000] border border-border-subtle bg-white px-3 py-2 text-[11px] text-on-surface-variant">
+            {points.length.toLocaleString("en-IN")} of {listings.length.toLocaleString("en-IN")} shown on the map
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }
