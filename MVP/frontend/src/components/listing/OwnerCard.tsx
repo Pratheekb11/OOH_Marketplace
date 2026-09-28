@@ -1,4 +1,4 @@
-import Button from "@/components/ui/Button";
+import CallbackButton from "@/components/leads/CallbackButton";
 import Icon from "@/components/ui/Icon";
 import type { ListingOut } from "@/components/marketplace/types";
 
@@ -30,12 +30,16 @@ export function OwnerCard({ listing }: OwnerCardProps) {
         ) : null}
         <p className="text-sm leading-relaxed text-on-surface-variant">
           Owner contact details are shared once a booking is confirmed. Questions about this space before
-          then go through our support team.
+          then: leave your number and our team will call you back.
         </p>
       </div>
-      <Button href="/support" variant="primary">
+      <CallbackButton
+        reason={`Enquiry: ${listing.title}`}
+        listingId={listing.id}
+        className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-xs font-bold uppercase tracking-widest text-white transition-smooth hover:bg-secondary"
+      >
         Ask About This Space
-      </Button>
+      </CallbackButton>
     </section>
   );
 }

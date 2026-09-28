@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import NavShellA from "@/components/layout/NavShellA";
+import CallbackButton from "@/components/leads/CallbackButton";
 
 // Server Component. Ported from login_Page.html's slim page-footer bar
 // (lines ~176-189) — deliberately NOT the full <SiteFooter/> (that's a
@@ -17,8 +18,9 @@ function AuthFooterBar() {
             &copy; {new Date().getFullYear()} AdSpace. All rights reserved.
           </span>
         </div>
-        {/* No dedicated legal/contact pages exist in this build — all four
-            route to /support rather than "#", consistent with SiteFooter. */}
+        {/* No dedicated legal pages exist in this build — those three route
+            to /support rather than "#", consistent with SiteFooter. Contact
+            Sales opens the call-back form. */}
         <div className="flex gap-8">
           <Link href="/support" className="text-slate-500 transition-colors hover:text-secondary-container">
             Privacy Policy
@@ -29,9 +31,9 @@ function AuthFooterBar() {
           <Link href="/support" className="text-slate-500 transition-colors hover:text-secondary-container">
             Cookie Settings
           </Link>
-          <Link href="/support" className="text-slate-500 transition-colors hover:text-secondary-container">
+          <CallbackButton reason="Contact Sales" className="text-slate-500 transition-colors hover:text-secondary-container">
             Contact Sales
-          </Link>
+          </CallbackButton>
         </div>
       </div>
     </footer>

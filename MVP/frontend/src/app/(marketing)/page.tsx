@@ -3,6 +3,7 @@ import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import CountUp from "@/components/marketing/CountUp";
 import Reveal from "@/components/marketing/Reveal";
+import CallbackButton from "@/components/leads/CallbackButton";
 
 // Landing page — a port of the prototype's Ui_Prototype_MVP_Prep/index.html.
 //
@@ -197,12 +198,9 @@ export default function LandingPage() {
                     className="!text-base transition-transform group-hover:translate-x-1"
                   />
                 </Link>
-                <Link
-                  href="/support"
-                  className="inline-flex items-center border border-primary px-10 py-4 font-inter text-xs font-bold uppercase tracking-[0.15em] text-primary transition-all hover:bg-primary hover:text-white"
-                >
+                <CallbackButton reason="Request Proposal" className="inline-flex items-center border border-primary px-10 py-4 font-inter text-xs font-bold uppercase tracking-[0.15em] text-primary transition-all hover:bg-primary hover:text-white">
                   Request Proposal
-                </Link>
+                </CallbackButton>
               </div>
             </div>
 
@@ -466,12 +464,9 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/support"
-                  className="w-full border border-primary bg-white py-5 text-center font-inter text-xs font-bold uppercase tracking-[0.2em] text-primary transition-all hover:bg-primary hover:text-white"
-                >
+                <CallbackButton reason="Service Quotation" className="w-full border border-primary bg-white py-5 text-center font-inter text-xs font-bold uppercase tracking-[0.2em] text-primary transition-all hover:bg-primary hover:text-white">
                   Service Quotation
-                </Link>
+                </CallbackButton>
               </div>
             </Reveal>
           </div>
@@ -525,12 +520,9 @@ export default function LandingPage() {
             >
               Start Listing Your Space
             </Link>
-            <Link
-              href="/support"
-              className="inline-block border-2 border-accent px-10 py-5 font-inter text-xs font-bold uppercase tracking-[0.15em] text-accent transition-all hover:bg-accent hover:text-[#0a1f44] sm:px-12"
-            >
+            <CallbackButton reason="Schedule Demo Call" className="inline-block border-2 border-accent px-10 py-5 font-inter text-xs font-bold uppercase tracking-[0.15em] text-accent transition-all hover:bg-accent hover:text-[#0a1f44] sm:px-12">
               Schedule Demo Call
-            </Link>
+            </CallbackButton>
           </Reveal>
         </div>
 
@@ -554,12 +546,9 @@ export default function LandingPage() {
             >
               Explore Placements
             </Link>
-            <Link
-              href="/support"
-              className="inline-flex items-center justify-center border border-primary px-10 py-5 font-inter text-xs font-bold uppercase tracking-[0.2em] text-primary transition-all hover:bg-primary hover:text-white sm:px-12"
-            >
+            <CallbackButton reason="Speak to an Advisor" className="inline-flex items-center justify-center border border-primary px-10 py-5 font-inter text-xs font-bold uppercase tracking-[0.2em] text-primary transition-all hover:bg-primary hover:text-white sm:px-12">
               Speak to an Advisor
-            </Link>
+            </CallbackButton>
           </div>
         </Reveal>
 

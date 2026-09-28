@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import Button from "@/components/ui/Button";
+import CallbackButton from "@/components/leads/CallbackButton";
 
 export const metadata = {
   title: "Partnerships | AdSpace",
@@ -207,13 +208,10 @@ export default function PartnershipsPage() {
                 <div className="font-headline text-5xl font-black">
                   12%<span className="ml-2 text-xl font-normal text-on-primary-container">Rebate Floor</span>
                 </div>
-                <Link
-                  href="/support"
-                  aria-label="Learn more about agency rebates"
-                  className="flex items-center justify-center rounded-full bg-secondary p-4"
-                >
+                <CallbackButton reason="Agency Rebates" className="flex items-center justify-center rounded-full bg-secondary p-4">
+                  <span className="sr-only">Ask about agency rebates</span>
                   <Icon name="arrow_forward" className="text-white" />
-                </Link>
+                </CallbackButton>
               </div>
             </div>
 

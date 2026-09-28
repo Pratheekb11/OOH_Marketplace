@@ -191,6 +191,18 @@ hero load sequence via `.rise`, the prototype's counter-rotating rings
 hero stat. Every one is neutralised under `prefers-reduced-motion` in
 `globals.css` — keep new animation in that block.
 
+## Call-back requests (leads)
+
+Contact CTAs ("Request Proposal", "Service Quotation", "Speak to an Advisor",
+"Contact Sales", "Ask About This Space", …) render
+`components/leads/CallbackButton.tsx`, not a link to `/support`: a
+name/phone/reason dialog whose reason is prefilled from the button and stays
+editable. It posts to public, rate-limited `POST /api/v1/leads` in
+`MVP/backend`; admins read the queue at `GET /api/v1/leads`. Rows are stored
+with `crm_status="pending"`. The CRM is not connected yet: implement
+`push_lead` in `MVP/backend/app/crm.py` (it returns the CRM's id, and the route
+then marks the row `synced`), and backfill anything still `pending`.
+
 ## Frontend/backend wiring
 
 `Ui_Prototype_MVP_Prep/js/api.js` is the only integration point so far: a tiny `api(path, options)` helper that reads `window.OOH_API_BASE_URL` (default `http://127.0.0.1:8000/api/v1`), attaches the JWT from `localStorage` (`adspace_access_token`), and throws on non-OK responses. `login_Page.html` is the only page currently wired to it (posts to `/auth/login`, stores the token, redirects to `listing_page.html`).

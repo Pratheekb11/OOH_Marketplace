@@ -109,3 +109,21 @@ class Payment(Timestamped, Base):
     status: Mapped[PaymentStatus] = mapped_column(Enum(PaymentStatus, native_enum=False, length=30), default=PaymentStatus.created)
     provider_order_id: Mapped[str] = mapped_column(String(100), unique=True)
     method_label: Mapped[str] = mapped_column(String(40), default="Dummy Card")
+
+
+class Lead(Timestamped, Base):
+    """A call-back request from one of the site's contact CTAs.
+
+    `crm_status` starts at "pending" and stays there until a CRM sync pushes
+    the row (see app/crm.py); `crm_ref` then holds the CRM's own id for it.
+    """
+    __tablename__ = "leads"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(120))
+    phone: Mapped[str] = mapped_column(String(30))
+    reason: Mapped[str] = mapped_column(String(500))
+    source: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    listing_id: Mapped[int | None] = mapped_column(ForeignKey("listings.id"), nullable=True, index=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    crm_status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
+    crm_ref: Mapped[str | None] = mapped_column(String(100), nullable=True)

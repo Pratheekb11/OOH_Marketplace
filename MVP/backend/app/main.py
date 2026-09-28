@@ -11,9 +11,21 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
+from app.crm import push_lead
 from app.database import get_db
 from app.images import public_image_url
-from app.models import Booking, BookingStatus, CartItem, Listing, ListingStatus, Payment, PaymentStatus, Role, User
+from app.models import (
+    Booking,
+    BookingStatus,
+    CartItem,
+    Lead,
+    Listing,
+    ListingStatus,
+    Payment,
+    PaymentStatus,
+    Role,
+    User,
+)
 from app.pricing import ADDON_CATALOG, inclusive_days, min_booking_days, quote_cart, quote_line
 from app.schemas import (
     AddonOut,
@@ -24,6 +36,8 @@ from app.schemas import (
     CartResponse,
     CheckoutRequest,
     CheckoutResponse,
+    LeadCreate,
+    LeadOut,
     ListingCreate,
     ListingFacets,
     ListingOut,
@@ -605,3 +619,28 @@ def list_bookings(advertiser: User = Depends(require_roles(Role.advertiser)), db
 @app.get("/api/v1/addons", response_model=list[AddonOut])
 def list_addons():
     return [{"code": code, **data} for code, data in ADDON_CATALOG.items()]
+
+
+
+@app.post("/api/v1/leads", response_model=LeadOut, status_code=status.HTTP_201_CREATED)
+@limiter.limit("5/minute")
+def create_lead(request: Request, payload: LeadCreate, viewer: User | None = Depends(optional_user), db: Session = Depends(get_db)):
+    """Public on purpose: most people asking for a call back have no account.
+    A signed-in caller is attached so sales can see who they are; a stale token
+    is ignored rather than turning a sales enquiry into a 401."""
+    if payload.listing_id is not None and db.get(Listing, payload.listing_id) is None:
+        raise HTTPException(status_code=422, detail="Listing not found")
+    lead = Lead(**payload.model_dump(), user_id=viewer.id if viewer else None)
+    db.add(lead)
+    db.commit()
+    crm_ref = push_lead(lead)
+    if crm_ref:
+        lead.crm_status, lead.crm_ref = "synced", crm_ref
+        db.commit()
+    db.refresh(lead)
+    return lead
+
+
+@app.get("/api/v1/leads", response_model=list[LeadOut])
+def list_leads(admin: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)):
+    return db.scalars(select(Lead).order_by(Lead.created_at.desc(), Lead.id.desc())).all()

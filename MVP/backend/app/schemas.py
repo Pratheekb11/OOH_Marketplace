@@ -1,6 +1,8 @@
+import re
 from datetime import date, datetime
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, field_validator, model_validator
 
 from app.images import public_image_url
 from app.models import BookingStatus, ListingStatus, PaymentStatus, Role
@@ -262,3 +264,36 @@ class PaymentOut(ORMModel):
 
 class PaymentDetailOut(PaymentOut):
     bookings: list[BookingOut]
+
+
+#: Digits plus the separators people actually type: "+91 98450-12345", "(080) 41234567".
+_PHONE_CHARS = re.compile(r"^\+?[0-9\s\-()]+$")
+
+
+class LeadCreate(BaseModel):
+    """A call-back request. `reason` arrives prefilled from the button the
+    visitor clicked ("Service Quotation") and may have been edited."""
+    name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=2, max_length=120)]
+    phone: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=30)]
+    reason: Annotated[str, StringConstraints(strip_whitespace=True, min_length=2, max_length=500)]
+    source: Annotated[str, StringConstraints(strip_whitespace=True, max_length=255)] | None = None
+    listing_id: int | None = None
+
+    @field_validator("phone")
+    @classmethod
+    def _phone_shape(cls, value: str) -> str:
+        digits = sum(ch.isdigit() for ch in value)
+        if not _PHONE_CHARS.match(value) or not 10 <= digits <= 15:
+            raise ValueError("enter a valid phone number (10-15 digits)")
+        return value
+
+
+class LeadOut(ORMModel):
+    id: int
+    name: str
+    phone: str
+    reason: str
+    source: str | None
+    listing_id: int | None
+    crm_status: str
+    created_at: datetime
