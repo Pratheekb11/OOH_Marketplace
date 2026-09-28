@@ -162,3 +162,17 @@ describe("MapPanel (P0-4)", () => {
     expect(leaflet.record.remove?.length ?? 0).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe("MapPanel directions", () => {
+  it("offers turn-by-turn directions from each marker's popup", async () => {
+    render(<MapPanel listings={[listing(42, { latitude: 12.97, longitude: 77.59 }, "MG Road Unipole")]} />);
+    await waitFor(() => expect(leaflet.record.bindPopup?.length ?? 0).toBeGreaterThanOrEqual(1));
+    const popup = leaflet.record.bindPopup[0][0] as HTMLElement;
+    const link = [...popup.querySelectorAll("a")].find((a) => /navigate/i.test(a.textContent ?? ""));
+    expect(link).toBeTruthy();
+    const url = new URL(link!.getAttribute("href")!);
+    expect(url.hostname).toBe("www.google.com");
+    expect(url.searchParams.get("destination")).toBe("12.97,77.59");
+    expect(link!.getAttribute("target")).toBe("_blank");
+  });
+});
