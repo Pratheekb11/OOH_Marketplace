@@ -130,23 +130,34 @@ def test_returning_google_user_signs_in_and_keeps_their_role(google):
 
 
 def test_google_email_matching_a_password_account_links_to_it(google):
+    """Registration never proves the email, so whoever set that password may not
+    own the inbox. Google does prove it: linking takes the account over for the
+    verified owner, drops the unproven password and ends its sessions."""
     test_client, session_factory = google
     registered = test_client.post(
         "/api/v1/auth/register",
         json={"email": "asha@example.com", "full_name": "Asha R", "password": "secure-password-123", "role": "owner"},
     )
     assert registered.status_code == 201, registered.text
+    password_token = test_client.post(
+        "/api/v1/auth/login", json={"email": "asha@example.com", "password": "secure-password-123"},
+    ).json()["access_token"]
     response = post(test_client, id_token())
     assert response.status_code == 200, response.text
     assert response.json()["needs_role"] is False
     profile = me(test_client, response.json()["access_token"]).json()
     assert profile["id"] == registered.json()["id"]
     assert profile["role"] == "owner"
-    # The password keeps working alongside Google.
+    # The pre-set password no longer opens the account, and a token issued
+    # against it is dead: an attacker who registered the victim's email first
+    # is locked out the moment the real owner signs in with Google.
     login = test_client.post("/api/v1/auth/login", json={"email": "asha@example.com", "password": "secure-password-123"})
-    assert login.status_code == 200, login.text
+    assert login.status_code == 401, login.text
+    assert me(test_client, password_token).status_code == 401
     with session_factory() as db:
-        assert db.scalar(select(User).where(User.email == "asha@example.com")).google_sub == "google-sub-123"
+        user = db.scalar(select(User).where(User.email == "asha@example.com"))
+        assert user.google_sub == "google-sub-123"
+        assert user.password_hash is None
 
 
 def test_email_is_matched_case_insensitively(google):

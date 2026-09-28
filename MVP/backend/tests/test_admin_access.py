@@ -6,7 +6,7 @@ the owner gates and the advertiser gates. The endpoints still scope their
 queries by the caller's own id, which is what the isolation assertions below
 pin down -- widening access must not turn into seeing everybody's rows.
 """
-from tests.conftest import register
+from tests.conftest import create_admin
 from tests.test_checkout import add_to_cart
 from tests.test_listings import create_listing
 
@@ -65,5 +65,5 @@ def test_non_admin_role_gates_still_reject(actors):
     assert client.get("/api/v1/cart", headers=actors["owner"]).status_code == 403
     assert client.get("/api/v1/bookings", headers=actors["owner"]).status_code == 403
 
-    other_admin = register(client, "second-admin@example.com", "admin")
+    other_admin = create_admin(client, actors["session_factory"], "second-admin@example.com")
     assert client.get("/api/v1/owner/listings", headers=other_admin).status_code == 200

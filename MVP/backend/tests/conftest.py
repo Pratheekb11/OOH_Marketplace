@@ -43,6 +43,18 @@ def register(client, email, role):
     return {"Authorization": f"Bearer {login.json()['access_token']}"}
 
 
+def create_admin(client, session_factory, email):
+    """Admins cannot self-register, so tests seed one straight into the DB."""
+    from app.models import Role, User
+    from app.security import password_context
+    with session_factory() as db:
+        db.add(User(email=email, full_name="Admin", password_hash=password_context.hash("secure-password-123"), role=Role.admin))
+        db.commit()
+    login = client.post("/api/v1/auth/login", json={"email": email, "password": "secure-password-123"})
+    assert login.status_code == 200, login.text
+    return {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+
 @pytest.fixture
 def actors(client):
     test_client, session_factory = client
@@ -52,5 +64,5 @@ def actors(client):
         "advertiser": register(test_client, "advertiser@example.com", "advertiser"),
         "second_advertiser": register(test_client, "second@example.com", "advertiser"),
         "owner": register(test_client, "owner@example.com", "owner"),
-        "admin": register(test_client, "admin@example.com", "admin"),
+        "admin": create_admin(test_client, session_factory, "admin@example.com"),
     }

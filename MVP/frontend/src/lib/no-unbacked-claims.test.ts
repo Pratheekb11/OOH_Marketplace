@@ -16,6 +16,8 @@ const BANNED = [
   "primary leasing rights",
   "hundreds of media owners",
   "bengaluru-static.png",
+  // Demo passwords must never be published on the site.
+  "password123",
 ];
 
 function sourceFiles(dir: string): string[] {

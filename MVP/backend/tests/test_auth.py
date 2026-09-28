@@ -93,7 +93,7 @@ def _password_headers(client, email):
 def test_change_password_rotates_the_credential(actors):
     client = actors["client"]
     response = client.post("/api/v1/auth/password", json={
-        "current_password": "secure-password-123", "new_password": "***REMOVED***",
+        "current_password": "secure-password-123", "new_password": "rotated-password-456",
     }, headers=actors["advertiser"])
     assert response.status_code == 200, response.text
 
@@ -102,7 +102,7 @@ def test_change_password_rotates_the_credential(actors):
     assert client.get("/api/v1/auth/me", headers=fresh).status_code == 200
 
     assert client.post("/api/v1/auth/login", json={
-        "email": "advertiser@example.com", "password": "***REMOVED***",
+        "email": "advertiser@example.com", "password": "rotated-password-456",
     }).status_code == 200
     assert client.post("/api/v1/auth/login", json={
         "email": "advertiser@example.com", "password": "secure-password-123",
@@ -113,7 +113,7 @@ def test_change_password_requires_the_current_one(actors):
     """A stolen bearer token alone must not be enough to seize the account."""
     client = actors["client"]
     response = client.post("/api/v1/auth/password", json={
-        "current_password": "not-the-password", "new_password": "***REMOVED***",
+        "current_password": "not-the-password", "new_password": "rotated-password-456",
     }, headers=actors["advertiser"])
     assert response.status_code == 401
     # The old credential still works -- nothing was written.
@@ -125,7 +125,7 @@ def test_change_password_requires_the_current_one(actors):
 def test_change_password_rejects_unauthenticated_and_weak_input(actors):
     client = actors["client"]
     assert client.post("/api/v1/auth/password", json={
-        "current_password": "secure-password-123", "new_password": "***REMOVED***",
+        "current_password": "secure-password-123", "new_password": "rotated-password-456",
     }).status_code == 401  # no bearer token at all
 
     for bad in ("short7c", "secure-password-123"):  # under 8 chars; unchanged from current
@@ -138,7 +138,7 @@ def test_change_password_only_ever_touches_the_caller(actors):
     """Even an admin cannot aim this at another account -- there is no target field."""
     client = actors["client"]
     assert client.post("/api/v1/auth/password", json={
-        "current_password": "secure-password-123", "new_password": "***REMOVED***",
+        "current_password": "secure-password-123", "new_password": "rotated-password-456",
     }, headers=actors["admin"]).status_code == 200
     # The owner's credential is untouched by the admin's rotation.
     assert client.post("/api/v1/auth/login", json={
