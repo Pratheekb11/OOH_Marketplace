@@ -8,3 +8,4 @@
 ruff==0.16.3          # lint + import order, config in the repo-root ruff.toml
 bandit==1.9.4         # Python security linter (medium severity and up)
 pip-audit==2.10.1     # known-vulnerability audit of the pinned requirements
+pillow==12.3.0        # scripts/import_scraped.py downsizes photos; local-only, not a runtime dep

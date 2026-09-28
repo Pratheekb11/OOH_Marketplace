@@ -54,12 +54,10 @@ function GallerySlot({
 }
 
 /**
- * Ported from listing_view.html's 4-tile bento gallery. Only the
- * MG Road Premium Unipole seed listing has extra gallery images beyond its
- * card thumbnail (2 of them — a 3rd rotted and was never downloaded, see
- * build brief); every other listing only has the one marketplace-card
- * image. Both cases degrade the same way: missing/broken slots render a
- * branded placeholder instead of a broken-image glyph.
+ * Ported from listing_view.html's 4-tile bento gallery. Fed by
+ * `galleryImages` (lib/gallery.ts): up to four site photos, cover first. Most
+ * listings have one, so missing/broken slots render a branded placeholder
+ * instead of a broken-image glyph.
  */
 export function BentoGallery({ images, title }: BentoGalleryProps) {
   const slots: (string | null)[] = [images[0] ?? null, images[1] ?? null, images[2] ?? null, images[3] ?? null];

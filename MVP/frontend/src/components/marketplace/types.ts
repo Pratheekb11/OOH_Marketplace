@@ -28,6 +28,9 @@ export interface ListingOut {
   rejection_reason: string | null;
   lighting: string | null;
   image_url: string | null;
+  /** Every photo, cover first. Optional: a static snapshot exported before
+   * galleries existed carries only `image_url`. */
+  image_urls?: string[];
   extra: ListingExtra | null;
   /** Shortest bookable window in inclusive days; the cart rejects anything
    * shorter. Optional because a static snapshot exported before the field

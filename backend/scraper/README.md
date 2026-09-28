@@ -121,10 +121,15 @@ API re-shuffling.
 rate; `minimumBilling` is that rate times the minimum span (verified:
 28333 × 7 = 198331). Without `--details` there is no rate at all.
 
-Images: each media has at most **one** site photograph, in the `logo` field
-under a `/medias/` path. Records whose `logo` points at `/uploads/mediaLogos/`
-carry only a media-owner brand mark — those are recorded in
-`extra.owner_logo` with a warning, not collected as inventory photos.
+Images: the site photographs are the `referenceArtworks` of the media's own
+option in the detail payload (the Printing/Mounting options carry generic
+sample art shared by every listing). They are published at camera resolution
+(3200x2400 observed), so the adapter asks the CDN for `?tx=w_1280,c_limit`,
+which downscales and never upscales. A listing may have several (13 of 2150
+had 2-4). `logo` is only the fallback: usually the site's 300x125 preview.
+One "Images shown are for reference only" placeholder is attached to 11
+unrelated listings; `MVP/backend/scripts/import_scraped.py` drops any photo
+three or more listings share.
 
 ## Observed on Bangalore (Aug 2026)
 
@@ -136,18 +141,15 @@ carry only a media-owner brand mark — those are recorded in
 | got | 1101 | 742 | 151 | 124 | 21 | 5 | 2 |
 | advertised | 1101 | 739 | 151 | 124 | 21 | 5 | 2 |
 
-Field coverage: lat/lng 2146, daily rate 2114, footfall 1441, dimensions 964,
-site photograph 48.
+Field coverage: lat/lng 2146, daily rate 2114, footfall 1441, dimensions 964.
 
 Two source-side limitations worth knowing before planning around this data:
 
 - **Bus shelters publish no dimensions** — 0 of 1101 carry a size, only a
   `size_bucket` of Small/Medium/Large. That is the single reason only ~943
   records are importable; everything else about them is complete.
-- **Photographs are rare.** 1703 records expose only a media-owner brand mark
-  (`extra.owner_logo`) rather than a picture of the site. There is at most one
-  photo per media and no gallery, so 48 images is the real ceiling here, not a
-  scraper limitation.
+- **Photographs (re-scrape, Sep 2026):** 2146 of 2150 records have a full-size
+  reference photo; ~4% of sites publish nothing over 500px.
 
 ## Conduct
 
