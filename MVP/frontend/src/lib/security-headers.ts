@@ -12,13 +12,18 @@
  *     the endpoints the button calls (popup mode; see GoogleAuthButton).
  *   - OpenStreetMap tiles for the marketplace map (MapPanel).
  *   - Material Symbols, the one font still loaded from Google Fonts.
- *   - The API, which is a separate origin in production
- *     (NEXT_PUBLIC_API_BASE_URL, see DEPLOY_VERCEL.md).
+ *   - The API, when NEXT_PUBLIC_API_BASE_URL is an absolute URL (local dev).
+ *     Production sets the relative "/api/v1", proxied by vercel.json's
+ *     rewrite, so the browser never leaves this origin there.
  */
 const LOCAL_API = "http://127.0.0.1:8000/api/v1";
 const GOOGLE_SIGN_IN = "https://accounts.google.com/gsi/";
 
+/** The API's origin for connect-src, or "" when it is this site's own origin:
+ * production uses the relative "/api/v1" behind vercel.json's rewrite, which
+ * 'self' already covers. */
 function origin(url: string | undefined): string {
+  if (url?.startsWith("/")) return "";
   try {
     return new URL(url || LOCAL_API).origin;
   } catch {
@@ -39,7 +44,7 @@ export function securityHeaders({ dev, apiBaseUrl }: SecurityHeaderOptions): { k
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com ${GOOGLE_SIGN_IN}style`,
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https://tile.openstreetmap.org https://*.tile.openstreetmap.org",
-    `connect-src 'self' ${origin(apiBaseUrl)} ${GOOGLE_SIGN_IN}${dev ? " ws: wss:" : ""}`,
+    ["connect-src 'self'", origin(apiBaseUrl), GOOGLE_SIGN_IN, dev ? "ws: wss:" : ""].filter(Boolean).join(" "),
     `frame-src ${GOOGLE_SIGN_IN}`,
     "object-src 'none'",
     "base-uri 'self'",
