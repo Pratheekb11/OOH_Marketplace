@@ -98,3 +98,15 @@ describe("next.config", () => {
     expect(headers["x-frame-options"]).toBe("DENY");
   });
 });
+
+describe("securityHeaders (API behind the site's own /api/v1 rewrite)", () => {
+  // Production sets NEXT_PUBLIC_API_BASE_URL to the relative "/api/v1": the
+  // browser only ever talks to this origin, which 'self' already covers.
+  const csp = directives(asMap(securityHeaders({ dev: false, apiBaseUrl: "/api/v1" }))["content-security-policy"]);
+
+  it("adds no other origin for a relative base URL", () => {
+    expect(csp["connect-src"]).toContain("'self'");
+    expect(csp["connect-src"]).toContain("https://accounts.google.com/gsi/");
+    expect(csp["connect-src"].join(" ")).not.toMatch(/127\.0\.0\.1|localhost|http:/);
+  });
+});
