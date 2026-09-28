@@ -2,6 +2,8 @@
 import password_context without constructing the whole FastAPI app as an import
 side effect.
 """
+import hashlib
+import hmac
 from datetime import datetime, timedelta, timezone
 
 from fastapi import Depends, HTTPException
@@ -22,8 +24,23 @@ bearer = HTTPBearer()
 limiter = Limiter(key_func=get_remote_address)
 
 
+def credential_stamp(user: User) -> str:
+    """A fingerprint of the account's current credential, carried in every token.
+
+    JWTs are stateless, so this is what lets a token die early: changing the
+    password, or Google taking over an account and dropping its password,
+    changes the stamp and every token issued before it stops matching.
+    """
+    return hmac.new(settings.secret_key.encode(), (user.password_hash or "").encode(), hashlib.sha256).hexdigest()[:32]
+
+
 def create_token(user: User) -> str:
-    payload = {"sub": str(user.id), "role": user.role.value, "exp": datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_expire_minutes)}
+    payload = {
+        "sub": str(user.id),
+        "role": user.role.value,
+        "cs": credential_stamp(user),
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_expire_minutes),
+    }
     return jwt.encode(payload, settings.secret_key, algorithm="HS256")
 
 
@@ -31,11 +48,14 @@ def current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer), db
     try:
         payload = jwt.decode(credentials.credentials, settings.secret_key, algorithms=["HS256"])
         user_id = int(payload["sub"])
+        stamp = str(payload["cs"])
     except (JWTError, KeyError, ValueError):
         raise HTTPException(status_code=401, detail="Invalid or expired access token")
     user = db.get(User, user_id)
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
+    if not hmac.compare_digest(stamp, credential_stamp(user)):
+        raise HTTPException(status_code=401, detail="Invalid or expired access token")
     return user
 
 

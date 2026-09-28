@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import Button from "@/components/ui/Button";
-import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import SupportSearch from "./SupportSearch";
 
@@ -100,32 +99,6 @@ const FAQS: FaqEntry[] = [
   },
   {
     category: "billing",
-    question: "Are there demo accounts I can log in with?",
-    answer: (
-      <>
-        Yes — this build seeds two accounts so you can try both sides of the marketplace without
-        registering:
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-surface-container bg-surface-container-lowest p-4">
-            <Badge tone="secondary" className="mb-2">
-              Owner
-            </Badge>
-            <p className="font-mono text-xs text-on-surface">owner@adspace.example</p>
-            <p className="font-mono text-xs text-on-surface-variant">password123</p>
-          </div>
-          <div className="rounded-xl border border-surface-container bg-surface-container-lowest p-4">
-            <Badge tone="primary" className="mb-2">
-              Advertiser
-            </Badge>
-            <p className="font-mono text-xs text-on-surface">advertiser@adspace.example</p>
-            <p className="font-mono text-xs text-on-surface-variant">password123</p>
-          </div>
-        </div>
-      </>
-    ),
-  },
-  {
-    category: "billing",
     question: "Where are your Terms of Service, Privacy Policy, and other legal docs?",
     answer: (
       <>
@@ -155,8 +128,8 @@ function faqId(faq: FaqEntry): string {
  * Analytics page too. It's replaced with an honest FAQ (grouped into the
  * same three categories the bento cards advertise) and a real mailto
  * contact CTA. FAQ content describes only real, current behavior of this
- * build (simulated payment, live-priced add-ons, auto-approved listings,
- * demo accounts) — nothing here is aspirational copy.
+ * build (simulated payment, live-priced add-ons, auto-approved listings)
+ * — nothing here is aspirational copy. Demo credentials are never listed.
  */
 export default function SupportPage() {
   return (

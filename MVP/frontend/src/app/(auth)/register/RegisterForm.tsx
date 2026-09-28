@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ApiError } from "@/lib/api";
+import { safeNextPath } from "@/lib/safe-next";
 import Icon from "@/components/ui/Icon";
 import TextField from "@/components/ui/TextField";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
@@ -36,7 +37,7 @@ interface FieldErrors {
 function NextParamSync({ onResolved }: { onResolved: (next: string | null) => void }) {
   const searchParams = useSearchParams();
   useEffect(() => {
-    onResolved(searchParams.get("next"));
+    onResolved(safeNextPath(searchParams.get("next")));
   }, [searchParams, onResolved]);
   return null;
 }

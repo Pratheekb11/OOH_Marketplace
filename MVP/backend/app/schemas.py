@@ -15,15 +15,27 @@ class ORMModel(BaseModel):
 
 
 class RegisterRequest(BaseModel):
+    """Public sign-up. Admin is deliberately not an option: an admin reads every
+    lead, so admins are only ever created directly in the database."""
     email: EmailStr
     full_name: str = Field(min_length=2, max_length=120)
     password: str = Field(min_length=8, max_length=128)
-    role: Role = Role.advertiser
+    role: Literal[Role.advertiser, Role.owner] = Role.advertiser
+
+    @field_validator("email")
+    @classmethod
+    def _lower_email(cls, value: str) -> str:
+        return value.lower()
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+    @field_validator("email")
+    @classmethod
+    def _lower_email(cls, value: str) -> str:
+        return value.lower()
 
 
 class PasswordChangeRequest(BaseModel):

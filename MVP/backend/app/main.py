@@ -82,7 +82,7 @@ def health():
 @app.post("/api/v1/auth/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 @limiter.limit("5/minute")
 def register(request: Request, payload: RegisterRequest, db: Session = Depends(get_db)):
-    if db.scalar(select(User).where(User.email == payload.email)):
+    if db.scalar(select(User).where(func.lower(User.email) == payload.email)):
         raise HTTPException(status_code=400, detail="Email is already registered")
     user = User(email=str(payload.email), full_name=payload.full_name, password_hash=password_context.hash(payload.password), role=payload.role)
     db.add(user); db.commit(); db.refresh(user)
@@ -92,7 +92,8 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
 @app.post("/api/v1/auth/login", response_model=Token)
 @limiter.limit("10/minute")
 def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
-    user = db.scalar(select(User).where(User.email == payload.email))
+    # Emails are stored lower-cased now; lower() still finds rows written before that.
+    user = db.scalar(select(User).where(func.lower(User.email) == payload.email))
     if not user or not _password_matches(user, payload.password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
     return Token(access_token=create_token(user))
@@ -115,7 +116,8 @@ def google_sign_in(request: Request, payload: GoogleAuthRequest, db: Session = D
     """Sign in, or sign up, with a Google Identity Services ID token.
 
     Found by Google's subject id first, then by (verified) email -- which links
-    Google to an account that was registered with a password. An existing
+    Google to an account that was registered with a password and drops that
+    password, since registration never proved the email. An existing
     account's role is never changed here. A new account needs a role; without
     one the caller gets `needs_role` back and nothing is created.
     """
@@ -133,7 +135,12 @@ def google_sign_in(request: Request, payload: GoogleAuthRequest, db: Session = D
         if user is not None:
             if user.google_sub and user.google_sub != identity.sub:
                 raise HTTPException(status_code=409, detail="This email is linked to a different Google account")
+            # Registration never proved this inbox, so whoever set the password may
+            # not own it (they could have registered the victim's email first).
+            # Google has proved it: drop the unproven password, which also changes
+            # the credential stamp and so ends every session issued against it.
             user.google_sub = identity.sub
+            user.password_hash = None
             db.commit()
     if user is None:
         if payload.role is None:
@@ -167,9 +174,8 @@ def change_password(request: Request, payload: PasswordChangeRequest, user: User
     bearer token resolved to -- so there is no way to aim it at somebody else, not even
     for an admin.
 
-    Previously issued tokens stay valid until they expire: they carry no password
-    reference and the JWTs are stateless, so there is nothing to revoke. Real session
-    invalidation needs a token version column, which is out of scope for the POC.
+    Previously issued tokens stop working: each carries a stamp of the credential
+    it was issued against (see `credential_stamp`), and the new hash changes it.
     """
     if not user.password_hash:
         raise HTTPException(status_code=400, detail="This account signs in with Google and has no password to change")
