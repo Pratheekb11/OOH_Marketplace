@@ -48,3 +48,17 @@ def test_upgrade_head_then_downgrade_base_on_sqlite(alembic_config):
     command.downgrade(config, "base")
     remaining = set(inspect(create_engine(url)).get_table_names())
     assert "bookings" not in remaining
+
+
+def test_head_lets_users_sign_in_with_google(alembic_config):
+    """Google-only accounts have no password, and are found again by Google's
+    stable subject id rather than by email."""
+    config, url = alembic_config
+
+    command.upgrade(config, "head")
+    columns = {column["name"]: column for column in inspect(create_engine(url)).get_columns("users")}
+    assert "google_sub" in columns
+    assert columns["google_sub"]["nullable"] is True
+    assert columns["password_hash"]["nullable"] is True
+
+    command.downgrade(config, "base")
