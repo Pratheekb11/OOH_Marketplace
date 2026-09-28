@@ -136,7 +136,13 @@ def test_snapshot_descriptions_are_not_the_source_copy():
 
 def test_shipped_listing_photos_carry_no_metadata():
     dirty = []
+    # Imported photos only (opaque hash names). The hand-named seed images are
+    # the prototype's AI-generated shots, whose "Made with Google AI" /
+    # trainedAlgorithmicMedia labels are a disclosure that must stay.
+    imported = re.compile(r"^[0-9a-f]{20}\.[a-z0-9]+$")
     for path in (FRONTEND_PUBLIC / "images" / "listings").iterdir():
+        if not imported.match(path.name):
+            continue
         with Image.open(path) as im:
             if im.getexif() or {"comment", "exif", "xmp"} & set(im.info):
                 dirty.append(path.name)

@@ -195,15 +195,19 @@ def test_every_snapshot_gallery_photo_exists_on_disk():
 
 
 def test_shipped_listing_photos_are_not_thumbnails():
-    """Before: 2097 of 2105 shipped photos were the source's 300x125 preview.
-    A few sites publish nothing better, so this allows a small remainder."""
+    """Before: 2097 of 2105 shipped covers were the source's 300x125 preview.
+    The source publishes nothing sharper for a few percent of sites (84 of
+    2103 have no photo over 500px; 14 only a 300x125 card), so the bound is
+    on those rates rather than zero."""
     covers = [row["image_url"] for row in _snapshot() if row.get("image_url")]
     assert covers
-    thumbnails = 0
+    previews = small = 0
     for url in covers:
         with Image.open(FRONTEND_PUBLIC / url.lstrip("/")) as im:
-            thumbnails += max(im.size) < 500
-    assert thumbnails / len(covers) < 0.02, f"{thumbnails}/{len(covers)} covers are thumbnails"
+            previews += im.size == (300, 125)
+            small += max(im.size) < 500
+    assert previews / len(covers) < 0.01, f"{previews}/{len(covers)} covers are 300x125 previews"
+    assert small / len(covers) < 0.05, f"{small}/{len(covers)} covers are under 500px"
 
 
 def test_shipped_photos_are_web_sized():
