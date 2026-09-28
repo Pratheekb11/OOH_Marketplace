@@ -44,7 +44,10 @@ class User(Timestamped, Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     full_name: Mapped[str] = mapped_column(String(120))
-    password_hash: Mapped[str] = mapped_column(String(255))
+    # None for an account that only ever signed in with Google.
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Google's stable subject id; set once the account has signed in with Google.
+    google_sub: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)
     role: Mapped[Role] = mapped_column(Enum(Role, native_enum=False, length=30), default=Role.advertiser)
 
 

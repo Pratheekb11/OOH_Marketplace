@@ -33,8 +33,22 @@ export interface RegisterInput {
   gstin?: string | null;
 }
 
+/** A new Google user has to say which side of the marketplace they are on
+ * before an account exists; `needsRole` asks the caller to find out and call
+ * `loginWithGoogle` again with the same credential and a role. */
+export type GoogleSignInResult = { needsRole: false } | { needsRole: true; email: string; fullName: string };
+
+interface GoogleAuthResponse {
+  access_token: string | null;
+  token_type: string;
+  needs_role: boolean;
+  email?: string | null;
+  full_name?: string | null;
+}
+
 export type AuthContextValue = AuthState & {
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (credential: string, role?: "advertiser" | "owner") => Promise<GoogleSignInResult>;
   register: (input: RegisterInput) => Promise<void>;
   logout: () => void;
 };
@@ -92,6 +106,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [loadUser],
   );
 
+  const loginWithGoogle = useCallback(
+    async (credential: string, role?: "advertiser" | "owner"): Promise<GoogleSignInResult> => {
+      const response = await api<GoogleAuthResponse>("/auth/google", {
+        method: "POST",
+        body: JSON.stringify(role ? { credential, role } : { credential }),
+        skipAuth: true,
+      });
+      if (response.needs_role || !response.access_token) {
+        return { needsRole: true, email: response.email ?? "", fullName: response.full_name ?? "" };
+      }
+      setToken(response.access_token);
+      await loadUser(response.access_token);
+      return { needsRole: false };
+    },
+    [loadUser],
+  );
+
   const register = useCallback(
     async (input: RegisterInput) => {
       await api("/auth/register", {
@@ -110,8 +141,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ ...state, login, register, logout }),
-    [state, login, register, logout],
+    () => ({ ...state, login, loginWithGoogle, register, logout }),
+    [state, login, loginWithGoogle, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

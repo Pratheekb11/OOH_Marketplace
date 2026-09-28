@@ -84,7 +84,10 @@ describe("AuthProvider.loginWithGoogle", () => {
     });
 
     expect(result).toEqual({ needsRole: true, email: "asha@example.com", fullName: "Asha Rao" });
-    const init = fetchMock.mock.calls.find(([u]) => String(u).endsWith("/auth/google"))![1] as unknown as RequestInit;
+    const [, init] = fetchMock.mock.calls.find(([u]) => String(u).endsWith("/auth/google"))! as unknown as [
+      string,
+      RequestInit,
+    ];
     expect(JSON.parse(String(init.body))).toEqual({ credential: "google-id-token" });
     expect(window.localStorage.getItem(TOKEN_KEY)).toBeNull();
     expect(ctx?.status).toBe("unauthenticated");

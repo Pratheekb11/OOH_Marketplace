@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 1440
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:5500"
     allowed_hosts: str = "localhost,127.0.0.1"
+    # OAuth client id for Sign in with Google. Empty disables POST /auth/google.
+    google_client_id: str = ""
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property

@@ -210,3 +210,20 @@ then marks the row `synced`), and backfill anything still `pending`.
 Every other prototype page (`listing_page.html`, `listing_your_adspace.html`, `checkout_page.html`, `Campaign_analytics.html`, etc.) is still presentation-only. When wiring a new page, follow the mapping in `backend/docs/FRONTEND.md` (e.g. marketplace cards → `GET /listings`/`GET /listings/{id}`, owner submission → `POST /listings` + multipart document upload, checkout → `POST /bookings`, dashboards → `GET /dashboard/{advertiser,owner}`). Never put secrets or provider keys in this frontend JS — the API is the only caller of external providers (Maps, GST, SMTP, S3).
 
 Each prototype page has a matching hand-authored CSS file and Tailwind config under `Ui_Prototype_MVP_Prep/css/` and `Ui_Prototype_MVP_Prep/js/tailwind.config.*.js` (one pair per page, not shared) — check for an existing pair before adding new styles for a page.
+
+## Sign in with Google
+
+`components/auth/GoogleAuthButton.tsx` renders Google Identity Services'
+button in **popup mode**: Google hands an ID token to a JS callback, which
+posts it to `POST /api/v1/auth/google`. `app/google_auth.py` verifies it
+against Google's JWKS with python-jose (signature, audience =
+`GOOGLE_CLIENT_ID`, issuer, expiry, `email_verified`). No redirect URIs, no
+client secret. Both halves read the same client id: `GOOGLE_CLIENT_ID`
+(backend) and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (frontend, build-time); without
+it the API answers 503 and the button stays disabled.
+
+Accounts are found by `users.google_sub`, then by email (linking Google to a
+password account). A new Google user with no role gets `needs_role` back and
+the button asks Advertiser or Space Owner; `admin` is never creatable this
+way, and an existing account's role is never changed. Google-only accounts
+have `password_hash = NULL`, so password login and change refuse them.

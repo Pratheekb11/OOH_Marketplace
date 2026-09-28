@@ -94,6 +94,7 @@ Environment variables (Settings → Environment Variables):
 | `APP_ENV` | `production` |
 | `ALLOWED_HOSTS` | `*.vercel.app,localhost,127.0.0.1` |
 | `CORS_ORIGINS` | the frontend URL — fill in after step 4, see step 5 |
+| `GOOGLE_CLIENT_ID` | the OAuth client id for Sign in with Google; unset returns 503 from `/auth/google` |
 
 The wildcard matters: Starlette's TrustedHostMiddleware only treats a pattern
 as a suffix match when it *starts* with `*`, so a bare `.vercel.app` matches
@@ -128,8 +129,15 @@ Environment variable:
 | Name | Value |
 | --- | --- |
 | `NEXT_PUBLIC_API_BASE_URL` | `https://<backend>.vercel.app/api/v1` |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | the same OAuth client id as the backend's `GOOGLE_CLIENT_ID` |
 
-This is baked in at build time, so changing it later needs a redeploy.
+These are baked in at build time, so changing them later needs a redeploy.
+
+The Google client is a **Web application** OAuth client in Google Cloud
+Console. Sign-in runs in popup mode, so it needs only **Authorized JavaScript
+origins** (the frontend URL, `http://localhost:3000`, `http://localhost`): no
+redirect URIs, no client secret. Publish the OAuth consent screen, or only its
+listed test users can sign in.
 
 Leave `NEXT_PUBLIC_BASE_PATH` and `NEXT_OUTPUT` unset — those exist only for the
 GitHub Pages export.

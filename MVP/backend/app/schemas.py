@@ -1,6 +1,6 @@
 import re
 from datetime import date, datetime
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, field_validator, model_validator
 
@@ -43,6 +43,23 @@ class PasswordChangeRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class GoogleAuthRequest(BaseModel):
+    """`credential` is the ID token from Google Identity Services. `role` is only
+    used when the Google account is new; admin is deliberately not an option."""
+    credential: str = Field(min_length=1, max_length=4096)
+    role: Literal[Role.advertiser, Role.owner] | None = None
+
+
+class GoogleAuthResponse(BaseModel):
+    """Either a bearer token, or `needs_role` for a new Google user who has not
+    said yet whether they are an advertiser or a space owner."""
+    access_token: str | None = None
+    token_type: str = "bearer"
+    needs_role: bool = False
+    email: str | None = None
+    full_name: str | None = None
 
 
 class UserOut(ORMModel):

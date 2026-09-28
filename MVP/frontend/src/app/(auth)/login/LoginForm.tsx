@@ -7,7 +7,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { ApiError } from "@/lib/api";
 import Icon from "@/components/ui/Icon";
 import TextField from "@/components/ui/TextField";
-import GoogleGlyph from "../_components/GoogleGlyph";
+import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 import RoleToggle, { type AuthRole } from "../_components/RoleToggle";
 
 function extractErrorMessage(detail: unknown): string {
@@ -164,15 +164,7 @@ export function LoginForm() {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <button
-          type="button"
-          disabled
-          title="Google sign-in is out of scope for this build — no OAuth provider is wired up yet."
-          className="flex cursor-not-allowed items-center justify-center gap-3 rounded-xl border-0 bg-surface-container-lowest px-4 py-3 font-bold text-on-surface opacity-60"
-        >
-          <GoogleGlyph />
-          Google
-        </button>
+        <GoogleAuthButton onSignedIn={() => router.push(nextPath || "/marketplace")} />
         <button
           type="button"
           disabled

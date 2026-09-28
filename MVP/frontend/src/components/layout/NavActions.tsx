@@ -11,7 +11,7 @@ import CartBadge from "./CartBadge";
  * The one genuinely new UI element here (the prototype's Sign In button is
  * static markup). Renders by auth state:
  *   - loading         -> fixed-size Skeleton (no layout shift once resolved)
- *   - unauthenticated  -> "Sign In" -> /login
+ *   - unauthenticated  -> "Register" -> /register, "Sign In" -> /login
  *   - advertiser       -> CartBadge + account menu (email + Sign out)
  *   - owner            -> "List Media" -> /list-your-space + account menu
  */
@@ -38,13 +38,22 @@ export function NavActions() {
     // Over the landing hero the nav is unpainted, where a bg-primary button
     // would sink into the photograph — the amber CTA is the readable one.
     return (
-      <Button
-        href="/login"
-        variant="primary"
-        size="sm"
-      >
-        Sign In
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          href="/register"
+          variant="ghost"
+          size="sm"
+        >
+          Register
+        </Button>
+        <Button
+          href="/login"
+          variant="primary"
+          size="sm"
+        >
+          Sign In
+        </Button>
+      </div>
     );
   }
 

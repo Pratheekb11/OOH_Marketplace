@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.crm import push_lead
 from app.database import get_db
+from app.google_auth import InvalidGoogleToken, verify_google_credential
 from app.images import public_image_url
 from app.models import (
     Booking,
@@ -36,6 +37,8 @@ from app.schemas import (
     CartResponse,
     CheckoutRequest,
     CheckoutResponse,
+    GoogleAuthRequest,
+    GoogleAuthResponse,
     LeadCreate,
     LeadOut,
     ListingCreate,
@@ -90,9 +93,63 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
 @limiter.limit("10/minute")
 def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
     user = db.scalar(select(User).where(User.email == payload.email))
-    if not user or not password_context.verify(payload.password, user.password_hash):
+    if not user or not _password_matches(user, payload.password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
     return Token(access_token=create_token(user))
+
+
+def _password_matches(user: User, password: str) -> bool:
+    """False for an account with no usable password -- one that only signs in with
+    Google, or the scraper's placeholder owner -- instead of a 500 from passlib."""
+    if not user.password_hash:
+        return False
+    try:
+        return password_context.verify(password, user.password_hash)
+    except ValueError:
+        return False
+
+
+@app.post("/api/v1/auth/google", response_model=GoogleAuthResponse)
+@limiter.limit("10/minute")
+def google_sign_in(request: Request, payload: GoogleAuthRequest, db: Session = Depends(get_db)):
+    """Sign in, or sign up, with a Google Identity Services ID token.
+
+    Found by Google's subject id first, then by (verified) email -- which links
+    Google to an account that was registered with a password. An existing
+    account's role is never changed here. A new account needs a role; without
+    one the caller gets `needs_role` back and nothing is created.
+    """
+    client_id = get_settings().google_client_id
+    if not client_id:
+        raise HTTPException(status_code=503, detail="Google sign-in is not configured")
+    try:
+        identity = verify_google_credential(payload.credential, client_id)
+    except InvalidGoogleToken:
+        raise HTTPException(status_code=401, detail="Google sign-in failed. Please try again.")
+
+    user = db.scalar(select(User).where(User.google_sub == identity.sub))
+    if user is None:
+        user = db.scalar(select(User).where(func.lower(User.email) == identity.email))
+        if user is not None:
+            if user.google_sub and user.google_sub != identity.sub:
+                raise HTTPException(status_code=409, detail="This email is linked to a different Google account")
+            user.google_sub = identity.sub
+            db.commit()
+    if user is None:
+        if payload.role is None:
+            return GoogleAuthResponse(needs_role=True, email=identity.email, full_name=identity.name)
+        user = User(email=identity.email, full_name=identity.name, password_hash=None, google_sub=identity.sub, role=payload.role)
+        db.add(user)
+        try:
+            db.commit()
+        except IntegrityError:
+            # A double-clicked button racing itself; the other request created it.
+            db.rollback()
+            user = db.scalar(select(User).where(User.google_sub == identity.sub))
+            if user is None:
+                raise
+        db.refresh(user)
+    return GoogleAuthResponse(access_token=create_token(user))
 
 
 @app.get("/api/v1/auth/me", response_model=UserOut)
@@ -114,7 +171,9 @@ def change_password(request: Request, payload: PasswordChangeRequest, user: User
     reference and the JWTs are stateless, so there is nothing to revoke. Real session
     invalidation needs a token version column, which is out of scope for the POC.
     """
-    if not password_context.verify(payload.current_password, user.password_hash):
+    if not user.password_hash:
+        raise HTTPException(status_code=400, detail="This account signs in with Google and has no password to change")
+    if not _password_matches(user, payload.current_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
     user.password_hash = password_context.hash(payload.new_password)
     db.commit()
