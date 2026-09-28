@@ -67,6 +67,10 @@ class Listing(Timestamped, Base):
     rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     lighting: Mapped[str | None] = mapped_column(String(20), nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    # Every photo of the site, cover first. Null on rows that only ever had a
+    # cover (owner submissions, imports that predate galleries): the API then
+    # reports `[image_url]`.
+    image_urls: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     extra: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
 

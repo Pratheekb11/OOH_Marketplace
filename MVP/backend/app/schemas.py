@@ -91,11 +91,13 @@ class ListingOut(ORMModel):
     cleaned to plain text (rows imported before cleaning existed still hold
     HTML), private `extra` keys are dropped, the minimum booking term they
     imply is published as `min_booking_days` instead, and a legacy
-    `scraped-<source_id>` image URL is swapped for its opaque name.
+    `scraped-<source_id>` image URL is swapped for its opaque name. `image_urls`
+    is the full gallery, falling back to the cover for rows that predate it.
     """
     id: int; owner_id: int; title: str; space_type: str; description: str; location: str
     width_ft: float | None; height_ft: float | None; price_per_day: float; footfall_estimate: int | None
     status: ListingStatus; rejection_reason: str | None; lighting: str | None; image_url: str | None; extra: dict | None
+    image_urls: list[str] = []
     min_booking_days: int = 1
 
     @model_validator(mode="before")
@@ -111,7 +113,14 @@ class ListingOut(ORMModel):
         fields["min_booking_days"] = max(derived, int(fields.get("min_booking_days") or 1))
         fields["extra"] = public_extra(extra)
         fields["description"] = html_to_text(fields.get("description"))
-        fields["image_url"] = public_image_url(fields.get("image_url"))
+        cover = fields.get("image_url")
+        gallery = fields.get("image_urls") or []
+        # A gallery whose first photo is no longer the cover was left behind by
+        # an edit to `image_url`; the cover wins.
+        if not gallery or gallery[0] != cover:
+            gallery = [cover] if cover else []
+        fields["image_url"] = public_image_url(cover)
+        fields["image_urls"] = [public_image_url(url) for url in gallery]
         return fields
 
 

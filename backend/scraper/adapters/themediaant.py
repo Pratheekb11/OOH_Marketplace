@@ -53,6 +53,10 @@ LIT_MAP = {"FRONT LIT": "front_lit", "BACK LIT": "back_lit", "NON LIT": "non_lit
 #: half the bytes (87 KB vs 191 KB on a sampled 850x591 photo).
 S3_HOSTS = ("tma-live.s3.ap-south-1.amazonaws.com", "tma-live.s3.amazonaws.com")
 CDN_HOST = "the-media-ant.mo.cloudinary.net"
+#: Reference photos are published at camera resolution (3200x2400 observed,
+#: ~2.7 MB). The CDN downscales them server side; `c_limit` never upscales, so
+#: a smaller original comes back as-is.
+PHOTO_TRANSFORM = "?tx=w_1280,c_limit"
 
 
 def cdn_url(url: str) -> str:
@@ -348,18 +352,33 @@ class TheMediaAntAdapter(Adapter):
         locality = merged.get("locality") or ""
         location_text = clean_text(geo.get("formatted_address") or f"{landmark}, {locality}".strip(", "))
 
-        # -- images. Despite the field name, `logo` is the site photograph, and
-        # it appears under two prefixes:
+        # -- images. Each media option carries `referenceArtworks`: on the
+        # media's own option these are the site photographs at full camera
+        # resolution, sometimes several. The Printing/Mounting options carry
+        # the site's generic sample art, shared by every listing.
+        #
+        # `logo` is the fallback. Despite the name it is also a site photo,
+        # under two prefixes:
         #   medias/<id>/<ts>/<name>_logo.jpg   - full size, ~850px
         #   uploads/mediaLogos/<ts>/<n>.jpg    - the site's own 300x125 preview
-        # Both are per-listing (1691 distinct URLs across 1703 records), so
-        # neither is a media-owner brand mark. `_logo` in the filename is a
-        # naming convention, not a sign that the image is chrome.
-        images = []
+        # `_logo` in the filename is a naming convention, not a sign that the
+        # image is chrome.
+        name = merged.get("name", "")
+        images = [
+            ScrapedImage(url=cdn_url(artwork["url"]) + PHOTO_TRANSFORM, trusted=True, alt=name)
+            for option in (detail or {}).get("mediaOptions") or []
+            if option.get("name") not in NON_INVENTORY_TEMPLATES
+            for artwork in option.get("referenceArtworks") or []
+            if artwork.get("url") and artwork.get("type", "image") == "image"
+        ]
         logo = merged.get("logo") or ""
-        if logo:
-            images.append(ScrapedImage(url=cdn_url(logo), trusted=True, alt=merged.get("name", "")))
+        if images:
+            photo_source = "reference"
+        elif logo:
+            images.append(ScrapedImage(url=cdn_url(logo), trusted=True, alt=name))
+            photo_source = "full" if "/medias/" in logo else "preview"
         else:
+            photo_source = None
             warnings.append("no photograph published")
 
         footfall = _parse_reach(attribute("reach", "Unique Reach (Per day)")) or _to_int(
@@ -409,7 +428,7 @@ class TheMediaAntAdapter(Adapter):
                 "gst_percentage": merged.get("serviceTaxPercentage"),
                 "page_views": merged.get("pageViews"),
                 "url_slug": slug,
-                "photo_source": ("full" if "/medias/" in logo else "preview") if logo else None,
+                "photo_source": photo_source,
             },
         )
 

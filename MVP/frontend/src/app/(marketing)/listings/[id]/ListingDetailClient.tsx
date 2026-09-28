@@ -9,25 +9,13 @@ import EmptyState from "@/components/ui/EmptyState";
 import Skeleton from "@/components/ui/Skeleton";
 import { ApiError } from "@/lib/api";
 import { fetchListing } from "@/lib/listings-source";
+import { galleryImages } from "@/lib/gallery";
 import type { ListingOut } from "@/components/marketplace/types";
 import BentoGallery from "@/components/listing/BentoGallery";
 import StatsGrid from "@/components/listing/StatsGrid";
 import ListingDescription from "@/components/listing/ListingDescription";
 import OwnerCard from "@/components/listing/OwnerCard";
 import BookingSidebar from "@/components/listing/BookingSidebar";
-
-// The prototype's two-image bento gallery extras (listing_view.html) only
-// exist for the MG Road Premium Unipole seed listing — matched by its
-// marketplace-card image path rather than a hardcoded id, since seed ids
-// shift across re-seeds. A 3rd gallery image (mg-road-unipole-3.png) is one
-// of the 3 prototype images that rotted and was never downloaded, so that
-// slot is deliberately left out here and falls back to the placeholder tile.
-const EXTRA_GALLERY: Record<string, string[]> = {
-  "/images/listings/mg-road-premium-unipole.png": [
-    "/images/gallery/mg-road-unipole-1.png",
-    "/images/gallery/mg-road-unipole-2.png",
-  ],
-};
 
 function fallbackDescription(listing: ListingOut): string {
   const parts = [
@@ -127,9 +115,7 @@ export default function ListingDetailClient({ id }: { id: string }) {
   }
 
   const { listing } = state;
-  const images = [listing.image_url, ...(EXTRA_GALLERY[listing.image_url ?? ""] ?? [])].filter(
-    (src): src is string => Boolean(src),
-  );
+  const images = galleryImages(listing);
   const description = listing.description.trim() || fallbackDescription(listing);
   const verified = listing.extra?.verified === true;
 
