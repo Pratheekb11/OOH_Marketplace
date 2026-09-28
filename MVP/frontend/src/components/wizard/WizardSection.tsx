@@ -16,13 +16,13 @@ export interface WizardSectionProps {
  * bg-surface-container-low card). */
 export function WizardSection({ heading, description, action, children, className = "" }: WizardSectionProps) {
   return (
-    <section className="grid grid-cols-1 gap-12 md:grid-cols-12">
+    <section className="grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-12">
       <div className="md:col-span-4">
         <h2 className="mb-3 font-syne text-2xl font-bold text-primary">{heading}</h2>
         {description ? <p className="text-sm text-on-surface-variant">{description}</p> : null}
         {action}
       </div>
-      <div className={`space-y-8 rounded-xl bg-surface-container-low p-10 md:col-span-8 ${className}`}>
+      <div className={`space-y-8 rounded-xl bg-surface-container-low p-5 sm:p-10 md:col-span-8 ${className}`}>
         {children}
       </div>
     </section>

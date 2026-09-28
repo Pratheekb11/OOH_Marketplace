@@ -11,8 +11,8 @@ import CallbackButton from "@/components/leads/CallbackButton";
 function AuthFooterBar() {
   return (
     <footer className="w-full border-t border-outline-variant/10 bg-slate-50 py-12">
-      <div className="flex w-full flex-col items-center justify-between px-12 font-headline text-sm md:flex-row">
-        <div className="mb-6 flex items-center gap-4 md:mb-0">
+      <div className="flex w-full flex-col items-center justify-between px-6 font-headline text-sm sm:px-12 md:flex-row">
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center md:mb-0">
           <span className="font-bold text-primary-container">AdSpace</span>
           <span className="text-slate-500">
             &copy; {new Date().getFullYear()} AdSpace. All rights reserved.
@@ -21,7 +21,7 @@ function AuthFooterBar() {
         {/* No dedicated legal pages exist in this build — those three route
             to /support rather than "#", consistent with SiteFooter. Contact
             Sales opens the call-back form. */}
-        <div className="flex gap-8">
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
           <Link href="/support" className="text-slate-500 transition-colors hover:text-secondary-container">
             Privacy Policy
           </Link>

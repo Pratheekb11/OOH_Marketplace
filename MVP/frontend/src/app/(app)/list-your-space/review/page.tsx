@@ -174,7 +174,7 @@ export default function ReviewStepPage() {
           type="button"
           onClick={handleSubmit}
           disabled={submitting}
-          className="brand-gradient flex-1 rounded-xl px-16 py-5 text-center font-syne font-bold text-white shadow-xl shadow-secondary/20 transition-transform hover:scale-[1.02] active:scale-95 disabled:pointer-events-none disabled:opacity-60 md:flex-none"
+          className="brand-gradient flex-1 rounded-xl px-6 py-5 text-center xl:px-16 font-syne font-bold text-white shadow-xl shadow-secondary/20 transition-transform hover:scale-[1.02] active:scale-95 disabled:pointer-events-none disabled:opacity-60 md:flex-none"
         >
           {submitting ? "Submitting…" : isEditMode ? "Save Changes" : "Submit Asset for Live"}
         </button>

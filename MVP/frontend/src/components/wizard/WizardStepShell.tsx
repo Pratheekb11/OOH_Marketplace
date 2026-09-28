@@ -31,15 +31,15 @@ export function WizardStepShell({
   children,
 }: WizardStepShellProps) {
   return (
-    <main className="flex-1 bg-surface px-8 py-16 font-manrope lg:px-24">
-      <div className="mb-20 max-w-4xl">
-        <h1 className="mb-6 font-syne text-4xl font-bold leading-tight tracking-tight text-primary sm:text-5xl lg:text-6xl">
+    <main className="flex-1 bg-surface px-5 py-10 font-manrope sm:px-8 sm:py-16 lg:px-24">
+      <div className="mb-12 max-w-4xl sm:mb-20">
+        <h1 className="mb-6 font-syne text-3xl font-bold leading-tight tracking-tight text-primary sm:text-5xl lg:text-6xl">
           {titlePrefix} <span className="text-secondary">{titleHighlight}</span>
         </h1>
         <p className="max-w-2xl text-lg leading-relaxed text-on-surface-variant">{description}</p>
       </div>
 
-      <div className="space-y-24">{children}</div>
+      <div className="space-y-16 sm:space-y-24">{children}</div>
 
       <div className="mt-12 flex flex-col items-center justify-between gap-8 border-t border-slate-200 pt-12 md:flex-row">
         <div className="flex items-center gap-4 text-slate-400">
@@ -50,7 +50,7 @@ export function WizardStepShell({
           {prevHref ? (
             <Link
               href={prevHref}
-              className="flex-1 px-12 py-5 text-center font-syne font-bold text-on-surface-variant transition-colors hover:text-primary md:flex-none"
+              className="flex-1 px-4 py-5 text-center font-syne xl:px-12 font-bold text-on-surface-variant transition-colors hover:text-primary md:flex-none"
             >
               Previous
             </Link>

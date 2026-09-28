@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import type { ReactNode } from "react";
 import RequireRole from "@/components/auth/RequireRole";
 import EditModeSync from "@/components/wizard/EditModeSync";
+import WizardMobileNav from "@/components/wizard/WizardMobileNav";
 import WizardSidebar from "@/components/wizard/WizardSidebar";
 import { WizardProvider, useWizard } from "@/lib/wizard/context";
 
@@ -41,7 +42,10 @@ function WizardBody({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <WizardSidebar />
-      <div className="flex-1">
+      {/* min-w-0: a flex item defaults to min-width:auto, so any wide child
+          would push the whole step past a phone's viewport. */}
+      <div className="min-w-0 flex-1">
+        <WizardMobileNav />
         {hydrated ? (
           children
         ) : (

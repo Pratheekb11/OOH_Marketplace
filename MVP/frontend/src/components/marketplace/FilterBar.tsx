@@ -115,9 +115,20 @@ export function FilterBar() {
     AREA_BANDS.find((band) => band.min === minArea && band.max === maxArea) ?? AREA_BANDS[0];
 
   const hasActiveFilters = FILTER_KEYS.some((key) => searchParams.get(key));
+  // One per select, not per URL key: a price band sets min_price and max_price.
+  const activeFilterCount = [
+    spaceType,
+    lighting,
+    minPrice || maxPrice,
+    size || minArea || maxArea,
+  ].filter(Boolean).length;
+
+  // On a phone the six selects stack into a panel half a screen tall, so
+  // below sm they fold behind a toggle; the search box stays out.
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   return (
-    <section className="sticky top-0 z-40 border-b border-surface-container bg-surface-container-lowest px-4 py-4 shadow-sm sm:px-8">
+    <section className="z-40 border-b sm:sticky sm:top-0 border-surface-container bg-surface-container-lowest px-4 py-4 shadow-sm sm:px-8">
       <div className="mx-auto grid max-w-full grid-cols-2 items-end gap-x-3 gap-y-4 sm:flex sm:flex-wrap sm:items-center sm:gap-6">
         <div className="col-span-2 flex flex-col gap-1 sm:min-w-[200px]">
           <TextField
@@ -130,6 +141,23 @@ export function FilterBar() {
           />
         </div>
 
+        <button
+          type="button"
+          aria-expanded={filtersOpen}
+          aria-controls="marketplace-filters"
+          onClick={() => setFiltersOpen((open) => !open)}
+          className="col-span-2 flex items-center justify-between rounded-lg border border-outline-variant px-3 py-2 text-xs font-bold uppercase tracking-widest text-primary sm:hidden"
+        >
+          <span className="flex items-center gap-2">
+            <Icon name="tune" className="!text-lg" />
+            Filters &amp; sort{activeFilterCount ? ` (${activeFilterCount})` : ""}
+          </span>
+          <Icon name="expand_more" className={`!text-lg transition-transform ${filtersOpen ? "rotate-180" : ""}`} />
+        </button>
+
+        {/* display:contents keeps these as direct grid/flex items of the row
+            above, so the sm+ layout is untouched. */}
+        <div id="marketplace-filters" className={filtersOpen ? "contents" : "hidden sm:contents"}>
         <SelectField
           label="Ad Options"
           containerClassName="gap-1"
@@ -239,6 +267,7 @@ export function FilterBar() {
             Clear
           </button>
         )}
+        </div>
       </div>
     </section>
   );

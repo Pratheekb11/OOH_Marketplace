@@ -42,16 +42,18 @@ export function AddonPicker({ addons, selected, onToggle, loading, unavailable }
         return (
           <label
             key={addon.code}
-            className={`flex cursor-pointer items-center justify-between rounded-xl border-l-4 p-6 transition-colors ${
+            className={`flex cursor-pointer flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border-l-4 p-4 transition-colors sm:p-6 ${
               checked ? "border-secondary bg-surface-container" : "border-transparent bg-surface-container-low hover:border-secondary hover:bg-surface-container"
             }`}
           >
-            <div className="flex items-center gap-4">
+            {/* basis-56 lets the price drop under the text in a narrow
+                sidebar instead of squeezing the blurb to a word per line. */}
+            <div className="flex min-w-0 flex-1 basis-56 items-center gap-4">
               <input
                 type="checkbox"
                 checked={checked}
                 onChange={() => onToggle(addon.code)}
-                className="h-5 w-5 rounded border-outline text-secondary focus:ring-secondary"
+                className="h-5 w-5 shrink-0 rounded border-outline text-secondary focus:ring-secondary"
               />
               <Icon name={addon.icon} className="!text-2xl text-secondary" />
               <div>
@@ -59,7 +61,7 @@ export function AddonPicker({ addons, selected, onToggle, loading, unavailable }
                 <p className="text-sm text-on-surface-variant">{addon.blurb}</p>
               </div>
             </div>
-            <Money value={addon.price} mode="full" className="font-black text-secondary" />
+            <Money value={addon.price} mode="full" className="ml-auto font-black text-secondary" />
           </label>
         );
       })}
