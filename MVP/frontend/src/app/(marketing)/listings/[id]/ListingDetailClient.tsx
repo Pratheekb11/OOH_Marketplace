@@ -16,6 +16,7 @@ import StatsGrid from "@/components/listing/StatsGrid";
 import ListingDescription from "@/components/listing/ListingDescription";
 import OwnerCard from "@/components/listing/OwnerCard";
 import BookingSidebar from "@/components/listing/BookingSidebar";
+import NavigateButton from "@/components/listing/NavigateButton";
 
 function fallbackDescription(listing: ListingOut): string {
   const parts = [
@@ -134,6 +135,7 @@ export default function ListingDetailClient({ id }: { id: string }) {
             <Icon name="location_on" className="!text-sm" />
             {listing.location}
           </span>
+          <NavigateButton listing={listing} />
         </div>
       </div>
 

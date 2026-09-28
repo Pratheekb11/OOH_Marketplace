@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type * as Leaflet from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { inrCompact } from "@/lib/format";
+import { currentMapsProvider, directionsUrl } from "@/lib/map/directions";
 import { toMapPoints, type MapPoint } from "@/lib/map/points";
 import type { ListingOut } from "./types";
 
@@ -26,7 +27,7 @@ const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const TILE_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 /** Popup body built as DOM nodes, so a title is always text and never markup. */
-function popupContent(point: MapPoint): HTMLElement {
+function popupContent(point: MapPoint, listing: ListingOut): HTMLElement {
   const root = document.createElement("div");
   root.className = "adspace-map-popup";
 
@@ -44,6 +45,17 @@ function popupContent(point: MapPoint): HTMLElement {
   link.textContent = "View space →";
 
   root.append(title, price, link);
+
+  const directions = directionsUrl(listing, currentMapsProvider());
+  if (directions) {
+    const navigate = document.createElement("a");
+    navigate.className = "adspace-map-popup__link";
+    navigate.href = directions;
+    navigate.target = "_blank";
+    navigate.rel = "noopener noreferrer";
+    navigate.textContent = "Navigate ↗";
+    root.append(navigate);
+  }
   return root;
 }
 
@@ -57,6 +69,7 @@ function popupContent(point: MapPoint): HTMLElement {
  */
 export function MapPanel({ listings, className = "" }: MapPanelProps) {
   const points = useMemo(() => toMapPoints(listings), [listings]);
+  const byId = useMemo(() => new Map(listings.map((listing) => [listing.id, listing])), [listings]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const leafletRef = useRef<typeof Leaflet | null>(null);
@@ -105,7 +118,7 @@ export function MapPanel({ listings, className = "" }: MapPanelProps) {
         iconSize: undefined,
       });
       L.marker([point.lat, point.lng], { icon, title: point.title, riseOnHover: true })
-        .bindPopup(popupContent(point))
+        .bindPopup(popupContent(point, byId.get(point.id)!))
         .addTo(layer);
     }
 
@@ -117,7 +130,7 @@ export function MapPanel({ listings, className = "" }: MapPanelProps) {
     } else if (points.length === 1) {
       map.setView([points[0].lat, points[0].lng], 15);
     }
-  }, [ready, points]);
+  }, [ready, points, byId]);
 
   const unmapped = listings.length - points.length;
 
