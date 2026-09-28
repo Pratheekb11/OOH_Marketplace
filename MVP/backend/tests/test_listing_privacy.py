@@ -94,7 +94,11 @@ def test_public_location_fields_survive(actors):
 
 
 def test_owner_supplied_extra_keys_survive(actors):
-    """Owners store their own rate-card fields in `extra`; those are theirs to show."""
+    """Owners store their own rate-card fields in `extra`; those are theirs to show.
+
+    Except the headline price: `display_price` is always derived from the
+    `price_per_day` checkout charges (33000 here), never the owner's figure,
+    so a card cannot advertise one price and bill another."""
     client = actors["client"]
     created = scraped_listing(
         client,
@@ -102,7 +106,7 @@ def test_owner_supplied_extra_keys_survive(actors):
         extra={"display_unit": "/ Slot", "display_price": 45000, "refund_policy": "Full refund 7 days out"},
     )
     extra = client.get(f"/api/v1/listings/{created['id']}").json()["extra"]
-    assert extra == {"display_unit": "/ Slot", "display_price": 45000, "refund_policy": "Full refund 7 days out"}
+    assert extra == {"display_unit": "/ Slot", "display_price": 33000, "refund_policy": "Full refund 7 days out"}
 
 
 def test_owner_listings_route_hides_provenance(actors):
