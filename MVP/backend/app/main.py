@@ -55,6 +55,7 @@ from app.schemas import (
     UserOut,
     VerificationDecision,
     VerificationRequestOut,
+    display_unit,
 )
 from app.security import create_token, current_user, limiter, password_context, require_roles
 
@@ -345,8 +346,15 @@ VERIFICATION_KEYS = ("verified", "verification_status")
 
 
 def _owner_extra(submitted: dict | None, current: dict | None) -> dict | None:
-    """The owner's `extra`, with the server-controlled keys taken from `current`."""
-    extra = {k: v for k, v in (submitted or {}).items() if k not in VERIFICATION_KEYS}
+    """The owner's `extra`, with the server-controlled keys taken from `current`.
+
+    `display_price` is never stored: the card's headline price is derived from
+    `price_per_day` on every read (see `with_display_price`). Only a known
+    `display_unit` is kept, in its canonical spelling.
+    """
+    extra = {k: v for k, v in (submitted or {}).items() if k not in (*VERIFICATION_KEYS, "display_price", "display_unit")}
+    if unit := display_unit((submitted or {}).get("display_unit")):
+        extra["display_unit"] = unit
     extra |= {k: v for k, v in (current or {}).items() if k in VERIFICATION_KEYS}
     return extra or None
 

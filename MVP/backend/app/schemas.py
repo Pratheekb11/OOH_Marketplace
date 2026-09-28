@@ -88,6 +88,39 @@ PRIVATE_EXTRA_KEYS = frozenset({
 })
 
 
+#: The units a card may quote its headline price in, and how many days each
+#: covers. "/ Slot" is the day-part slot a digital screen is sold by, priced
+#: per day like "/ Day".
+DISPLAY_UNITS = {"day": ("/ Day", 1), "slot": ("/ Slot", 1), "week": ("/ Week", 7), "month": ("/ Month", 30)}
+
+
+def display_unit(value) -> str | None:
+    """Canonical spelling of a display unit ("per month" -> "/ Month"), or None."""
+    if not isinstance(value, str):
+        return None
+    key = value.strip().lower().removeprefix("per").strip().lstrip("/").strip()
+    return DISPLAY_UNITS[key][0] if key in DISPLAY_UNITS else None
+
+
+def with_display_price(extra: dict | None, price_per_day: float) -> dict | None:
+    """`extra` with the card's headline price derived from `price_per_day`.
+
+    `display_price` used to be whatever the owner typed, and the card shows it
+    in place of the price checkout charges. It is now always the charged day
+    rate times the unit's days; an unknown or missing unit drops both keys so
+    the card falls back to the plain per-day price.
+    """
+    if extra is None:
+        return None
+    unit = display_unit(extra.get("display_unit"))
+    extra = {k: v for k, v in extra.items() if k not in ("display_unit", "display_price")}
+    if unit is not None:
+        days = next(d for label, d in DISPLAY_UNITS.values() if label == unit)
+        extra["display_unit"] = unit
+        extra["display_price"] = round(price_per_day * days)
+    return extra
+
+
 def public_extra(extra: dict | None) -> dict | None:
     if extra is None:
         return None
@@ -151,7 +184,7 @@ def _listing_fields(cls, data) -> dict:
     derived = min_booking_days(fields.get("price_per_day") or 0, extra)
     # An already-public dict has lost `minimum_billing`; keep what it carries.
     fields["min_booking_days"] = max(derived, int(fields.get("min_booking_days") or 1))
-    fields["extra"] = public_extra(extra)
+    fields["extra"] = with_display_price(public_extra(extra), fields.get("price_per_day") or 0)
     fields["description"] = html_to_text(fields.get("description"))
     cover = fields.get("image_url")
     gallery = fields.get("image_urls") or []

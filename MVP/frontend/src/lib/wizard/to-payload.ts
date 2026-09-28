@@ -70,9 +70,9 @@ export function toListingPayload(state: WizardState): ListingCreatePayload {
         quarterly: numOrNull(state.quarterlyRate),
         annual: numOrNull(state.annualRate),
       },
-      // Mirrors the seeded listings' extra.display_unit / extra.display_price.
-      display_unit: "day",
-      display_price: pricePerDay,
+      // The card's headline unit. The price itself is derived server-side from
+      // price_per_day, so the wizard never sends a figure that could drift.
+      display_unit: "/ Day",
       peak_hour_surcharge: numOrNull(state.peakHourSurcharge),
       installation_fee: numOrNull(state.installationFee),
       maintenance_fee: numOrNull(state.maintenanceFee),
