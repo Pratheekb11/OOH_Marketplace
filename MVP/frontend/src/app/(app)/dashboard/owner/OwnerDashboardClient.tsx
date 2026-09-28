@@ -10,6 +10,8 @@ import EmptyState from "@/components/ui/EmptyState";
 import Icon from "@/components/ui/Icon";
 import Money from "@/components/ui/Money";
 import Skeleton from "@/components/ui/Skeleton";
+import { useToast } from "@/components/ui/Toast";
+import VerificationControl, { type VerificationStatus } from "@/components/verification/VerificationControl";
 import { api } from "@/lib/api";
 import { formatIsoDate } from "@/lib/format";
 import type { Listing, OwnerBooking } from "@/types/api";
@@ -164,6 +166,21 @@ function OwnerDashboardBody() {
   const [bookings, setBookings] = useState<OwnerBooking[] | null>(null);
   const [listings, setListings] = useState<Listing[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [requesting, setRequesting] = useState<number | null>(null);
+  const { showToast } = useToast();
+
+  async function requestVerification(listingId: number) {
+    setRequesting(listingId);
+    try {
+      const updated = await api<Listing>(`/listings/${listingId}/verification`, { method: "POST" });
+      setListings((current) => (current ?? []).map((l) => (l.id === listingId ? updated : l)));
+      showToast({ title: "Verification requested", description: "An admin will review this space.", tone: "success" });
+    } catch {
+      showToast({ title: "Request not sent", description: "Couldn't send the verification request. Please try again.", tone: "error" });
+    } finally {
+      setRequesting(null);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -209,7 +226,16 @@ function OwnerDashboardBody() {
     // gets a row — "which of my spaces isn't selling" is the whole point.
     const bySpace = new Map<
       number,
-      { title: string; location: string; image: string | null; status: string; bookings: number; revenue: number; bookedDays: number }
+      {
+        title: string;
+        location: string;
+        image: string | null;
+        status: string;
+        verification: VerificationStatus | null;
+        bookings: number;
+        revenue: number;
+        bookedDays: number;
+      }
     >();
     for (const listing of listings ?? []) {
       bySpace.set(listing.id, {
@@ -217,6 +243,7 @@ function OwnerDashboardBody() {
         location: listing.location,
         image: listing.image_url ?? null,
         status: String(listing.status),
+        verification: listing.verification_status ?? "none",
         bookings: 0,
         revenue: 0,
         bookedDays: 0,
@@ -228,6 +255,7 @@ function OwnerDashboardBody() {
         location: b.listing_location,
         image: b.listing_image_url,
         status: b.listing_status,
+        verification: null,
         bookings: 0,
         revenue: 0,
         bookedDays: 0,
@@ -475,6 +503,12 @@ function OwnerDashboardBody() {
                     <Badge tone="tertiary" className="!bg-surface-container-highest !text-on-surface-variant">
                       Archived
                     </Badge>
+                  ) : space.verification ? (
+                    <VerificationControl
+                      status={space.verification}
+                      busy={requesting === space.id}
+                      onRequest={() => requestVerification(space.id)}
+                    />
                   ) : null}
                 </div>
                 <p className="truncate text-xs text-on-surface-variant">

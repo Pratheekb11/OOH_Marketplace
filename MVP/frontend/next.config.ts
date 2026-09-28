@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { securityHeaders } from "./src/lib/security-headers";
 
 /**
  * Static-export mode, used only by the GitHub Pages workflow
@@ -32,6 +33,24 @@ const nextConfig: NextConfig = {
   // NEXT_DIST_DIR=.next-dev (see package.json); production/build keeps the
   // default `.next`.
   distDir: process.env.NEXT_DIST_DIR || ".next",
+
+  // Every route. A static export has no server to send headers (Next warns
+  // and GitHub Pages ignores them), so the export build leaves them out.
+  ...(isExport
+    ? {}
+    : {
+        async headers() {
+          return [
+            {
+              source: "/:path*",
+              headers: securityHeaders({
+                dev: process.env.NODE_ENV === "development",
+                apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+              }),
+            },
+          ];
+        },
+      }),
 
   ...(isExport
     ? {

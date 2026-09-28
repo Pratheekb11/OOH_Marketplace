@@ -46,6 +46,9 @@ export interface Listing {
   lighting?: string | null;
   image_url?: string | null;
   extra?: Record<string, unknown> | null;
+  /** Only on the owner's own listings (GET /owner/listings): where the
+   * request for the admin-granted "Verified" badge stands. */
+  verification_status?: "none" | "requested" | "verified" | "rejected";
 }
 
 export type BookingStatus = "pending_payment" | "booked" | "active" | "cancelled";

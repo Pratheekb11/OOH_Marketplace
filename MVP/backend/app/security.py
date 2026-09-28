@@ -10,18 +10,16 @@ from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
 from app.models import Role, User
+from app.ratelimit import limiter  # noqa: F401  - re-exported for app.main and the tests
 
 settings = get_settings()
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer = HTTPBearer()
-limiter = Limiter(key_func=get_remote_address)
 
 
 def credential_stamp(user: User) -> str:

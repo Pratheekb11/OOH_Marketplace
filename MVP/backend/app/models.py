@@ -130,3 +130,16 @@ class Lead(Timestamped, Base):
     user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
     crm_status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
     crm_ref: Mapped[str | None] = mapped_column(String(100), nullable=True)
+
+
+class RateLimitBucket(Base):
+    """One fixed-window counter per rate-limit key (see app/ratelimit.py).
+
+    `key` names who and what is being limited ("login-ip:203.0.113.7"),
+    `window_start` is the epoch second the current window began, and `hits`
+    counts attempts inside it.
+    """
+    __tablename__ = "rate_limit_buckets"
+    key: Mapped[str] = mapped_column(String(255), primary_key=True)
+    window_start: Mapped[int] = mapped_column(Integer, index=True)
+    hits: Mapped[int] = mapped_column(Integer, default=0)

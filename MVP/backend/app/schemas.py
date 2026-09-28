@@ -81,7 +81,11 @@ class UserOut(ORMModel):
 #: Keys the scraper importer writes into `Listing.extra` for its own use:
 #: provenance for re-imports, and the source's commercial terms. None of them
 #: may leave the API. `minimum_billing` still shapes `min_booking_days`.
-PRIVATE_EXTRA_KEYS = frozenset({"source_url", "source_site", "source_id", "card_rate", "minimum_billing", "warnings"})
+PRIVATE_EXTRA_KEYS = frozenset({
+    "source_url", "source_site", "source_id", "card_rate", "minimum_billing", "warnings",
+    # Where the owner's verification request stands: theirs and the admins' business.
+    "verification_status",
+})
 
 
 def public_extra(extra: dict | None) -> dict | None:
@@ -134,25 +138,67 @@ class ListingOut(ORMModel):
     @model_validator(mode="before")
     @classmethod
     def _public_view(cls, data):
-        if isinstance(data, dict):
-            fields = dict(data)
-        else:
-            fields = {name: getattr(data, name) for name in cls.model_fields if hasattr(data, name)}
-        extra = fields.get("extra")
-        derived = min_booking_days(fields.get("price_per_day") or 0, extra)
-        # An already-public dict has lost `minimum_billing`; keep what it carries.
-        fields["min_booking_days"] = max(derived, int(fields.get("min_booking_days") or 1))
-        fields["extra"] = public_extra(extra)
-        fields["description"] = html_to_text(fields.get("description"))
-        cover = fields.get("image_url")
-        gallery = fields.get("image_urls") or []
-        # A gallery whose first photo is no longer the cover was left behind by
-        # an edit to `image_url`; the cover wins.
-        if not gallery or gallery[0] != cover:
-            gallery = [cover] if cover else []
-        fields["image_url"] = public_image_url(cover)
-        fields["image_urls"] = [public_image_url(url) for url in gallery]
+        return _listing_fields(cls, data)
+
+
+def _listing_fields(cls, data) -> dict:
+    """Shared by ListingOut and OwnerListingOut: the stored row, made public."""
+    if isinstance(data, dict):
+        fields = dict(data)
+    else:
+        fields = {name: getattr(data, name) for name in cls.model_fields if hasattr(data, name)}
+    extra = fields.get("extra")
+    derived = min_booking_days(fields.get("price_per_day") or 0, extra)
+    # An already-public dict has lost `minimum_billing`; keep what it carries.
+    fields["min_booking_days"] = max(derived, int(fields.get("min_booking_days") or 1))
+    fields["extra"] = public_extra(extra)
+    fields["description"] = html_to_text(fields.get("description"))
+    cover = fields.get("image_url")
+    gallery = fields.get("image_urls") or []
+    # A gallery whose first photo is no longer the cover was left behind by
+    # an edit to `image_url`; the cover wins.
+    if not gallery or gallery[0] != cover:
+        gallery = [cover] if cover else []
+    fields["image_url"] = public_image_url(cover)
+    fields["image_urls"] = [public_image_url(url) for url in gallery]
+    return fields
+
+
+def verification_status(extra: dict | None) -> str:
+    extra = extra or {}
+    if extra.get("verified") is True:
+        return "verified"
+    return extra.get("verification_status") if extra.get("verification_status") in ("requested", "rejected") else "none"
+
+
+class OwnerListingOut(ListingOut):
+    """A listing as its own owner sees it: the public view plus where its
+    verification request stands."""
+    verification_status: Literal["none", "requested", "verified", "rejected"] = "none"
+
+    @model_validator(mode="before")
+    @classmethod
+    def _public_view(cls, data):
+        raw_extra = data.get("extra") if isinstance(data, dict) else getattr(data, "extra", None)
+        fields = _listing_fields(cls, data)
+        fields["verification_status"] = verification_status(raw_extra)
         return fields
+
+
+class VerificationRequestOut(BaseModel):
+    """One pending "please verify my space" request, for the admin queue."""
+    id: int
+    title: str
+    location: str
+    space_type: str
+    image_url: str | None
+    owner_id: int
+    owner_name: str
+    owner_email: str
+
+
+class VerificationDecision(BaseModel):
+    approve: bool
 
 
 class ListingPage(BaseModel):

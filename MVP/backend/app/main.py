@@ -4,8 +4,6 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from slowapi import _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
 from sqlalchemy import delete, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -28,6 +26,7 @@ from app.models import (
     User,
 )
 from app.pricing import ADDON_CATALOG, inclusive_days, min_booking_days, quote_cart, quote_line
+from app.ratelimit import client_ip
 from app.schemas import (
     AddonOut,
     BookingOut,
@@ -48,21 +47,33 @@ from app.schemas import (
     ListingUpdate,
     LoginRequest,
     OwnerBookingOut,
+    OwnerListingOut,
     PasswordChangeRequest,
     PaymentDetailOut,
     RegisterRequest,
     Token,
     UserOut,
+    VerificationDecision,
+    VerificationRequestOut,
 )
 from app.security import create_token, current_user, limiter, password_context, require_roles
 
 settings = get_settings()
 
-app = FastAPI(title="AdSpace MVP API", version="1.0.0", description="Backend API for OOH marketplace, bookings and VAS operations.", docs_url=None if settings.app_env == "production" else "/docs", redoc_url=None)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+_production = settings.app_env.strip().lower() == "production"
+# The schema and docs are a map of every route: development only.
+app = FastAPI(
+    title="AdSpace MVP API", version="1.0.0", description="Backend API for OOH marketplace, bookings and VAS operations.",
+    docs_url=None if _production else "/docs", redoc_url=None, openapi_url=None if _production else "/openapi.json",
+)
 app.add_middleware(CORSMiddleware, allow_origins=settings.origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.hosts if settings.app_env == "production" else ["*"])
+
+
+#: The API only ever returns JSON, so nothing it serves may load anything or be framed.
+_API_CSP = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+#: The interactive docs (development only) load Swagger UI from a CDN.
+_DOCS_PATHS = ("/docs", "/openapi.json")
 
 
 @app.middleware("http")
@@ -71,6 +82,12 @@ async def security_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    if not request.url.path.startswith(_DOCS_PATHS):
+        response.headers["Content-Security-Policy"] = _API_CSP
+    if get_settings().app_env.strip().lower() == "production":
+        response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains"
     return response
 
 
@@ -80,8 +97,8 @@ def health():
 
 
 @app.post("/api/v1/auth/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-@limiter.limit("5/minute")
 def register(request: Request, payload: RegisterRequest, db: Session = Depends(get_db)):
+    limiter.hit(db, f"register-ip:{client_ip(request)}", limit=5, window_seconds=60)
     if db.scalar(select(User).where(func.lower(User.email) == payload.email)):
         raise HTTPException(status_code=400, detail="Email is already registered")
     user = User(email=str(payload.email), full_name=payload.full_name, password_hash=password_context.hash(payload.password), role=payload.role)
@@ -90,8 +107,11 @@ def register(request: Request, payload: RegisterRequest, db: Session = Depends(g
 
 
 @app.post("/api/v1/auth/login", response_model=Token)
-@limiter.limit("10/minute")
 def login(request: Request, payload: LoginRequest, db: Session = Depends(get_db)):
+    # Per address, and per account: a botnet spreading guesses for one password
+    # across many addresses still runs into the second limit.
+    limiter.hit(db, f"login-ip:{client_ip(request)}", limit=10, window_seconds=60)
+    limiter.hit(db, f"login-email:{payload.email}", limit=10, window_seconds=900)
     # Emails are stored lower-cased now; lower() still finds rows written before that.
     user = db.scalar(select(User).where(func.lower(User.email) == payload.email))
     if not user or not _password_matches(user, payload.password):
@@ -111,7 +131,6 @@ def _password_matches(user: User, password: str) -> bool:
 
 
 @app.post("/api/v1/auth/google", response_model=GoogleAuthResponse)
-@limiter.limit("10/minute")
 def google_sign_in(request: Request, payload: GoogleAuthRequest, db: Session = Depends(get_db)):
     """Sign in, or sign up, with a Google Identity Services ID token.
 
@@ -121,6 +140,7 @@ def google_sign_in(request: Request, payload: GoogleAuthRequest, db: Session = D
     account's role is never changed here. A new account needs a role; without
     one the caller gets `needs_role` back and nothing is created.
     """
+    limiter.hit(db, f"google-ip:{client_ip(request)}", limit=10, window_seconds=60)
     client_id = get_settings().google_client_id
     if not client_id:
         raise HTTPException(status_code=503, detail="Google sign-in is not configured")
@@ -165,7 +185,6 @@ def me(user: User = Depends(current_user)):
 
 
 @app.post("/api/v1/auth/password", response_model=Token)
-@limiter.limit("5/minute")
 def change_password(request: Request, payload: PasswordChangeRequest, user: User = Depends(current_user), db: Session = Depends(get_db)):
     """Rotate the caller's own password and hand back a fresh token.
 
@@ -177,6 +196,7 @@ def change_password(request: Request, payload: PasswordChangeRequest, user: User
     Previously issued tokens stop working: each carries a stamp of the credential
     it was issued against (see `credential_stamp`), and the new hash changes it.
     """
+    limiter.hit(db, f"password-user:{user.id}", limit=5, window_seconds=60)
     if not user.password_hash:
         raise HTTPException(status_code=400, detail="This account signs in with Google and has no password to change")
     if not _password_matches(user, payload.current_password):
@@ -319,11 +339,25 @@ def get_listing(listing_id: int, db: Session = Depends(get_db), viewer: User | N
     return listing
 
 
+#: `extra` keys only the server writes: the "Verified" badge is granted by an
+#: admin (see the verification routes below), never declared by the owner.
+VERIFICATION_KEYS = ("verified", "verification_status")
+
+
+def _owner_extra(submitted: dict | None, current: dict | None) -> dict | None:
+    """The owner's `extra`, with the server-controlled keys taken from `current`."""
+    extra = {k: v for k, v in (submitted or {}).items() if k not in VERIFICATION_KEYS}
+    extra |= {k: v for k, v in (current or {}).items() if k in VERIFICATION_KEYS}
+    return extra or None
+
+
 @app.post("/api/v1/listings", response_model=ListingOut, status_code=status.HTTP_201_CREATED)
 def create_listing(payload: ListingCreate, owner: User = Depends(require_roles(Role.owner)), db: Session = Depends(get_db)):
     # POC auto-approves every submission; pending/rejected stay unused until an admin
     # review flow exists (see rejection_reason column, also currently unused).
-    listing = Listing(owner_id=owner.id, status=ListingStatus.active, **payload.model_dump())
+    fields = payload.model_dump()
+    fields["extra"] = _owner_extra(fields["extra"], None)
+    listing = Listing(owner_id=owner.id, status=ListingStatus.active, **fields)
     db.add(listing); db.commit(); db.refresh(listing)
     return listing
 
@@ -333,7 +367,9 @@ def update_listing(listing_id: int, payload: ListingUpdate, owner: User = Depend
     listing = db.get(Listing, listing_id)
     if not listing or listing.owner_id != owner.id or listing.status == ListingStatus.archived:
         raise HTTPException(status_code=404, detail="Listing not found")
-    for field, value in payload.model_dump().items():
+    fields = payload.model_dump()
+    fields["extra"] = _owner_extra(fields["extra"], listing.extra)
+    for field, value in fields.items():
         setattr(listing, field, value)
     db.commit(); db.refresh(listing)
     return listing
@@ -353,7 +389,7 @@ def archive_listing(listing_id: int, owner: User = Depends(require_roles(Role.ow
     return None
 
 
-@app.get("/api/v1/owner/listings", response_model=list[ListingOut])
+@app.get("/api/v1/owner/listings", response_model=list[OwnerListingOut])
 def owner_listings(owner: User = Depends(require_roles(Role.owner)), db: Session = Depends(get_db)):
     return db.scalars(select(Listing).where(Listing.owner_id == owner.id).order_by(Listing.created_at.desc())).all()
 
@@ -688,11 +724,11 @@ def list_addons():
 
 
 @app.post("/api/v1/leads", response_model=LeadOut, status_code=status.HTTP_201_CREATED)
-@limiter.limit("5/minute")
 def create_lead(request: Request, payload: LeadCreate, viewer: User | None = Depends(optional_user), db: Session = Depends(get_db)):
     """Public on purpose: most people asking for a call back have no account.
     A signed-in caller is attached so sales can see who they are; a stale token
     is ignored rather than turning a sales enquiry into a 401."""
+    limiter.hit(db, f"lead-ip:{client_ip(request)}", limit=5, window_seconds=60)
     if payload.listing_id is not None and db.get(Listing, payload.listing_id) is None:
         raise HTTPException(status_code=422, detail="Listing not found")
     lead = Lead(**payload.model_dump(), user_id=viewer.id if viewer else None)
@@ -709,3 +745,62 @@ def create_lead(request: Request, payload: LeadCreate, viewer: User | None = Dep
 @app.get("/api/v1/leads", response_model=list[LeadOut])
 def list_leads(admin: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)):
     return db.scalars(select(Lead).order_by(Lead.created_at.desc(), Lead.id.desc())).all()
+
+
+# --- Verification ------------------------------------------------------------
+# The "Verified" badge is `extra.verified`, and only an admin sets it. An owner
+# asks (`extra.verification_status = "requested"`); an admin approves (badge on,
+# status cleared) or rejects (badge off, status "rejected", owner may ask again).
+# JSON columns are not mutation-tracked, so `extra` is always replaced whole.
+
+
+def _owned_listing(db: Session, listing_id: int, owner: User) -> Listing:
+    listing = db.get(Listing, listing_id)
+    if not listing or listing.owner_id != owner.id or listing.status == ListingStatus.archived:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    return listing
+
+
+@app.post("/api/v1/listings/{listing_id}/verification", response_model=OwnerListingOut)
+def request_verification(listing_id: int, owner: User = Depends(require_roles(Role.owner)), db: Session = Depends(get_db)):
+    listing = _owned_listing(db, listing_id, owner)
+    extra = dict(listing.extra or {})
+    if extra.get("verified") is True:
+        raise HTTPException(status_code=409, detail="This space is already verified")
+    extra["verification_status"] = "requested"
+    listing.extra = extra
+    db.commit(); db.refresh(listing)
+    return listing
+
+
+@app.get("/api/v1/admin/verification-requests", response_model=list[VerificationRequestOut])
+def verification_requests(admin: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)):
+    rows = db.execute(
+        select(Listing, User).join(User, Listing.owner_id == User.id)
+        .where(Listing.status != ListingStatus.archived).order_by(Listing.updated_at.asc(), Listing.id.asc())
+    ).all()
+    return [
+        {
+            "id": listing.id, "title": listing.title, "location": listing.location, "space_type": listing.space_type,
+            "image_url": public_image_url(listing.image_url), "owner_id": owner.id,
+            "owner_name": owner.full_name, "owner_email": owner.email,
+        }
+        for listing, owner in rows
+        if (listing.extra or {}).get("verification_status") == "requested"
+    ]
+
+
+@app.post("/api/v1/admin/listings/{listing_id}/verification", response_model=ListingOut)
+def decide_verification(listing_id: int, payload: VerificationDecision, admin: User = Depends(require_roles(Role.admin)), db: Session = Depends(get_db)):
+    listing = db.get(Listing, listing_id)
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    extra = dict(listing.extra or {})
+    extra["verified"] = payload.approve
+    if payload.approve:
+        extra.pop("verification_status", None)
+    else:
+        extra["verification_status"] = "rejected"
+    listing.extra = extra
+    db.commit(); db.refresh(listing)
+    return listing
