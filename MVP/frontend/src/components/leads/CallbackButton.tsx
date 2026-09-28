@@ -92,7 +92,7 @@ export function CallbackButton({ reason, source, listingId, className = "", chil
 
   const dialog = (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/40 p-4"
+      className="fade-in fixed inset-0 z-[100] flex items-center justify-center bg-primary/40 p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) setOpen(false);
       }}
@@ -104,7 +104,7 @@ export function CallbackButton({ reason, source, listingId, className = "", chil
         onKeyDown={(event) => {
           if (event.key === "Escape") setOpen(false);
         }}
-        className="relative w-full max-w-md border border-border-subtle bg-white p-8 text-left text-primary shadow-xl sm:p-10"
+        className="pop-in relative w-full max-w-md border border-border-subtle bg-white p-8 text-left text-primary shadow-xl sm:p-10"
       >
         <button
           type="button"

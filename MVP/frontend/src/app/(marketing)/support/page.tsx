@@ -160,7 +160,7 @@ function faqId(faq: FaqEntry): string {
  */
 export default function SupportPage() {
   return (
-    <div className="font-epilogue">
+    <div className="scroll-sections font-epilogue">
       {/* ================= HERO ================= */}
       <section className="border-b border-border-subtle bg-white px-8 py-24 md:px-16">
         <div className="mx-auto flex max-w-6xl flex-col items-end gap-12 md:flex-row">

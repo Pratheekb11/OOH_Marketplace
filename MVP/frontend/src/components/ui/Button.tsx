@@ -8,11 +8,11 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   // Standard CTA — bg-primary/hover:bg-secondary, uppercase tracking-widest,
   // matches nav "Sign In" and most form-submit buttons across the prototype.
   primary:
-    "bg-primary text-white uppercase tracking-widest text-xs font-bold hover:bg-secondary",
+    "sheen bg-primary text-white uppercase tracking-widest text-xs font-bold hover:bg-secondary",
   // .brand-gradient + scale interaction — used for Book Now / Proceed to
   // Payment, the prototype's highest-emphasis actions.
   gradient:
-    "brand-gradient text-white uppercase tracking-widest text-xs font-bold hover:scale-[1.02] active:scale-95",
+    "sheen brand-gradient text-white uppercase tracking-widest text-xs font-bold hover:scale-[1.02] active:scale-95",
   outline:
     "border border-primary text-primary uppercase tracking-widest text-xs font-bold hover:bg-primary hover:text-white",
   ghost:
@@ -54,7 +54,7 @@ export function Button<T extends ElementType = "button">({
   const Component = (href ? Link : (as ?? "button")) as ElementType;
   const isPlainButton = Component === "button";
   const classes = [
-    "inline-flex items-center justify-center gap-2 rounded-lg transition-smooth",
+    "inline-flex items-center justify-center gap-2 rounded-lg transition-smooth active:scale-[0.97]",
     "disabled:opacity-50 disabled:pointer-events-none",
     VARIANT_CLASSES[variant],
     SIZE_CLASSES[size],

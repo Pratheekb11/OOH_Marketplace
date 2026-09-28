@@ -41,7 +41,7 @@ export function NavShellB() {
   const appLinks = [...COMMON_LINKS, ...roleLinks, ...TRAILING_LINKS];
 
   return (
-    <nav className="sticky top-0 z-50 flex w-full items-center justify-between bg-slate-50/60 px-8 py-4 backdrop-blur-xl">
+    <nav className="nav-lift sticky top-0 z-50 flex w-full items-center justify-between bg-slate-50/60 px-8 py-4 backdrop-blur-xl">
       <div className="flex items-center gap-12">
         <Link href="/" className="font-headline text-2xl font-bold tracking-tighter text-primary">
           Ad<span className="text-secondary">Space</span>

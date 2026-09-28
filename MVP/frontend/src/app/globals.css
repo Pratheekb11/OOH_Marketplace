@@ -234,6 +234,246 @@
     }
   }
 
+  /* ---------------------------------------------------------------------
+     Site-wide motion layer. Same light register, same palette — these only
+     add movement at the points a visitor's eye should land on. Every rule
+     here has a counterpart in the prefers-reduced-motion block at the end.
+     --------------------------------------------------------------------- */
+
+  /* Route entrance, applied by each route group's template.tsx. Fill mode is
+     `backwards`, not `both`: a lingering transform would make the wrapper a
+     containing block for position:fixed descendants once the animation ends. */
+  .page-enter {
+    animation: page-enter 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  @keyframes page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  /* Reading-progress hairline under the sticky nav and the nav's shadow once
+     the page scrolls. Both are CSS scroll-driven — no scroll listener — and
+     simply absent in browsers without animation-timeline. */
+  .scroll-progress {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .scroll-progress {
+      display: block;
+      transform-origin: left;
+      animation: scroll-progress linear both;
+      animation-timeline: scroll(root);
+    }
+
+    .nav-lift {
+      animation: nav-lift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 160px;
+    }
+
+    /* Whole-section entrance for pages without hand-placed Reveal blocks. */
+    .scroll-sections > section:not(:first-child) {
+      animation: section-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+
+  @keyframes scroll-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes nav-lift {
+    to {
+      box-shadow: 0 10px 30px -18px rgba(10, 31, 68, 0.35);
+    }
+  }
+
+  @keyframes section-in {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Staggered entrance for grids; the caller sets --i per item. Capped so
+     the 40th card of a long page does not wait two seconds. */
+  .stagger-in {
+    animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: calc(min(var(--i, 0), 8) * 70ms);
+  }
+
+  /* Light sweep across solid CTAs on hover. */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      110deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.28) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .sheen:hover::after {
+    transform: translateX(120%);
+  }
+
+  /* Hairlines that draw themselves: inside a Reveal they wait for .is-in;
+     standalone (.draw-in) they play on load after --rise-delay. */
+  .reveal .draw-x {
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+  }
+
+  .reveal.is-in .draw-x {
+    transform: scaleX(1);
+  }
+
+  .draw-in {
+    transform-origin: left;
+    animation: draw-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  @keyframes draw-in {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  /* Photographs uncover top-to-bottom when their Reveal enters. */
+  .reveal .wipe {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1.2s cubic-bezier(0.77, 0, 0.18, 1) 0.1s;
+  }
+
+  .reveal.is-in .wipe {
+    clip-path: inset(0);
+  }
+
+  /* Hero photograph: a curtain wipe, then a slow settle out of a zoom. */
+  .hero-wipe {
+    animation: hero-wipe 1.4s cubic-bezier(0.77, 0, 0.18, 1) backwards;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  @keyframes hero-wipe {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0);
+    }
+  }
+
+  .ken-burns {
+    animation: ken-burns 3.2s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  @keyframes ken-burns {
+    from {
+      transform: scale(1.15);
+    }
+  }
+
+  /* Gentle bob on the hero stat card, so the one live number keeps the eye. */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  /* Dialogs, the mobile menu and toasts. */
+  .fade-in {
+    animation: fade-in 0.25s ease-out backwards;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .pop-in {
+    animation: pop-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.97);
+    }
+  }
+
+  .slide-in-right {
+    animation: slide-in-right 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+  }
+
+  /* Skeleton shimmer — a moving highlight reads as "loading" more clearly
+     than a pulse. */
+  .shimmer {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.55) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 150% 0;
+    }
+    to {
+      background-position: -50% 0;
+    }
+  }
+
   /* Marketplace map pins (components/marketplace/MapPanel.tsx). Leaflet
      places the icon's top-left corner on the point; the translate hangs the
      price label above it instead. */
@@ -298,7 +538,34 @@
 
   .rise,
   .ring-slow,
-  .ring-fast {
-    animation: none;
+  .ring-fast,
+  .page-enter,
+  .scroll-progress,
+  .stagger-in,
+  .draw-in,
+  .hero-wipe,
+  .ken-burns,
+  .float,
+  .fade-in,
+  .pop-in,
+  .slide-in-right,
+  .shimmer,
+  .scroll-sections > section {
+    animation: none !important;
+  }
+
+  .scroll-progress {
+    display: none;
+  }
+
+  .reveal .draw-x,
+  .reveal .wipe {
+    transform: none;
+    clip-path: none;
+    transition: none;
+  }
+
+  .sheen::after {
+    display: none;
   }
 }

@@ -26,7 +26,7 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 function toneClasses(tone: ToastTone): string {
-  const base = "glass-card rounded-xl p-4 shadow-lg border border-border-subtle text-on-surface";
+  const base = "slide-in-right glass-card rounded-xl p-4 shadow-lg border border-border-subtle text-on-surface";
   if (tone === "success") return `${base} border-l-4 border-l-tertiary-container`;
   if (tone === "error") return `${base} border-l-4 border-l-error`;
   return base;

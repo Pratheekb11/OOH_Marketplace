@@ -24,7 +24,7 @@ export const metadata = {
 // be a live number pulled from this app's real bookings).
 export default function PartnershipsPage() {
   return (
-    <main>
+    <main className="scroll-sections">
       {/* ================= HERO ================= */}
       <section className="relative flex min-h-[80vh] w-full items-center overflow-hidden">
         <div className="absolute inset-0 z-0">

@@ -66,12 +66,17 @@ export function NavShellA() {
 
   return (
     <nav
-      className={`sticky top-0 z-50 w-full px-6 py-5 transition-colors duration-300 sm:px-8 ${
+      className={`nav-lift sticky top-0 z-50 w-full px-6 py-5 transition-colors duration-300 sm:px-8 ${
         menuOpen
           ? "border-b border-border-subtle bg-white text-primary"
           : "border-b border-border-subtle bg-white/95 text-primary backdrop-blur-sm"
       }`}
     >
+      {/* Reading progress: a gold hairline along the nav's bottom edge. */}
+      <span
+        aria-hidden="true"
+        className="scroll-progress pointer-events-none absolute inset-x-0 -bottom-px z-50 h-0.5 bg-secondary"
+      />
       <div className="relative z-50 flex w-full items-center justify-between">
       <Link
         href="/"
@@ -128,11 +133,15 @@ export function NavShellA() {
       {menuOpen ? (
         <div
           id="mobile-menu"
-          className="fixed inset-0 z-40 flex flex-col overflow-y-auto bg-white px-6 pb-12 pt-28 sm:px-8 lg:hidden"
+          className="fade-in fixed inset-0 z-40 flex flex-col overflow-y-auto bg-white px-6 pb-12 pt-28 sm:px-8 lg:hidden"
         >
           <ul className="flex flex-col">
-            {PRIMARY_LINKS.map((link) => (
-              <li key={link.label} className="border-b border-border-subtle">
+            {PRIMARY_LINKS.map((link, i) => (
+              <li
+                key={link.label}
+                className="stagger-in border-b border-border-subtle"
+                style={{ "--i": i + 1 } as React.CSSProperties}
+              >
                 <Link
                   href={link.href}
                   onClick={() => setMenuOpen(false)}

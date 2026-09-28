@@ -116,7 +116,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-start justify-center bg-primary/40 px-4 pt-[12vh] backdrop-blur-sm"
+      className="fade-in fixed inset-0 z-[200] flex items-start justify-center bg-primary/40 px-4 pt-[12vh] backdrop-blur-sm"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -126,7 +126,7 @@ export function SearchModal({ open, onClose }: SearchModalProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Search listings"
-        className="glass-card w-full max-w-xl overflow-hidden rounded-2xl border border-border-subtle shadow-2xl"
+        className="pop-in glass-card w-full max-w-xl overflow-hidden rounded-2xl border border-border-subtle shadow-2xl"
       >
         <div className="flex items-center gap-3 border-b border-border-subtle px-5 py-4">
           <Icon name="search" className="text-on-surface-variant" />

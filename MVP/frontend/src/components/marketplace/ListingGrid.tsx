@@ -74,8 +74,8 @@ export function ListingGrid({ listings, loading, error, onClearFilters, hasActiv
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-      {listings.map((listing) => (
-        <ListingCard key={listing.id} listing={listing} />
+      {listings.map((listing, i) => (
+        <ListingCard key={listing.id} listing={listing} index={i} />
       ))}
     </div>
   );

@@ -27,6 +27,8 @@ function formatSize(listing: ListingOut): string | null {
 
 export interface ListingCardProps {
   listing: ListingOut;
+  /** Position in the grid; drives the staggered entrance delay. */
+  index?: number;
 }
 
 /**
@@ -35,7 +37,7 @@ export interface ListingCardProps {
  * images) — the onError handler swaps to a branded placeholder instead of a
  * broken-image glyph.
  */
-export function ListingCard({ listing }: ListingCardProps) {
+export function ListingCard({ listing, index = 0 }: ListingCardProps) {
   const [imageFailed, setImageFailed] = useState(false);
   const showImage = Boolean(listing.image_url) && !imageFailed;
   const displayPrice = listing.extra?.display_price;
@@ -46,8 +48,14 @@ export function ListingCard({ listing }: ListingCardProps) {
   return (
     <Link
       href={`/listings/${listing.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-surface-container bg-surface-container-lowest transition-all duration-300 hover:shadow-[0_20px_50px_rgba(10,31,68,0.08)]"
+      style={{ "--i": index } as React.CSSProperties}
+      className="stagger-in group relative flex flex-col overflow-hidden rounded-xl border border-surface-container bg-surface-container-lowest transition-all duration-300 hover:-translate-y-1 hover:border-secondary/30 hover:shadow-[0_20px_50px_rgba(10,31,68,0.12)]"
     >
+      {/* Gold accent that sweeps across the top edge on hover. */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 z-10 h-0.5 origin-left scale-x-0 bg-secondary transition-transform duration-500 group-hover:scale-x-100"
+      />
       <div className="relative h-48 overflow-hidden bg-surface-container-high">
         {showImage ? (
           <Image
@@ -55,7 +63,7 @@ export function ListingCard({ listing }: ListingCardProps) {
             alt={listing.title}
             fill
             sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 90vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             onError={() => setImageFailed(true)}
           />
         ) : (
@@ -110,8 +118,12 @@ export function ListingCard({ listing }: ListingCardProps) {
             <Icon name="trending_up" className="!text-sm text-secondary" />
             {formatCount(listing.footfall_estimate)}
           </span>
-          <span className="rounded-lg bg-primary px-4 py-1.5 text-[10px] font-bold text-white transition-colors group-hover:bg-secondary">
+          <span className="flex items-center gap-0 rounded-lg bg-primary px-4 py-1.5 text-[10px] font-bold text-white transition-all duration-300 group-hover:gap-1 group-hover:bg-secondary">
             Book
+            <Icon
+              name="arrow_forward"
+              className="!w-0 overflow-hidden !text-xs opacity-0 transition-all duration-300 group-hover:!w-3 group-hover:opacity-100"
+            />
           </span>
         </div>
       </div>

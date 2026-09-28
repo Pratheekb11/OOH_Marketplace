@@ -27,9 +27,11 @@ import CallbackButton from "@/components/leads/CallbackButton";
 //      marketplace instead of a single hardcoded listing id, which would rot
 //      the moment the catalogue is re-imported.
 //
-// Motion is additive only: scroll entrances via Reveal, a hero load sequence
-// via `.rise`, the prototype's own counter-rotating rings in Institutional
-// Support, and one count-up on the hero stat. Every one of them is neutralised
+// Motion is additive only: scroll entrances via Reveal (with self-drawing
+// hairlines and photographs that wipe in), a hero load sequence via `.rise`
+// and a curtain wipe on the hero photograph, the prototype's own
+// counter-rotating rings in Institutional Support, and one count-up on the
+// floating hero stat. Every one of them is neutralised
 // under prefers-reduced-motion in globals.css.
 
 const PILLARS = [
@@ -155,7 +157,10 @@ export default function LandingPage() {
                 className="rise mb-8 flex items-center gap-4"
                 style={{ "--rise-delay": "80ms" } as React.CSSProperties}
               >
-                <span className="h-px w-12 bg-secondary" />
+                <span
+                  className="draw-in h-px w-12 bg-secondary"
+                  style={{ "--rise-delay": "300ms" } as React.CSSProperties}
+                />
                 <span className="font-inter text-[11px] font-bold uppercase tracking-[0.2em] text-secondary">
                   Bengaluru OOH Direct
                 </span>
@@ -172,7 +177,14 @@ export default function LandingPage() {
                   className="rise block font-normal italic"
                   style={{ "--rise-delay": "280ms" } as React.CSSProperties}
                 >
-                  Media Placements.
+                  <span className="relative inline-block">
+                    Media Placements.
+                    <span
+                      aria-hidden="true"
+                      className="draw-in absolute -bottom-2 left-0 h-[3px] w-28 bg-secondary"
+                      style={{ "--rise-delay": "900ms" } as React.CSSProperties}
+                    />
+                  </span>
                 </span>
               </h1>
 
@@ -190,7 +202,7 @@ export default function LandingPage() {
               >
                 <Link
                   href="/marketplace"
-                  className="group inline-flex items-center gap-3 bg-primary px-10 py-4 font-inter text-xs font-bold uppercase tracking-[0.15em] text-white transition-all hover:bg-secondary"
+                  className="sheen group inline-flex items-center gap-3 bg-primary px-10 py-4 font-inter text-xs font-bold uppercase tracking-[0.15em] text-white transition-all hover:bg-secondary"
                 >
                   View Inventory
                   <Icon
@@ -209,18 +221,22 @@ export default function LandingPage() {
               className="rise relative mt-16 lg:col-span-5 lg:mt-0"
               style={{ "--rise-delay": "640ms" } as React.CSSProperties}
             >
-              <div className="group relative z-10 aspect-[4/5] w-full border border-primary/10 lg:aspect-auto lg:h-full">
+              <div
+                className="hero-wipe group relative z-10 aspect-[4/5] w-full overflow-hidden border border-primary/10 lg:aspect-auto lg:h-full"
+                style={{ "--rise-delay": "640ms" } as React.CSSProperties}
+              >
                 <Image
                   src="/images/hero/landing-hero.jpg"
                   alt="Lit hoardings above night traffic on a city arterial road"
                   fill
                   priority
                   sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="object-cover grayscale-[20%] transition-all duration-700 group-hover:grayscale-0"
+                  className="ken-burns object-cover grayscale-[20%] transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
+                  style={{ "--rise-delay": "640ms" } as React.CSSProperties}
                 />
               </div>
 
-              <div className="absolute -bottom-6 right-4 z-20 min-w-[240px] border border-border-subtle bg-white p-8 shadow-sm sm:-right-6">
+              <div className="float absolute -bottom-6 right-4 z-20 min-w-[240px] border border-border-subtle bg-white p-8 shadow-sm sm:-right-6">
                 <div className="mb-1 font-headline text-4xl font-bold text-primary">
                   <CountUp to={250} suffix="K+" />
                 </div>
@@ -244,7 +260,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 gap-16 md:grid-cols-3">
             {PILLARS.map((pillar, i) => (
               <Reveal key={pillar.title} delay={i * 110} className="space-y-6">
-                <div className="text-secondary">
+                <div className="inline-flex h-16 w-16 items-center justify-center border border-border-subtle text-secondary transition-all duration-500 hover:-translate-y-1 hover:border-secondary hover:bg-secondary hover:text-white">
                   <Icon name={pillar.icon} className="!text-4xl" />
                 </div>
                 <h3 className="font-headline text-xl font-bold tracking-tight text-primary">
@@ -269,7 +285,7 @@ export default function LandingPage() {
               <h2 className="mb-4 font-headline text-4xl font-bold text-primary">
                 Marketplace Selects
               </h2>
-              <div className="h-1 w-20 bg-primary" />
+              <div className="draw-x h-1 w-20 bg-primary" />
             </div>
             <Link
               href="/marketplace"
@@ -293,7 +309,7 @@ export default function LandingPage() {
                 {/* Grid items stretch, and the two stacked side cards are the
                     taller column — so the photograph takes the slack rather
                     than leaving a blank panel under the caption. */}
-                <div className="relative aspect-[16/9] flex-1 overflow-hidden md:aspect-auto md:min-h-[20rem]">
+                <div className="wipe relative aspect-[16/9] flex-1 overflow-hidden md:aspect-auto md:min-h-[20rem]">
                   <Image
                     src={SELECTS.feature.image}
                     alt={SELECTS.feature.alt}
@@ -333,13 +349,13 @@ export default function LandingPage() {
                     href={`/marketplace?space_type=${encodeURIComponent(card.spaceType)}`}
                     className="group flex h-full cursor-pointer flex-col overflow-hidden border border-border-subtle bg-white transition-colors hover:border-primary"
                   >
-                    <div className="relative aspect-video overflow-hidden">
+                    <div className="wipe relative aspect-video overflow-hidden">
                       <Image
                         src={card.image}
                         alt={card.alt}
                         fill
                         sizes="(min-width: 768px) 40vw, 100vw"
-                        className="object-cover grayscale transition-all duration-700 group-hover:grayscale-0"
+                        className="object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
                       />
                     </div>
                     <div className="p-6">
@@ -480,7 +496,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl">
           <Reveal className="mb-16 max-w-2xl">
             <div className="mb-6 flex items-center gap-4">
-              <span className="h-px w-12 bg-accent" />
+              <span className="draw-x h-px w-12 bg-accent" />
               <span className="font-inter text-[11px] font-bold uppercase tracking-[0.2em] text-accent">
                 For Media Owners
               </span>
