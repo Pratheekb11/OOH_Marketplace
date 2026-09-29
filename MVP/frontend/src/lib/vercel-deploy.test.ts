@@ -13,7 +13,7 @@ const script = `${repoRoot}scripts/vercel-ignore-build.sh`;
 
 function run(env: Record<string, string>) {
   return spawnSync("bash", [script], {
-    env: { PATH: process.env.PATH ?? "", ...env },
+    env: { PATH: process.env.PATH ?? "", NODE_ENV: "test", ...env },
     encoding: "utf8",
   }).status;
 }
