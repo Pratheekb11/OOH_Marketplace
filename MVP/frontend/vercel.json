@@ -6,5 +6,5 @@
       "destination": "https://ooh-marketplace-virid.vercel.app/api/v1/:path*"
     }
   ],
-  "ignoreCommand": "bash ../../scripts/vercel-ignore-build.sh"
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" != main ]; then exit 0; fi; case \"$VERCEL_GIT_COMMIT_MESSAGE\" in *\"[deploy]\"*) exit 1;; esac; exit 0"
 }

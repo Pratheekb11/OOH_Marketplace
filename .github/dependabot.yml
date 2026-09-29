@@ -1,5 +1,5 @@
-# Monthly dependency PRs (Vercel never builds them; see
-# scripts/vercel-ignore-build.sh). Grouped so a quiet month produces one PR per ecosystem
+# Monthly dependency PRs (Vercel never builds them; see ignoreCommand in each
+# vercel.json). Grouped so a quiet month produces one PR per ecosystem
 # instead of six, and capped so a busy month cannot bury real work.
 version: 2
 
