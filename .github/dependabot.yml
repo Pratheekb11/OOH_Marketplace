@@ -1,13 +1,13 @@
-# Weekly dependency PRs. Grouped so a quiet week produces one PR per ecosystem
-# instead of six, and capped so a busy week cannot bury real work.
+# Monthly dependency PRs (Vercel never builds them; see
+# scripts/vercel-ignore-build.sh). Grouped so a quiet month produces one PR per ecosystem
+# instead of six, and capped so a busy month cannot bury real work.
 version: 2
 
 updates:
   - package-ecosystem: npm
     directory: /MVP/frontend
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
     open-pull-requests-limit: 5
     groups:
       # Next/React/Tailwind majors are deliberate, re-tested decisions (see the
@@ -19,8 +19,7 @@ updates:
   - package-ecosystem: pip
     directory: /MVP/backend
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
     open-pull-requests-limit: 5
     groups:
       backend-minor-and-patch:
@@ -29,8 +28,7 @@ updates:
   - package-ecosystem: pip
     directory: /backend
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
     open-pull-requests-limit: 5
     groups:
       legacy-backend-minor-and-patch:
@@ -39,8 +37,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
     open-pull-requests-limit: 5
     groups:
       actions:

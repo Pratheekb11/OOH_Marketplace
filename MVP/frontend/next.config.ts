@@ -39,6 +39,11 @@ const nextConfig: NextConfig = {
   ...(isExport
     ? {}
     : {
+        // Listing photos are already pre-sized JPEGs. Sending ~2,800 of them
+        // through /_next/image burns the Vercel Hobby plan's image
+        // optimisation quota for little gain, so serve them straight from
+        // the static CDN.
+        images: { unoptimized: true },
         async headers() {
           return [
             {
