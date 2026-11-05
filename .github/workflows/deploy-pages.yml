@@ -81,7 +81,7 @@ jobs:
         run: touch out/.nojekyll
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           # Relative to the workspace root — `defaults.run.working-directory`
           # only applies to `run` steps, not to action inputs.
